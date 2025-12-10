@@ -2,12 +2,13 @@
 # pylint: disable=redefined-outer-name
 from datetime import datetime
 from urllib.parse import urlencode
+
 import pytest
 
 from course_catalog.etl.constants import COMMON_HEADERS
 from course_catalog.etl.openedx import (
-    openedx_extract_transform_factory,
     OpenEdxConfiguration,
+    openedx_extract_transform_factory,
 )
 from open_discussions.test_utils import any_instance_of
 
@@ -79,10 +80,8 @@ def test_extract(mocked_responses, openedx_config, openedx_extract_transform):
 @pytest.mark.usefixtures("mocked_responses")
 @pytest.mark.parametrize("config_arg_idx", range(6))
 def test_extract_disabled(openedx_config, config_arg_idx):
+    """Verify that extract() exits with no API call if configuration is missing
     """
-    Verify that extract() exits with no API call if configuration is missing
-    """
-
     args = list(openedx_config)
     args[config_arg_idx] = None
 

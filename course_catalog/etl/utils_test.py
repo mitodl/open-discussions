@@ -82,8 +82,7 @@ def test_log_exceptions(mocker, side_effect):
 @pytest.mark.parametrize("has_bucket", [True, False])
 @pytest.mark.parametrize("metadata", [None, {"foo": "bar"}])
 def test_sync_s3_text(mock_ocw_learning_bucket, has_bucket, metadata):
-    """
-    Verify data is saved to S3 if a bucket and metadata are provided
+    """Verify data is saved to S3 if a bucket and metadata are provided
     """
     key = "fake_key"
     sync_s3_text(mock_ocw_learning_bucket.bucket if has_bucket else None, key, metadata)
@@ -100,8 +99,7 @@ def test_sync_s3_text(mock_ocw_learning_bucket, has_bucket, metadata):
 @pytest.mark.parametrize("data", [b"data", b"", None])
 @pytest.mark.parametrize("headers", [None, {"a": "header"}])
 def test_extract_text_metadata(mocker, data, token, settings, headers):
-    """
-    Verify that tika is called and returns a response
+    """Verify that tika is called and returns a response
     """
     settings.TIKA_ACCESS_TOKEN = token
     mock_response = {"metadata": {"Author:": "MIT"}, "content": "Extracted text"}
@@ -213,8 +211,7 @@ def test_map_topics(mocker):
 
 
 def test_get_text_from_element():
-    """
-    get_text_from_element should walk through elements, extracting text, and ignoring script and style tags completely.
+    """get_text_from_element should walk through elements, extracting text, and ignoring script and style tags completely.
     """
     input_xml = """
     <vertical display_name="name">
@@ -311,7 +308,7 @@ def test_transform_content_files(mocker, has_metadata, matching_checksum):
 
 
 def test_documents_from_olx():
-    """test for documents_from_olx"""
+    """Test for documents_from_olx"""
     parsed_documents = get_olx_test_docs()
     assert len(parsed_documents) == 108
 

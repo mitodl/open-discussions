@@ -6,8 +6,8 @@ from authentication.backends.micromasters import MicroMastersAuth
 from authentication.exceptions import UserMissingSocialAuthException
 from authentication.strategy import DjangoRestFrameworkStrategy
 from authentication.utils import (
-    load_drf_strategy,
     jwt_get_username_from_payload_handler,
+    load_drf_strategy,
 )
 
 

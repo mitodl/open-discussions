@@ -26,14 +26,14 @@ def mock_prolearn_api_setting(settings):
 @pytest.fixture
 def mock_csail_programs_data():
     """Mock prolearn CSAIL programs data"""
-    with open("./test_json/prolearn_csail_programs.json", "r") as f:
+    with open("./test_json/prolearn_csail_programs.json") as f:
         return json.loads(f.read())
 
 
 @pytest.fixture
 def mock_mitpe_courses_data():
     """Mock prolearn Professional Education courses data"""
-    with open("./test_json/prolearn_mitpe_courses.json", "r") as f:
+    with open("./test_json/prolearn_mitpe_courses.json") as f:
         return json.loads(f.read())
 
 
@@ -48,7 +48,7 @@ def mocked_prolearn_programs_responses(
         settings.PROLEARN_CATALOG_API_URL,
         json=mock_csail_programs_data,
     )
-    yield mocked_responses
+    return mocked_responses
 
 
 @pytest.fixture
@@ -62,7 +62,7 @@ def mocked_prolearn_courses_responses(
         settings.PROLEARN_CATALOG_API_URL,
         json=mock_mitpe_courses_data,
     )
-    yield mocked_responses
+    return mocked_responses
 
 
 @pytest.mark.usefixtures("mocked_prolearn_programs_responses")

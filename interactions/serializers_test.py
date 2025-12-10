@@ -1,12 +1,12 @@
 """Tests for serializers"""
-from django.contrib.contenttypes.models import ContentType
 import pytest
+from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.factories import (
     CourseFactory,
+    ProgramFactory,
     UserListFactory,
     VideoFactory,
-    ProgramFactory,
 )
 from course_catalog.serializers import GenericForeignKeyFieldSerializer
 from interactions.serializers import (

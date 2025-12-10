@@ -18,7 +18,7 @@ def cassette_name(request):
 @pytest.fixture
 def cassette_exists(cassette_name):
     """Returns True if cassette exists"""
-    path = "cassettes/{}.json".format(cassette_name)
+    path = f"cassettes/{cassette_name}.json"
     return os.path.exists(path)
 
 
@@ -32,7 +32,7 @@ def use_betamax(request):
     return False
 
 
-@pytest.fixture()
+@pytest.fixture
 def configure_betamax(mocker, cassette_exists, request):
     """Configure betamax (deprecated - minimal implementation)"""
     setup_betamax("once" if cassette_exists is False else "none")
@@ -44,4 +44,4 @@ def configure_betamax(mocker, cassette_exists, request):
 
     urllib3.disable_warnings()
 
-    yield betamax_parametrized_recorder
+    return betamax_parametrized_recorder

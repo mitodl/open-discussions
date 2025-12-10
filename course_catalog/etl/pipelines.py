@@ -1,29 +1,28 @@
 """ETL pipelines"""
-from typing import List
 
-from toolz import compose, curry, curried
+from toolz import compose, curried, curry
 
+from course_catalog.constants import PlatformType
 from course_catalog.etl import (
-    micromasters,
     loaders,
+    micromasters,
     mitx,
-    xpro,
     mitxonline,
     ocw,
     oll,
-    video,
-    youtube,
     podcast,
     prolearn,
+    video,
+    xpro,
+    youtube,
 )
 from course_catalog.etl.constants import (
-    ProgramLoaderConfig,
     CourseLoaderConfig,
     LearningResourceRunLoaderConfig,
     OfferedByLoaderConfig,
+    ProgramLoaderConfig,
 )
-from course_catalog.constants import PlatformType
-from course_catalog.models import Program, Course
+from course_catalog.models import Course, Program
 
 # A few notes on how this module works:
 #
@@ -113,7 +112,7 @@ video_topics_etl = compose(loaders.load_videos, video.extract_videos_topics)
 podcast_etl = compose(loaders.load_podcasts, podcast.transform, podcast.extract)
 
 
-def prolearn_programs_etl() -> List[Program]:
+def prolearn_programs_etl() -> list[Program]:
     """Iterate through all supported prolearn platforms to import programs"""
     results = []
     for platform in prolearn.PROLEARN_DEPARTMENT_MAPPING.keys():
@@ -126,7 +125,7 @@ def prolearn_programs_etl() -> List[Program]:
     return results
 
 
-def prolearn_courses_etl() -> List[Course]:
+def prolearn_courses_etl() -> list[Course]:
     """Iterate through all supported prolearn platforms to import courses"""
     results = []
     for platform in prolearn.PROLEARN_DEPARTMENT_MAPPING.keys():

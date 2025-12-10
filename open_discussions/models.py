@@ -1,5 +1,4 @@
-"""
-Classes related to models for open_discussions
+"""Classes related to models for open_discussions
 """
 from django.db.models import DateTimeField, Model
 from django.db.models.query import QuerySet
@@ -8,13 +7,11 @@ from open_discussions.utils import now_in_utc
 
 
 class TimestampedModelQuerySet(QuerySet):
-    """
-    Subclassed QuerySet for TimestampedModelManager
+    """Subclassed QuerySet for TimestampedModelManager
     """
 
     def update(self, **kwargs):
-        """
-        Automatically update updated_on timestamp when .update(). This is because .update()
+        """Automatically update updated_on timestamp when .update(). This is because .update()
         does not go through .save(), thus will not auto_now, because it happens on the
         database level without loading objects into memory.
         """
@@ -24,8 +21,7 @@ class TimestampedModelQuerySet(QuerySet):
 
 
 class TimestampedModel(Model):
-    """
-    Base model for create/update timestamps
+    """Base model for create/update timestamps
     """
 
     objects = TimestampedModelQuerySet.as_manager()
@@ -37,8 +33,7 @@ class TimestampedModel(Model):
 
 
 class NoDefaultTimestampedModel(TimestampedModel):
-    """
-    This model is an alternative for TimestampedModel with one
+    """This model is an alternative for TimestampedModel with one
     important difference: it doesn't specify `auto_now` and `auto_now_add`.
     This allows us to pass in our own values without django overriding them.
     You'd typically use this model when backpopulating data from a source that

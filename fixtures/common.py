@@ -21,8 +21,7 @@ def silence_factory_logging():
 
 @pytest.fixture(autouse=True)
 def warnings_as_errors():
-    """
-    Convert warnings to errors. This should only affect unit tests, letting pylint and other plugins
+    """Convert warnings to errors. This should only affect unit tests, letting pylint and other plugins
     raise DeprecationWarnings without erroring.
     """
     try:
@@ -55,7 +54,7 @@ def randomness():
     factory.fuzzy.reseed_random("happy little clouds")
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_celery(mocker):
     """Mock object that patches certain celery functions"""
     exception_class = TabError
@@ -65,7 +64,7 @@ def mocked_celery(mocker):
     group_mock = mocker.patch("celery.group", autospec=True)
     chain_mock = mocker.patch("celery.chain", autospec=True)
 
-    yield SimpleNamespace(
+    return SimpleNamespace(
         replace=replace_mock,
         group=group_mock,
         chain=chain_mock,

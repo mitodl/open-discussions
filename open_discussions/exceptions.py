@@ -3,8 +3,7 @@ from rest_framework.views import exception_handler
 
 
 def api_exception_handler(exc, context):
-    """
-    Handles API exceptions by appending extra info
+    """Handles API exceptions by appending extra info
     """
     # Call REST framework's default exception handler first,
     # to get the standard error response.

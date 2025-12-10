@@ -1,12 +1,10 @@
-"""
-course_catalog constants
+"""course_catalog constants
 """
 from enum import Enum
 
 
 class OfferedBy(Enum):
-    """
-    Enum for our Offered By labels. They are our MIT "brands" for LearningResources
+    """Enum for our Offered By labels. They are our MIT "brands" for LearningResources
     (Courses, Bootcamps, Programs) and are independent of what platform.
     User generated lists UserLists (like a learning path) don't have offered by "brand".
     Values are user-facing.
@@ -26,8 +24,7 @@ class OfferedBy(Enum):
 
 
 class PlatformType(Enum):
-    """
-    Enum for platforms
+    """Enum for platforms
     """
 
     ocw = "ocw"
@@ -60,8 +57,7 @@ RESOURCE_FILE_PLATFORMS = [PlatformType.ocw.value, *EDX_PLATFORMS]
 
 
 class ResourceType(Enum):
-    """
-    Enum for resource types (for OCW and MitX)
+    """Enum for resource types (for OCW and MitX)
     """
 
     course = "course"
@@ -69,8 +65,7 @@ class ResourceType(Enum):
 
 
 class AvailabilityType(Enum):
-    """
-    Enum for Course availability options dictated by edX API values.
+    """Enum for Course availability options dictated by edX API values.
     While these are the options coming in from edX that we store as is, we
     display some values differently. Namely "Current" is displayed to the user
     as "Available Now" and "Archived" is displayed as "Prior".
@@ -85,8 +80,7 @@ class AvailabilityType(Enum):
 
 
 class UserListType(Enum):
-    """
-    Enum for UserLists. User-created lists that are not Learning Paths are displayed
+    """Enum for UserLists. User-created lists that are not Learning Paths are displayed
     to the user as "Your Lists"
     """
 
@@ -95,8 +89,7 @@ class UserListType(Enum):
 
 
 class StaffListType(Enum):
-    """
-    Enum for StaffList objects; sorted = staffpath, unsorted = stafflist
+    """Enum for StaffList objects; sorted = staffpath, unsorted = stafflist
     """
 
     PATH = "path"
@@ -104,8 +97,7 @@ class StaffListType(Enum):
 
 
 class PrivacyLevel(Enum):
-    """
-    Enum tracking privacy levels for user-created UserLists
+    """Enum tracking privacy levels for user-created UserLists
     """
 
     private = "private"

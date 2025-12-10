@@ -5,25 +5,25 @@ from open_discussions import features
 
 
 def channel_exists(view):
-    """
-    Return True (deprecated - channels removed)
+    """Return True (deprecated - channels removed)
 
     Args:
         view (rest_framework.views.APIView): django DRF view
 
     Returns:
         bool: True
+
     """
     return True
 
 
 def is_admin_user(request):
-    """
-    Args:
+    """Args:
         request (HTTPRequest): django request object
 
     Returns:
         bool: True if user is staff/admin
+
     """
     return request.user is not None and (
         request.user.is_staff or request.user.is_superuser
@@ -31,8 +31,7 @@ def is_admin_user(request):
 
 
 def is_moderator(request, view):
-    """
-    Helper function to check if a user is a moderator (deprecated - always False)
+    """Helper function to check if a user is a moderator (deprecated - always False)
 
     Args:
         request (HTTPRequest): django request object
@@ -40,32 +39,33 @@ def is_moderator(request, view):
 
     Returns:
         bool: False (channels removed)
+
     """
     return False
 
 
 def channel_is_mod_editable(view):
-    """
-    Helper function to check that a channel can be edited (deprecated - always False)
+    """Helper function to check that a channel can be edited (deprecated - always False)
 
     Args:
         view (APIView): a DRF view object
 
     Returns:
         bool: False (channels removed)
+
     """
     return False
 
 
 def is_readonly(request):
-    """
-    Returns True if the request uses a readonly verb
+    """Returns True if the request uses a readonly verb
 
     Args:
         request (HTTPRequest): A request
 
     Returns:
         bool: True if the request method is readonly
+
     """
     return request.method in permissions.SAFE_METHODS
 
@@ -91,7 +91,6 @@ class IsStaffOrModeratorPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or is a moderator"""
-
         return channel_exists(view) and (
             is_admin_user(request) or is_moderator(request, view)
         )
@@ -110,8 +109,7 @@ class IsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
 
 
 class IsOwnSubscriptionOrAdminPermission(permissions.BasePermission):
-    """
-    Checks that the user is (1) staff/moderator, (2) editing their own subscription, or (3) making
+    """Checks that the user is (1) staff/moderator, (2) editing their own subscription, or (3) making
     a readonly request
     """
 
@@ -124,8 +122,7 @@ class IsOwnSubscriptionOrAdminPermission(permissions.BasePermission):
         return resource_owner_username == request.user.username
 
     def has_permission(self, request, view):
-        """
-        Returns True if user is (1) staff/moderator, (2) editing their own subscription, or (3) making
+        """Returns True if user is (1) staff/moderator, (2) editing their own subscription, or (3) making
         a readonly request
         """
         return (
@@ -137,8 +134,7 @@ class IsOwnSubscriptionOrAdminPermission(permissions.BasePermission):
 
 
 class ContributorPermissions(permissions.BasePermission):
-    """
-    Only staff and moderators should be able to see and edit the list of contributors
+    """Only staff and moderators should be able to see and edit the list of contributors
     """
 
     def has_permission(self, request, view):
@@ -157,8 +153,7 @@ class ContributorPermissions(permissions.BasePermission):
 
 
 class ModeratorPermissions(permissions.BasePermission):
-    """
-    All users should be able to see a list of moderators. Only staff and moderators should be able to edit it.
+    """All users should be able to see a list of moderators. Only staff and moderators should be able to edit it.
     """
 
     def has_permission(self, request, view):

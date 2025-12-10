@@ -31,7 +31,6 @@ from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     COURSE_TYPE,
-    GLOBAL_DOC_TYPE,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     USER_LIST_TYPE,
@@ -80,7 +79,7 @@ def search_features(settings):
     settings.FEATURES[features.PODCAST_SEARCH] = True
 
 
-@pytest.fixture()
+@pytest.fixture
 def gen_query_filters_mock(mocker):
     """Mock _apply_general_query_filters"""
 
@@ -117,8 +116,7 @@ def test_gen_video_id(mocker):
 def test_is_reddit_object_removed(
     mocker, banned_by_val, approved_by_val, expected_value
 ):
-    """
-    Tests that is_reddit_object_removed returns the expected values based on the
+    """Tests that is_reddit_object_removed returns the expected values based on the
     banned_by and approved_by properties for the given object
     """
     reddit_obj = mocker.Mock(banned_by=banned_by_val, approved_by=approved_by_val)
@@ -575,8 +573,7 @@ def test_find_similar_resources(settings, is_anonymous, opensearch, user):
 def test_transform_results(
     user, is_anonymous, suggest_min_hits, max_suggestions, settings
 ):  # pylint: disable=too-many-locals
-    """
-    transform_results should move scripted fields into the source result
+    """transform_results should move scripted fields into the source result
     """
     settings.OPENSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
     settings.OPENSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
@@ -713,10 +710,8 @@ def test_transform_results(
 @pytest.mark.parametrize("department_fitler", [["Chemistry", "Biology"], [], ["Math"]])
 @pytest.mark.django_db
 def test_transform_department_filter(department_fitler):
+    """transform_results should replace coursenum if there is a department filter
     """
-    transform_results should replace coursenum if there is a department filter
-    """
-
     course = CourseFactory.create(
         course_id="HASH+1.1",
         extra_course_numbers=["5.1", "7.1"],
@@ -764,8 +759,7 @@ def test_transform_department_filter(department_fitler):
 
 @pytest.mark.django_db
 def test_transform_department_name_aggregations():
-    """
-    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
+    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
@@ -799,8 +793,7 @@ def test_transform_department_name_aggregations():
 
 @pytest.mark.django_db
 def test_transform_level_aggregation():
-    """
-    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
+    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
@@ -851,8 +844,7 @@ def test_transform_level_aggregation():
 
 @pytest.mark.django_db
 def test_transform_topics_aggregations():
-    """
-    Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
+    """Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
     """
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
@@ -884,8 +876,7 @@ def test_transform_topics_aggregations():
 
 @pytest.mark.django_db
 def test_transform_resource_type_aggregations():
-    """
-    Resource_type Aggregations with filters are nested under `agg_filter_resource_type`.
+    """Resource_type Aggregations with filters are nested under `agg_filter_resource_type`.
     transform_results should unnest them
     """
     results = {
@@ -924,10 +915,8 @@ def test_transform_resource_type_aggregations():
 def test_combine_type_buckets_in_aggregates(
     podcast_present_in_aggregate, userlist_present_in_aggregate
 ):
+    """transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data
     """
-    transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data
-    """
-
     type_buckets = []
 
     if podcast_present_in_aggregate:

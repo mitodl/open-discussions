@@ -6,8 +6,7 @@ from course_catalog.constants import OfferedBy, PlatformType
 
 
 def backfill_offeredby(apps, schema_editor):
-    """
-    Backfills offered_by values for existing Courses and Bootcamps
+    """Backfills offered_by values for existing Courses and Bootcamps
     """
     Course = apps.get_model("course_catalog", "Course")
     for course in Course.objects.iterator():

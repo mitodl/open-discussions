@@ -1,5 +1,4 @@
-"""
-course_catalog permissions
+"""course_catalog permissions
 """
 from django.http import HttpRequest
 from rest_framework.generics import get_object_or_404
@@ -12,14 +11,14 @@ from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
 
 
 def is_staff_list_editor(request: HttpRequest) -> bool:
-    """
-    Determine if a request user is a member of the staff list editors group.
+    """Determine if a request user is a member of the staff list editors group.
 
     Args:
         request (HttpRequest): The request
 
     Returns:
         bool: True if request user is a staff list editor
+
     """
     return (
         request.user is not None
@@ -70,8 +69,7 @@ class HasUserListItemPermissions(BasePermission):
 
 
 class HasStaffListPermission(BasePermission):
-    """
-    Permission to view/create/modify StaffLists
+    """Permission to view/create/modify StaffLists
     """
 
     def has_permission(self, request, view):

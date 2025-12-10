@@ -6,9 +6,9 @@ from praw.exceptions import APIException, PRAWException
 from prawcore.exceptions import Forbidden, NotFound, Redirect
 
 from notifications import utils
-from notifications.notifiers.exceptions import CancelNotificationError
 from notifications.factories import EmailNotificationFactory
 from notifications.models import EmailNotification
+from notifications.notifiers.exceptions import CancelNotificationError
 
 pytestmark = pytest.mark.django_db
 
@@ -96,6 +96,5 @@ def test_mark_as_sent_or_canceled_misc_error():
 )
 def test_praw_error_to_cancelled(error, expected_cls):
     """Test that each of the errors is correctly translated to CancelNotificationError or reraised"""
-    with pytest.raises(expected_cls):
-        with utils.praw_error_to_cancelled():
-            raise error
+    with pytest.raises(expected_cls), utils.praw_error_to_cancelled():
+        raise error

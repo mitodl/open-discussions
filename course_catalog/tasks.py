@@ -1,9 +1,7 @@
-"""
-course_catalog tasks
+"""course_catalog tasks
 """
 import logging
 from datetime import datetime
-from typing import List
 
 import boto3
 import celery
@@ -50,10 +48,8 @@ def get_ocw_courses(
     utc_start_timestamp=None,
     force_s3_upload=False,
 ):
+    """Task to sync a batch of OCW courses
     """
-    Task to sync a batch of OCW courses
-    """
-
     if utc_start_timestamp:
         utc_start_timestamp = datetime.strptime(utc_start_timestamp, ISOFORMAT)
         utc_start_timestamp = utc_start_timestamp.replace(tzinfo=pytz.UTC)
@@ -70,9 +66,8 @@ def get_ocw_courses(
 
 def get_content_tasks(
     platform: str, chunk_size: int = None, s3_prefix: str = None
-) -> List[Task]:
-    """
-    Return a list of grouped celery tasks for indexing edx content
+) -> list[Task]:
+    """Return a list of grouped celery tasks for indexing edx content
     """
     if chunk_size is None:
         chunk_size = settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE
@@ -96,10 +91,8 @@ def get_content_tasks(
 
 @app.task(acks_late=True)
 def get_ocw_next_courses(*, url_paths, force_overwrite, utc_start_timestamp=None):
+    """Task to sync a batch of OCW Next courses
     """
-    Task to sync a batch of OCW Next courses
-    """
-
     if utc_start_timestamp:
         utc_start_timestamp = datetime.strptime(utc_start_timestamp, ISOFORMAT)
         utc_start_timestamp = utc_start_timestamp.replace(tzinfo=pytz.UTC)
@@ -120,8 +113,7 @@ def get_ocw_data(
     utc_start_timestamp=None,
     force_s3_upload=False,
 ):  # pylint:disable=too-many-locals,too-many-branches,too-many-arguments
-    """
-    Task to sync OCW course data with database
+    """Task to sync OCW course data with database
     """
     if not (
         settings.AWS_ACCESS_KEY_ID
@@ -177,8 +169,7 @@ def get_ocw_next_data(
     utc_start_timestamp=None,
     prefix=None,
 ):  # pylint:disable=too-many-locals,too-many-branches
-    """
-    Task to sync OCW Next course data with database
+    """Task to sync OCW Next course data with database
     """
     if not (
         settings.AWS_ACCESS_KEY_ID
@@ -233,8 +224,7 @@ def get_ocw_next_data(
 
 @app.task
 def get_ocw_files(ids=None):
-    """
-    Task to sync OCW content files with database
+    """Task to sync OCW content files with database
     """
     if not (
         settings.OCW_LEARNING_COURSE_BUCKET_NAME
@@ -268,10 +258,9 @@ def import_all_ocw_files(self, chunk_size):
 
 @app.task
 def get_content_files(
-    ids: List[int], platform: str, keys: List[str], s3_prefix: str = None
+    ids: list[int], platform: str, keys: list[str], s3_prefix: str = None
 ):
-    """
-    Task to sync edX course content files with database
+    """Task to sync edX course content files with database
     """
     if not (
         settings.AWS_ACCESS_KEY_ID
@@ -286,7 +275,6 @@ def get_content_files(
 @app.task(bind=True)
 def import_all_xpro_files(self, chunk_size=None):
     """Ingest xPRO OLX files from an S3 bucket"""
-
     raise self.replace(
         get_content_tasks(
             PlatformType.xpro.value,
@@ -320,8 +308,7 @@ def import_all_mitx_files(self, chunk_size=None):
 
 @app.task
 def upload_ocw_parsed_json():
-    """
-    Task to upload all OCW Course master json data to S3
+    """Task to upload all OCW Course master json data to S3
     """
     s3_bucket = boto3.resource(
         "s3",
@@ -381,8 +368,7 @@ def get_prolearn_data():
 
 @app.task
 def get_youtube_data(*, channel_ids=None):
-    """
-    Execute the YouTube ETL pipeline
+    """Execute the YouTube ETL pipeline
 
     Args:
         channel_ids (list of str or None):
@@ -391,6 +377,7 @@ def get_youtube_data(*, channel_ids=None):
     Returns:
         int:
             The number of results that were fetched
+
     """
     results = pipelines.youtube_etl(channel_ids=channel_ids)
 
@@ -401,8 +388,7 @@ def get_youtube_data(*, channel_ids=None):
 def get_youtube_transcripts(
     *, created_after=None, created_minutes=None, overwrite=False
 ):
-    """
-    Fetch transcripts for Youtube videos
+    """Fetch transcripts for Youtube videos
 
     Args:
         created_after (date or None):
@@ -411,8 +397,8 @@ def get_youtube_transcripts(
             if a string transcripts are pulled only from videos added created_minutes ago and after
         overwrite (bool):
             if true youtube transcriptsipts are updated for videos that already have transcripts
-    """
 
+    """
     videos = youtube.get_youtube_videos_for_transcripts_job(
         created_after=created_after,
         created_minutes=created_minutes,
@@ -425,24 +411,24 @@ def get_youtube_transcripts(
 
 @app.task
 def get_video_topics(*, video_ids=None):
-    """
-    Execute the video topics pipeline
+    """Execute the video topics pipeline
 
     Args:
         video_ids (list of int):
             list of video ids to generate topics for
+
     """
     pipelines.video_topics_etl(video_ids=video_ids)
 
 
 @app.task
 def get_podcast_data():
-    """
-    Execute the Podcast ETL pipeline
+    """Execute the Podcast ETL pipeline
 
     Returns:
         int:
             The number of results that were fetched
+
     """
     results = pipelines.podcast_etl()
 

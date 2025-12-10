@@ -3,11 +3,11 @@ import pytest
 
 from notifications.factories import NotificationSettingsFactory
 from notifications.models import (
-    FREQUENCY_IMMEDIATE,
+    FREQUENCIES,
     FREQUENCY_DAILY,
+    FREQUENCY_IMMEDIATE,
     FREQUENCY_NEVER,
     FREQUENCY_WEEKLY,
-    FREQUENCIES,
 )
 
 pytestmark = pytest.mark.django_db

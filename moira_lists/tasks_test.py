@@ -1,8 +1,8 @@
-""" Tests for moira tasks"""
+"""Tests for moira tasks"""
 import pytest
 
-from moira_lists.tasks import update_moira_list_users, update_user_moira_lists
 from moira_lists.factories import MoiraListFactory
+from moira_lists.tasks import update_moira_list_users, update_user_moira_lists
 from open_discussions.factories import UserFactory
 
 pytestmark = pytest.mark.django_db

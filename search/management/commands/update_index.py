@@ -1,10 +1,10 @@
 """Management command to index reddit content"""
 from django.core.management.base import BaseCommand, CommandError
 
-from open_discussions.utils import now_in_utc
-from search.tasks import start_update_index
-from search.constants import VALID_OBJECT_TYPES, RESOURCE_FILE_TYPE, COURSE_TYPE
 from course_catalog.constants import PlatformType
+from open_discussions.utils import now_in_utc
+from search.constants import COURSE_TYPE, RESOURCE_FILE_TYPE, VALID_OBJECT_TYPES
+from search.tasks import start_update_index
 
 valid_object_types = list(VALID_OBJECT_TYPES)
 valid_object_types.append(RESOURCE_FILE_TYPE)
@@ -48,13 +48,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Index the comments and posts for the channels the user is subscribed to"""
-
         if options["all"]:
             task = start_update_index.delay(valid_object_types, options["platform"])
             self.stdout.write(
-                "Started celery task {task} to update index content for all indexes".format(
-                    task=task
-                )
+                f"Started celery task {task} to update index content for all indexes"
             )
             if options["platform"]:
                 self.stdout.write(
@@ -82,9 +79,7 @@ class Command(BaseCommand):
                 )
             task = start_update_index.delay(indexes_to_update, options["platform"])
             self.stdout.write(
-                "Started celery task {task} to update index content for the following indexes: {indexes}".format(
-                    task=task, indexes=indexes_to_update
-                )
+                f"Started celery task {task} to update index content for the following indexes: {indexes_to_update}"
             )
 
             if options["platform"]:
@@ -103,5 +98,5 @@ class Command(BaseCommand):
 
         total_seconds = (now_in_utc() - start).total_seconds()
         self.stdout.write(
-            "Update index finished, took {} seconds".format(total_seconds)
+            f"Update index finished, took {total_seconds} seconds"
         )

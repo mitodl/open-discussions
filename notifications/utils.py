@@ -1,13 +1,13 @@
 """Notification Utils"""
-from contextlib import contextmanager
 import logging
+from contextlib import contextmanager
 
 from django.db import transaction
 from praw.exceptions import APIException, PRAWException
 from prawcore.exceptions import Forbidden, NotFound, Redirect
 
-from notifications.notifiers.exceptions import CancelNotificationError
 from notifications.models import EmailNotification
+from notifications.notifiers.exceptions import CancelNotificationError
 from open_discussions.utils import now_in_utc
 
 log = logging.getLogger()
@@ -15,14 +15,14 @@ log = logging.getLogger()
 
 @contextmanager
 def mark_as_sent_or_canceled(notification):
-    """
-    Marks the message as sent if it hasn't been yet or canceled if a cancel exception is raised
+    """Marks the message as sent if it hasn't been yet or canceled if a cancel exception is raised
 
     Yeilds:
         bool: True if the email is being sent
 
     Args:
         notification (NotificationBase): notification to mark as sent
+
     """
     with transaction.atomic():
         notification = EmailNotification.objects.select_for_update().get(

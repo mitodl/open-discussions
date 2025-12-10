@@ -1,23 +1,22 @@
 """Tests for views for REST APIs for users"""
 # pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
 import json
-from os.path import splitext, basename
+from os.path import basename, splitext
 from types import SimpleNamespace
 
+import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
-import pytest
 from social_django.models import UserSocialAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
-from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
+from profiles.utils import DEFAULT_PROFILE_IMAGE, make_temp_image_file
 
 pytestmark = [pytest.mark.django_db]
 
 
 def test_list_users(staff_client, staff_user):
-    """
-    List users
+    """List users
     """
     profile = staff_user.profile
     url = reverse("user_api-list")
@@ -32,13 +31,9 @@ def test_list_users(staff_client, staff_user):
                 "image": profile.image,
                 "image_small": profile.image_small,
                 "image_medium": profile.image_medium,
-                "image_file": "http://testserver{}".format(profile.image_file.url),
-                "image_small_file": "http://testserver{}".format(
-                    profile.image_small_file.url
-                ),
-                "image_medium_file": "http://testserver{}".format(
-                    profile.image_medium_file.url
-                ),
+                "image_file": f"http://testserver{profile.image_file.url}",
+                "image_small_file": f"http://testserver{profile.image_small_file.url}",
+                "image_medium_file": f"http://testserver{profile.image_medium_file.url}",
                 "profile_image_small": profile.image_small_file.url,
                 "profile_image_medium": profile.image_medium_file.url,
                 "bio": profile.bio,
@@ -57,8 +52,7 @@ def test_list_users(staff_client, staff_user):
 def test_create_user(
     staff_client, staff_user, mocker, uid, email_optin, toc_optin
 ):  # pylint: disable=too-many-arguments
-    """
-    Create a user and assert the response
+    """Create a user and assert the response
     """
     staff_user.email = ""
     staff_user.profile.email_optin = None
@@ -123,8 +117,7 @@ def test_create_user(
 
 
 def test_get_user(staff_client, user):
-    """
-    Get a user
+    """Get a user
     """
     profile = user.profile
     url = reverse("user_api-detail", kwargs={"username": user.username})
@@ -138,13 +131,9 @@ def test_get_user(staff_client, user):
             "image": profile.image,
             "image_small": profile.image_small,
             "image_medium": profile.image_medium,
-            "image_file": "http://testserver{}".format(profile.image_file.url),
-            "image_small_file": "http://testserver{}".format(
-                profile.image_small_file.url
-            ),
-            "image_medium_file": "http://testserver{}".format(
-                profile.image_medium_file.url
-            ),
+            "image_file": f"http://testserver{profile.image_file.url}",
+            "image_small_file": f"http://testserver{profile.image_small_file.url}",
+            "image_medium_file": f"http://testserver{profile.image_medium_file.url}",
             "profile_image_small": profile.image_small_file.url,
             "profile_image_medium": profile.image_medium_file.url,
             "bio": profile.bio,
@@ -169,9 +158,9 @@ def test_get_profile(logged_in, user, user_client):
         "image": profile.image,
         "image_small": profile.image_small,
         "image_medium": profile.image_medium,
-        "image_file": "{}".format(profile.image_file.url),
-        "image_small_file": "{}".format(profile.image_small_file.url),
-        "image_medium_file": "{}".format(profile.image_medium_file.url),
+        "image_file": f"{profile.image_file.url}",
+        "image_small_file": f"{profile.image_small_file.url}",
+        "image_medium_file": f"{profile.image_medium_file.url}",
         "profile_image_small": profile.image_small_file.url,
         "profile_image_medium": profile.image_medium_file.url,
         "bio": profile.bio,
@@ -187,8 +176,7 @@ def test_get_profile(logged_in, user, user_client):
 @pytest.mark.parametrize("email_optin", [None, True, False])
 @pytest.mark.parametrize("toc_optin", [None, True, False])
 def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
-    """
-    Update a users' profile
+    """Update a users' profile
     """
     user.email = ""
     user.save()
@@ -219,13 +207,9 @@ def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
             "image": profile.image,
             "image_small": profile.image_small,
             "image_medium": profile.image_medium,
-            "image_file": "http://testserver{}".format(profile.image_file.url),
-            "image_small_file": "http://testserver{}".format(
-                profile.image_small_file.url
-            ),
-            "image_medium_file": "http://testserver{}".format(
-                profile.image_medium_file.url
-            ),
+            "image_file": f"http://testserver{profile.image_file.url}",
+            "image_small_file": f"http://testserver{profile.image_small_file.url}",
+            "image_medium_file": f"http://testserver{profile.image_medium_file.url}",
             "profile_image_small": profile.image_small_file.url,
             "profile_image_medium": profile.image_medium_file.url,
             "bio": profile.bio,
@@ -245,8 +229,7 @@ def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
 
 
 def test_patch_username(staff_client, user):
-    """
-    Trying to update a users's username does not change anything
+    """Trying to update a users's username does not change anything
     """
     url = reverse("user_api-detail", kwargs={"username": user.username})
     resp = staff_client.patch(url, data={"username": "notallowed"})
@@ -255,8 +238,7 @@ def test_patch_username(staff_client, user):
 
 
 def test_patch_profile_by_user(client, logged_in_profile):
-    """
-    Test that users can update their profiles, including profile images
+    """Test that users can update their profiles, including profile images
     """
     url = reverse(
         "profile_api-detail", kwargs={"user__username": logged_in_profile.user.username}
@@ -293,8 +275,7 @@ def test_patch_profile_by_user(client, logged_in_profile):
 
 
 def test_initialized_avatar(client, user):
-    """
-    Test that a PNG avatar image is returned for a user
+    """Test that a PNG avatar image is returned for a user
     """
     url = reverse(
         "name-initials-avatar",
@@ -314,8 +295,7 @@ def test_initialized_avatar(client, user):
 
 
 def test_initials_avatar_fake_user(client):
-    """
-    Test that a default avatar image is returned for a fake user
+    """Test that a default avatar image is returned for a fake user
     """
     url = reverse(
         "name-initials-avatar",
@@ -334,7 +314,7 @@ def test_initials_avatar_fake_user(client):
 class TestUserContributionListView:
     """Tests for UserContributionListView"""
 
-    @pytest.fixture()
+    @pytest.fixture
     def scenario(self, user_client, user):
         """Common test data needed for class test cases"""
         return SimpleNamespace(fake_pagination={"fake": "pagination"})

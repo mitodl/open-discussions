@@ -27,14 +27,12 @@ class Command(BaseCommand):
         chunk_size = options["chunk_size"]
         task = import_all_xpro_files.delay(chunk_size=chunk_size)
         self.stdout.write(
-            "Started task {task} to get xpro course run file data".format(task=task)
+            f"Started task {task} to get xpro course run file data"
         )
         self.stdout.write("Waiting on task...")
         start = now_in_utc()
         task.get()
         total_seconds = (now_in_utc() - start).total_seconds()
         self.stdout.write(
-            "Population of xpro file data finished, took {} seconds".format(
-                total_seconds
-            )
+            f"Population of xpro file data finished, took {total_seconds} seconds"
         )

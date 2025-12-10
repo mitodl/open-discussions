@@ -1,5 +1,4 @@
-"""
-course_catalog models
+"""course_catalog models
 """
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -9,10 +8,10 @@ from django.db import models
 from django.db.models import (
     Exists,
     ExpressionWrapper,
+    JSONField,
     OuterRef,
     Prefetch,
     Value,
-    JSONField,
 )
 
 from course_catalog.constants import (
@@ -104,8 +103,7 @@ class LearningResourceQuerySet(TimestampedModelQuerySet):
 
 
 class LearningResourceGenericRelationsMixin(models.Model):
-    """
-    Model mixin for resource models that are favoriteable
+    """Model mixin for resource models that are favoriteable
 
     This is intended to be used only for models that have a
     GenericRelation referenced by FavoriteItem
@@ -120,8 +118,7 @@ class LearningResourceGenericRelationsMixin(models.Model):
 
 
 class CourseInstructor(TimestampedModel):
-    """
-    Instructors for all courses
+    """Instructors for all courses
     """
 
     first_name = models.CharField(max_length=128, null=True, blank=True)
@@ -136,8 +133,7 @@ class CourseInstructor(TimestampedModel):
 
 
 class CourseTopic(TimestampedModel):
-    """
-    Topics for all courses (e.g. "History")
+    """Topics for all courses (e.g. "History")
     """
 
     name = models.CharField(max_length=128, unique=True)
@@ -147,8 +143,7 @@ class CourseTopic(TimestampedModel):
 
 
 class CoursePrice(TimestampedModel):
-    """
-    Price model for all courses (e.g. "price": 0.00, "mode": "audit")
+    """Price model for all courses (e.g. "price": 0.00, "mode": "audit")
     """
 
     price = models.DecimalField(decimal_places=2, max_digits=12)
@@ -156,7 +151,7 @@ class CoursePrice(TimestampedModel):
     upgrade_deadline = models.DateTimeField(null=True)
 
     def __str__(self):
-        return "${:,.2f}".format(self.price)
+        return f"${self.price:,.2f}"
 
 
 class LearningResourceOfferor(TimestampedModel):
@@ -169,8 +164,7 @@ class LearningResourceOfferor(TimestampedModel):
 
 
 class LearningResource(TimestampedModel):
-    """
-    Base class for all learning resource models under course_catalog app.
+    """Base class for all learning resource models under course_catalog app.
     """
 
     title = models.CharField(max_length=256)
@@ -184,8 +178,7 @@ class LearningResource(TimestampedModel):
 
 
 class AbstractCourse(LearningResource):
-    """
-    Abstract data model for course models
+    """Abstract data model for course models
     """
 
     full_description = models.TextField(null=True, blank=True)
@@ -210,8 +203,7 @@ class AbstractCourse(LearningResource):
 
 
 class LearningResourceRun(AbstractCourse):
-    """
-    Model for course runs
+    """Model for course runs
     """
 
     run_id = models.CharField(max_length=128)
@@ -267,8 +259,7 @@ class LearningResourceRun(AbstractCourse):
 
 
 class ContentFile(TimestampedModel):
-    """
-    ContentFile model for courserun files
+    """ContentFile model for courserun files
     """
 
     uid = models.CharField(max_length=36, null=True, blank=True)
@@ -305,21 +296,20 @@ class ContentFile(TimestampedModel):
 
 
 def get_max_length(field):
-    """
-    Get the max length of a ContentFile field
+    """Get the max length of a ContentFile field
 
     Args:
         field (str): the name of the field
 
     Returns:
         int: the max_length of the field
+
     """
     return ContentFile._meta.get_field(field).max_length
 
 
 class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
-    """
-    Course model for courses on all platforms
+    """Course model for courses on all platforms
     """
 
     objects = LearningResourceQuerySet.as_manager()
@@ -347,8 +337,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
         """Returns the audience for the course"""
         if self.platform in PROFESSIONAL_COURSE_PLATFORMS:
             return [PROFESSIONAL]
-        else:
-            return [OPEN]
+        return [OPEN]
 
     @property
     def certification(self):
@@ -361,8 +350,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
             )
         ):
             return [CERTIFICATE]
-        else:
-            return []
+        return []
 
     @property
     def department_name(self):
@@ -400,8 +388,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
 
 class List(LearningResource):
-    """
-    List model tracks an ordered list of other LearningResources.
+    """List model tracks an ordered list of other LearningResources.
     """
 
     image_description = models.CharField(max_length=1024, null=True, blank=True)
@@ -411,8 +398,7 @@ class List(LearningResource):
 
 
 class ListItem(TimestampedModel):
-    """
-    ListItem model tracks associated metadata and LearningResource.
+    """ListItem model tracks associated metadata and LearningResource.
     `content_type` is restricted to the learning resources we want.
     Lists should not contain other Lists such as Programs and UserLists (such as learning paths).
     """
@@ -431,8 +417,7 @@ class ListItem(TimestampedModel):
 
 
 class LearningList(List, LearningResourceGenericRelationsMixin):
-    """
-    Abstract class and base for user lists and staff lists
+    """Abstract class and base for user lists and staff lists
     """
 
     objects = LearningResourceQuerySet.as_manager()
@@ -463,8 +448,7 @@ class LearningList(List, LearningResourceGenericRelationsMixin):
 
 
 class UserList(LearningList):
-    """
-    UserList is a user-created model tracking a restricted list of LearningResources.
+    """UserList is a user-created model tracking a restricted list of LearningResources.
     """
 
     image_src = models.ImageField(
@@ -476,8 +460,7 @@ class UserList(LearningList):
 
 
 class UserListItem(ListItem):
-    """
-    ListItem model for UserLists
+    """ListItem model for UserLists
     """
 
     content_type = models.ForeignKey(
@@ -493,8 +476,7 @@ class UserListItem(ListItem):
 
 
 class StaffList(LearningList):
-    """
-    StaffList is similar to UserList but can only be creadted/edited by a specific group of users
+    """StaffList is similar to UserList but can only be creadted/edited by a specific group of users
     """
 
     image_src = models.ImageField(
@@ -506,8 +488,7 @@ class StaffList(LearningList):
 
 
 class StaffListItem(ListItem):
-    """
-    ListItem model for StaffLists
+    """ListItem model for StaffLists
     """
 
     content_type = models.ForeignKey(
@@ -523,8 +504,7 @@ class StaffListItem(ListItem):
 
 
 class Program(List, LearningResourceGenericRelationsMixin):
-    """
-    Program model for MIT programs. Consists of specified list of LearningResources.
+    """Program model for MIT programs. Consists of specified list of LearningResources.
     """
 
     objects = LearningResourceQuerySet.as_manager()
@@ -538,13 +518,11 @@ class Program(List, LearningResourceGenericRelationsMixin):
     @property
     def audience(self):
         """Returns the audience for the program"""
-
         if OfferedBy.micromasters.value in self.offered_by.values_list(
             "name", flat=True
         ):
             return [OPEN, PROFESSIONAL]
-        else:
-            return [PROFESSIONAL]
+        return [PROFESSIONAL]
 
     @property
     def certification(self):
@@ -553,16 +531,14 @@ class Program(List, LearningResourceGenericRelationsMixin):
 
 
 class ProgramItem(ListItem):
-    """
-    ListItem model for Programs
+    """ListItem model for Programs
     """
 
     program = models.ForeignKey(Program, related_name="items", on_delete=models.CASCADE)
 
 
 class FavoriteItem(TimestampedModel):
-    """
-    FavoriteItem model tracks LearningResources that are marked by user as their favorite.
+    """FavoriteItem model tracks LearningResources that are marked by user as their favorite.
     Favorites don't need to track an user-specified order, although they can by
     default be displayed ordered by timestamp. Users should be able to favorite any
     LearningResource, including Lists like Programs and UserLists.
@@ -638,8 +614,7 @@ class Video(LearningResource, LearningResourceGenericRelationsMixin):
 
 
 class Playlist(List, LearningResourceGenericRelationsMixin):
-    """
-    Video playlist model, contains videos
+    """Video playlist model, contains videos
     """
 
     objects = LearningResourceQuerySet.as_manager()

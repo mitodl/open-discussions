@@ -1,7 +1,7 @@
 """Tests for URLs"""
 from urllib.parse import quote_plus
-import pytest
 
+import pytest
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
@@ -26,7 +26,7 @@ def test_post_slug_match(post_slug):
     assert reverse(
         "channel-post",
         kwargs={"channel_name": "channel1", "post_id": "1n", "post_slug": post_slug},
-    ) == "/c/channel1/1n/{}".format(quote_plus(post_slug))
+    ) == f"/c/channel1/1n/{quote_plus(post_slug)}"
     assert reverse(
         "channel-post-comment",
         kwargs={
@@ -35,7 +35,7 @@ def test_post_slug_match(post_slug):
             "post_slug": post_slug,
             "comment_id": "b4",
         },
-    ) == "/c/channel1/1n/{}/comment/b4".format(quote_plus(post_slug))
+    ) == f"/c/channel1/1n/{quote_plus(post_slug)}/comment/b4"
 
 
 @pytest.mark.parametrize("post_slug", ["spaced slug", "non-alphanum-$"])

@@ -1,5 +1,4 @@
-"""
-course_catalog serializers
+"""course_catalog serializers
 """
 from urllib.parse import urljoin
 
@@ -51,8 +50,7 @@ COMMON_IGNORED_FIELDS = ("created_on", "updated_on")
 
 
 class GenericForeignKeyFieldSerializer(serializers.Serializer):
-    """
-    Special field to handle the generic foreign key in FavoriteItem and ListItem
+    """Special field to handle the generic foreign key in FavoriteItem and ListItem
     """
 
     def to_representation(self, instance):
@@ -80,16 +78,14 @@ class GenericForeignKeyFieldSerializer(serializers.Serializer):
 
 
 class FavoriteSerializerMixin(serializers.Serializer):
-    """
-    Mixin to serializer is_favorite for various models
+    """Mixin to serializer is_favorite for various models
     """
 
     is_favorite = serializers.BooleanField(read_only=True)
 
 
 class MicroUserListItemSerializer(serializers.ModelSerializer):
-    """
-    Serializer for UserListItem containing only the item id and userlist id.
+    """Serializer for UserListItem containing only the item id and userlist id.
     """
 
     item_id = serializers.IntegerField(source="id")
@@ -103,8 +99,7 @@ class MicroUserListItemSerializer(serializers.ModelSerializer):
 
 
 class MicroStaffListItemSerializer(serializers.ModelSerializer):
-    """
-    Serializer for UserListItem containing only the item id and userlist id.
+    """Serializer for UserListItem containing only the item id and userlist id.
     """
 
     item_id = serializers.IntegerField(source="id")
@@ -118,8 +113,7 @@ class MicroStaffListItemSerializer(serializers.ModelSerializer):
 
 
 class ListsSerializerMixin(serializers.Serializer):
-    """
-    Mixin to serialize lists for various models
+    """Mixin to serialize lists for various models
     """
 
     lists = MicroUserListItemSerializer(source="list_items", read_only=True, many=True)
@@ -129,8 +123,7 @@ class ListsSerializerMixin(serializers.Serializer):
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):
-    """
-    Serializer for CourseInstructor model
+    """Serializer for CourseInstructor model
     """
 
     class Meta:
@@ -139,8 +132,7 @@ class CourseInstructorSerializer(serializers.ModelSerializer):
 
 
 class CoursePriceSerializer(serializers.ModelSerializer):
-    """
-    Serializer for CoursePrice model
+    """Serializer for CoursePrice model
     """
 
     class Meta:
@@ -149,8 +141,7 @@ class CoursePriceSerializer(serializers.ModelSerializer):
 
 
 class CourseTopicSerializer(serializers.ModelSerializer):
-    """
-    Serializer for CourseTopic model
+    """Serializer for CourseTopic model
     """
 
     class Meta:
@@ -169,32 +160,28 @@ class LearningResourceOfferorField(serializers.Field):
 class BaseCourseSerializer(
     FavoriteSerializerMixin, ListsSerializerMixin, serializers.ModelSerializer
 ):
-    """
-    Serializer with common functions to be used by CourseSerializer
+    """Serializer with common functions to be used by CourseSerializer
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
 
     def create(self, validated_data):
-        """
-        Custom create since serializers don't do writable nested serializers by default
+        """Custom create since serializers don't do writable nested serializers by default
         """
         course = super().create(validated_data)
         self.handle_many_to_many(course)
         return course
 
     def update(self, instance, validated_data):
-        """
-        Custom update since serializers don't do writable nested serializers by default
+        """Custom update since serializers don't do writable nested serializers by default
         """
         course = super().update(instance, validated_data)
         self.handle_many_to_many(course)
         return course
 
     def handle_many_to_many(self, resource):
-        """
-        Handle the creation and assignment of topics, instructors, and prices
+        """Handle the creation and assignment of topics, instructors, and prices
         """
         topics = self.topics if hasattr(self, "topics") else []
         resource.topics.clear()
@@ -203,8 +190,7 @@ class BaseCourseSerializer(
             resource.topics.add(course_topic)
 
     def validate(self, attrs):
-        """
-        Verify that image_src is either a valid url or a valid relative url
+        """Verify that image_src is either a valid url or a valid relative url
         """
         if attrs.get("image_src"):
             url_validator = URLValidator()
@@ -221,16 +207,14 @@ class BaseCourseSerializer(
 
 
 class LearningResourceRunSerializer(BaseCourseSerializer):
-    """
-    Serializer for creating LearningResourceRun objects from edx data
+    """Serializer for creating LearningResourceRun objects from edx data
     """
 
     instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
     prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
 
     def validate(self, attrs):
-        """
-        Verify the run doesn't exist if we're creating a new one
+        """Verify the run doesn't exist if we're creating a new one
         """
         super().validate(attrs)
 
@@ -246,8 +230,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         return attrs
 
     def handle_many_to_many(self, resource):
-        """
-        Handle the creation and assignment of instructors and prices
+        """Handle the creation and assignment of instructors and prices
         """
         super().handle_many_to_many(resource)
 
@@ -267,8 +250,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
             resource.prices.add(course_price)
 
     def to_internal_value(self, data):
-        """
-        Custom function to parse data out of the raw edx json
+        """Custom function to parse data out of the raw edx json
         """
         year, semester = utils.get_year_and_semester(data)
         course_fields = {
@@ -330,16 +312,14 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
 
 
 class LearningResourceRunMixin(serializers.Serializer):
-    """
-    Mixin to serialize LearningResourceRuns for various models
+    """Mixin to serialize LearningResourceRuns for various models
     """
 
     runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
 
 
 class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
-    """
-    Serializer for Course model
+    """Serializer for Course model
     """
 
     object_type = serializers.CharField(read_only=True, default="course")
@@ -348,8 +328,7 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
     department_slug = serializers.ReadOnlyField()
 
     def validate(self, attrs):
-        """
-        Verify the Course doesn't exist if we're creating a new one
+        """Verify the Course doesn't exist if we're creating a new one
         """
         super().validate(attrs)
 
@@ -373,13 +352,11 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
 
 
 class OCWSerializer(CourseSerializer):
-    """
-    Serializer for creating Course objects from ocw data
+    """Serializer for creating Course objects from ocw data
     """
 
     def to_internal_value(self, data):
-        """
-        Custom function to parse data out of the raw ocw json
+        """Custom function to parse data out of the raw ocw json
         """
         topics = [
             {"name": topic_name}
@@ -418,15 +395,12 @@ class OCWSerializer(CourseSerializer):
 
 
 class OCWNextSerializer(CourseSerializer):
-    """
-    Serializer for creating Course objects from ocw next data
+    """Serializer for creating Course objects from ocw next data
     """
 
     def to_internal_value(self, data):
+        """Custom function to parse data out of the raw ocw json
         """
-        Custom function to parse data out of the raw ocw json
-        """
-
         topics = [
             topic for topic_sublist in data.get("topics", []) for topic in topic_sublist
         ]
@@ -469,8 +443,7 @@ class OCWNextSerializer(CourseSerializer):
 
 
 class ListItemListSerializer(serializers.ListSerializer):
-    """
-    This class exists to handle the limitation that prefetch_related
+    """This class exists to handle the limitation that prefetch_related
     cannot correctly handle GenericRelation for multiple content types
 
     Instead, it groups each of the items in a collection by content type
@@ -512,8 +485,7 @@ class ListItemListSerializer(serializers.ListSerializer):
 
 
 class BaseListItemSerializer(serializers.Serializer):
-    """
-    Base class for list items
+    """Base class for list items
     """
 
     content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
@@ -531,7 +503,7 @@ class BaseListItemSerializer(serializers.Serializer):
                 "podcast",
                 "podcastepisode",
             ]:
-                raise ValidationError("Incorrect object type {}".format(content_type))
+                raise ValidationError(f"Incorrect object type {content_type}")
             if (
                 content_type == "course"
                 and not Course.objects.filter(id=object_id).exists()
@@ -563,13 +535,11 @@ class BaseListItemSerializer(serializers.Serializer):
 class UserListItemSerializer(
     serializers.ModelSerializer, BaseListItemSerializer, FavoriteSerializerMixin
 ):
-    """
-    Serializer for UserListItem model, includes content_data
+    """Serializer for UserListItem model, includes content_data
     """
 
     def update_index(self, user_list):
-        """
-        If this serializer was instantiated from the UserListItemView, then update the search index
+        """If this serializer was instantiated from the UserListItemView, then update the search index
 
         Args:
             user_list (UserList): the UserList object to update in the search index.
@@ -631,8 +601,7 @@ class UserListItemSerializer(
 
 
 class BaseListSerializer(serializers.Serializer):
-    """
-    Base serializer for user lists and staff lists
+    """Base serializer for user lists and staff lists
     """
 
     item_count = serializers.SerializerMethodField()
@@ -644,7 +613,7 @@ class BaseListSerializer(serializers.Serializer):
     certification = serializers.ReadOnlyField()
 
     def get_author_name(self, instance):
-        """get author name for userlist"""
+        """Get author name for userlist"""
         return instance.author.profile.name
 
     def get_item_count(self, instance):
@@ -693,13 +662,11 @@ class UserListSerializer(
     FavoriteSerializerMixin,
     ListsSerializerMixin,
 ):
-    """
-    Simplified serializer for UserList model.
+    """Simplified serializer for UserList model.
     """
 
     def validate_list_type(self, list_type):
-        """
-        Validator for list_type.
+        """Validator for list_type.
         """
         if not list_type or list_type not in [
             listtype.value for listtype in UserListType
@@ -708,8 +675,7 @@ class UserListSerializer(
         return list_type
 
     def validate_privacy_level(self, privacy_level):
-        """
-        Validator for privacy_level
+        """Validator for privacy_level
         """
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
@@ -762,14 +728,12 @@ class StaffListSerializer(
     """Serlalizer for StaffList model"""
 
     def validate_privacy_level(self, privacy_level):
-        """
-        Validator for privacy_level, should always be True
+        """Validator for privacy_level, should always be True
         """
         return privacy_level
 
     def validate_list_type(self, list_type):
-        """
-        Validator for list_type.
+        """Validator for list_type.
         """
         if not list_type or list_type not in [
             listtype.value for listtype in StaffListType
@@ -813,13 +777,11 @@ class StaffListSerializer(
 
 
 class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerializer):
-    """
-    Serializer for StaffListItem model, includes content_data
+    """Serializer for StaffListItem model, includes content_data
     """
 
     def update_index(self, staff_list):
-        """
-        If this serializer was instantiated from the StaffListItemView, then update the search index
+        """If this serializer was instantiated from the StaffListItemView, then update the search index
 
         Args:
             staff_list (StaffList): the StaffList object to update in the search index.
@@ -881,8 +843,7 @@ class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerialize
 
 
 class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
-    """
-    Serializer for ProgramItem model
+    """Serializer for ProgramItem model
     """
 
     content_data = GenericForeignKeyFieldSerializer(source="item")
@@ -899,8 +860,7 @@ class ProgramSerializer(
     ListsSerializerMixin,
     LearningResourceRunMixin,
 ):
-    """
-    Serializer for Program model, minus runs
+    """Serializer for Program model, minus runs
     """
 
     items = ProgramItemSerializer(many=True, allow_null=True)
@@ -918,8 +878,7 @@ class ProgramSerializer(
 class VideoSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
-    """
-    Serializer for Video model, with runs
+    """Serializer for Video model, with runs
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
@@ -934,15 +893,14 @@ class VideoSerializer(
 
 
 class FavoriteItemSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Favorite Item
+    """Serializer for Favorite Item
     """
 
     content_data = GenericForeignKeyFieldSerializer(source="item")
     content_type = serializers.CharField(source="content_type.name")
 
     def to_representation(self, instance):
-        """put `is_favorite` in to the content data"""
+        """Put `is_favorite` in to the content data"""
         data = super().to_representation(instance)
         data["content_data"]["is_favorite"] = True
         return data
@@ -955,8 +913,7 @@ class FavoriteItemSerializer(serializers.ModelSerializer):
 class PodcastEpisodeSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
-    """
-    Serializer for PodcastEpisode
+    """Serializer for PodcastEpisode
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
@@ -967,7 +924,7 @@ class PodcastEpisodeSerializer(
     certification = serializers.ReadOnlyField()
 
     def get_podcast_title(self, instance):
-        """get the podcast title"""
+        """Get the podcast title"""
         return instance.podcast.title
 
     class Meta:
@@ -978,8 +935,7 @@ class PodcastEpisodeSerializer(
 class PodcastSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
-    """
-    Serializer for Podcasts
+    """Serializer for Podcasts
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)

@@ -13,8 +13,7 @@ class BaseJwtAuth(LegacyAuth):
     ISSUER_NAME = None
 
     def user_data(self):
-        """
-        Returns user data from the JWT
+        """Returns user data from the JWT
         """
         jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 

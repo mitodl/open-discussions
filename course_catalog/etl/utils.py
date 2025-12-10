@@ -7,13 +7,13 @@ import mimetypes
 import os
 import re
 import uuid
+from collections.abc import Generator
 from datetime import datetime
 from functools import wraps
 from hashlib import md5
 from itertools import chain
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Generator
 
 import boto3
 import pytz
@@ -31,14 +31,13 @@ from course_catalog.constants import (
     VALID_TEXT_FILE_TYPES,
     PlatformType,
 )
-from course_catalog.models import get_max_length, LearningResourceRun, ContentFile
+from course_catalog.models import ContentFile, LearningResourceRun, get_max_length
 
 log = logging.getLogger()
 
 
 def log_exceptions(msg, *, exc_return_value=None):
-    """
-    Returns a decorator to log exceptions of the wrapped function
+    """Returns a decorator to log exceptions of the wrapped function
 
     Args:
         msg (str): message to print to log
@@ -46,26 +45,27 @@ def log_exceptions(msg, *, exc_return_value=None):
 
     Returns:
         callable: the decorator function
+
     """
 
     def _log_exceptions(func):
-        """
-        Decorates a function with exception logging
+        """Decorates a function with exception logging
 
         Args:
             func (callable): function to decorate
 
         Returns:
             callable: the wrapped function
+
         """
 
         @wraps(func)
         def _log_exceptions_wrapper(*args, **kwargs):
-            """
-            Log the exception and return the exc_return_value
+            """Log the exception and return the exc_return_value
 
             Returns:
                 Any: the exc_return_value
+
             """
             try:
                 return func(*args, **kwargs)
@@ -79,13 +79,13 @@ def log_exceptions(msg, *, exc_return_value=None):
 
 
 def sync_s3_text(bucket, key, content_meta):
-    """
-    Save the extracted text for a ContentFile to S3 for future use
+    """Save the extracted text for a ContentFile to S3 for future use
 
     Args:
         bucket(s3.Bucket): the bucket to place data in
         key(str): the original key of the content file
         content_meta(dict): the content metadata returned by tika
+
     """
     if bucket and content_meta:
         bucket.put_object(
@@ -96,8 +96,7 @@ def sync_s3_text(bucket, key, content_meta):
 
 
 def extract_text_metadata(data, *, other_headers=None):
-    """
-    Use tika to extract text content from file data
+    """Use tika to extract text content from file data
 
     Args:
         data (str): File contents
@@ -119,8 +118,7 @@ def extract_text_metadata(data, *, other_headers=None):
 
 
 def extract_text_from_url(url, *, mime_type=None):
-    """
-    Retrieve data from a URL and parse it with tika
+    """Retrieve data from a URL and parse it with tika
 
     Args:
         url(str): The URL to retrieve content from
@@ -128,6 +126,7 @@ def extract_text_from_url(url, *, mime_type=None):
 
     Returns:
         str: The text contained in the URL content.
+
     """
     response = requests.get(url)
     response.raise_for_status()
@@ -140,8 +139,7 @@ def extract_text_from_url(url, *, mime_type=None):
 
 
 def generate_unique_id(text):
-    """
-    Generate a unique UUID based on a string
+    """Generate a unique UUID based on a string
 
     Args:
         text(str): The string to base the uuid on
@@ -154,8 +152,7 @@ def generate_unique_id(text):
 
 
 def strip_extra_whitespace(text):
-    """
-    Remove extra whitespace from text
+    """Remove extra whitespace from text
 
     Args:
         text: string to strip extra whitespace from
@@ -168,8 +165,7 @@ def strip_extra_whitespace(text):
 
 
 def parse_dates(date_string, hour=12):
-    """
-    Extract a pair of dates from a string
+    """Extract a pair of dates from a string
 
     Args:
         date_string(str): A string containing start and end dates
@@ -177,6 +173,7 @@ def parse_dates(date_string, hour=12):
 
     Returns:
         tuple of datetime: Start and end datetimes
+
     """
     # Start and end dates in same month (Jun 18-19, 2020)
     pattern_1_month = re.compile(
@@ -227,8 +224,7 @@ def parse_dates(date_string, hour=12):
 
 
 def map_topics(raw_topics, mapping):
-    """
-    Return a list of EdX topics corresponding to the list of raw topics
+    """Return a list of EdX topics corresponding to the list of raw topics
 
     Args:
         raw_topics(list of str): List of raw topics
@@ -236,6 +232,7 @@ def map_topics(raw_topics, mapping):
 
     Returns:
         list of str: EdX topics
+
     """
     topics = set()
     for raw_topic in raw_topics:
@@ -259,12 +256,12 @@ def _infinite_counter():
 
 
 def _get_text_from_element(element, content):
-    """
-    Helper method to recurse through XML elements
+    """Helper method to recurse through XML elements
 
     Args:
         element (Element): An XML element
         content (list): A list of strings, to be modified with any new material
+
     """
     if element.tag not in ("style", "script"):
         if element.text:
@@ -278,11 +275,11 @@ def _get_text_from_element(element, content):
 
 
 def get_text_from_element(element):
-    """
-    Get relevant text for ingestion from XML element
+    """Get relevant text for ingestion from XML element
 
     Args:
         element (Element): A XML element representing a vertical
+
     """
     content = []
     _get_text_from_element(element, content)
@@ -290,14 +287,14 @@ def get_text_from_element(element):
 
 
 def get_xbundle_docs(olx_path: str) -> Generator[dict, None, None]:
-    """
-    Get vertical documents from an edx tar archive
+    """Get vertical documents from an edx tar archive
 
     Args:
         olx_path(str): path to extracted edx tar archive
 
     Yields:
         tuple: A list of (bytes of content, metadata)
+
     """
     bundle = XBundle()
     bundle.import_from_directory(olx_path)
@@ -318,14 +315,14 @@ def get_xbundle_docs(olx_path: str) -> Generator[dict, None, None]:
 def documents_from_olx(
     olx_path: str,
 ) -> Generator[tuple, None, None]:  # pylint: disable=too-many-locals
-    """
-    Extract text from OLX directory
+    """Extract text from OLX directory
 
     Args:
         olx_path (str): The path to the directory with the OLX data
 
     Yields:
         tuple: A list of (bytes of content, metadata)
+
     """
     try:
         for vertical in get_xbundle_docs(olx_path):
@@ -359,8 +356,7 @@ def documents_from_olx(
 def transform_content_files(
     course_tarpath: str, run: LearningResourceRun
 ) -> Generator[dict, None, None]:
-    """
-    Pass content to tika, then return a JSON document with the transformed content inside it
+    """Pass content to tika, then return a JSON document with the transformed content inside it
 
     Args:
         course_tarpath (str): The path to the tarball which contains the OLX
@@ -368,6 +364,7 @@ def transform_content_files(
 
     Yields:
         dict: content from file
+
     """
     basedir = os.path.basename(course_tarpath).split(".")[0]
     with TemporaryDirectory(prefix=basedir) as inner_tempdir:
@@ -424,14 +421,14 @@ def transform_content_files(
 
 
 def get_learning_course_bucket_name(platform: str) -> str:
-    """
-    Get the name of the platform's edx content bucket
+    """Get the name of the platform's edx content bucket
 
     Args:
         platform(str): The edx platform
 
     Returns:
         str: The name of the edx archive bucket for the platform
+
     """
     bucket_names = {
         PlatformType.mitx.value: settings.EDX_LEARNING_COURSE_BUCKET_NAME,
@@ -442,14 +439,14 @@ def get_learning_course_bucket_name(platform: str) -> str:
 
 
 def get_learning_course_bucket(platform: str) -> object:
-    """
-    Get the platform's learning course S3 Bucket holding content file data
+    """Get the platform's learning course S3 Bucket holding content file data
 
     Args:
         platform(str): The platform value
 
     Returns:
         boto3.Bucket: the OCW S3 Bucket or None
+
     """
     bucket_name = get_learning_course_bucket_name(platform)
     if bucket_name:
@@ -462,14 +459,14 @@ def get_learning_course_bucket(platform: str) -> object:
 
 
 def _load_ucc_topic_mappings():
-    """
-    Loads the topic mappings from the crosswalk CSV file
+    """Loads the topic mappings from the crosswalk CSV file
 
     Returns:
         dict:
             the mapping dictionary
+
     """
-    with open("course_catalog/data/ucc-topic-mappings.csv", "r") as mapping_file:
+    with open("course_catalog/data/ucc-topic-mappings.csv") as mapping_file:
         rows = list(csv.reader(mapping_file))
         # drop the column headers (first row)
         rows = rows[1:]
@@ -485,8 +482,7 @@ UCC_TOPIC_MAPPINGS = SimpleLazyObject(_load_ucc_topic_mappings)
 
 
 def transform_topics(topics):
-    """
-    Transform topics by using our crosswalk mapping
+    """Transform topics by using our crosswalk mapping
 
     Args:
         topics (list of dict):
@@ -494,6 +490,7 @@ def transform_topics(topics):
 
     Return:
         list of dict: the transformed topics
+
     """
     return [
         {"name": topic_name}
@@ -508,16 +505,16 @@ def transform_topics(topics):
 
 
 def extract_valid_department_from_id(course_string):
-    """
-    Extracts a department from course data and returns
+    """Extracts a department from course data and returns
 
     Args:
         course_string (str): course name as string
 
     Returns:
         department (str): parsed department string
+
     """
-    department_string = re.search("\+([^\.]*)\.", course_string)
+    department_string = re.search(r"\+([^\.]*)\.", course_string)
     if department_string:
         dept_candidate = department_string.groups()[0]
         return [dept_candidate] if dept_candidate in OCW_DEPARTMENTS.keys() else None
@@ -525,7 +522,7 @@ def extract_valid_department_from_id(course_string):
 
 
 def calc_checksum(filename) -> str:
-    "Return the md5 checksum of the specified filepath"
+    """Return the md5 checksum of the specified filepath"""
     hash_md5 = md5()
     with open(filename, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):

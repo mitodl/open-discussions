@@ -1,5 +1,4 @@
-"""
-Test end to end django views.
+"""Test end to end django views.
 """
 # pylint: disable=redefined-outer-name,too-many-arguments
 import xml.etree.ElementTree as etree
@@ -38,7 +37,7 @@ lazy = pytest.lazy_fixture
 def test_article_ui_flag(
     settings, client, env_id, secret_key, upload_url, feature_enabled, exp
 ):
-    """make sure that the article ui flag is only true if feature and env vars are set"""
+    """Make sure that the article ui flag is only true if feature and env vars are set"""
     settings.CKEDITOR_ENVIRONMENT_ID = env_id
     settings.CKEDITOR_SECRET_KEY = secret_key
     settings.CKEDITOR_UPLOAD_URL = upload_url

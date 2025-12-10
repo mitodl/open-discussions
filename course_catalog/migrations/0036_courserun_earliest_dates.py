@@ -6,8 +6,7 @@ from course_catalog.utils import semester_year_to_date
 
 
 def populate_earliest_dates(apps, schema_editor):
-    """
-    Delete all courses, runs, and bootcamps.  They will need to be imported again.
+    """Delete all courses, runs, and bootcamps.  They will need to be imported again.
     """
     CourseRun = apps.get_model("course_catalog", "CourseRun")
 

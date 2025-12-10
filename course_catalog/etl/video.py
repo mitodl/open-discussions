@@ -6,8 +6,7 @@ from search.api import get_similar_topics
 
 
 def extract_topics(video):
-    """
-    Extract a video's topics
+    """Extract a video's topics
 
     Args:
         video (course_catalog.models.Video):
@@ -16,6 +15,7 @@ def extract_topics(video):
     Returns:
         list of dict:
             list of topic data for the video
+
     """
     text_doc = {"title": video.title, "short_description": video.short_description}
 
@@ -30,8 +30,7 @@ def extract_topics(video):
 
 
 def extract_videos_topics(*, video_ids=None):
-    """
-    Extract video topics for some or all of published videos
+    """Extract video topics for some or all of published videos
 
     Args:
         video_ids (list of str or None): optional list of video ids
@@ -39,6 +38,7 @@ def extract_videos_topics(*, video_ids=None):
     Yields:
         dict:
             normalized video object with topics
+
     """
     videos = (
         Video.objects.filter(published=True)

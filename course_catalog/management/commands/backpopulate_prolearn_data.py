@@ -43,7 +43,5 @@ class Command(BaseCommand):
             task.get()
             total_seconds = (now_in_utc() - start).total_seconds()
             self.stdout.write(
-                "Population of prolearn data finished, took {} seconds".format(
-                    total_seconds
-                )
+                f"Population of prolearn data finished, took {total_seconds} seconds"
             )

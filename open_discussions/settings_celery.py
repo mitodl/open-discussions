@@ -1,5 +1,4 @@
-"""
-Django settings for celery.
+"""Django settings for celery.
 """
 from open_discussions.envs import get_bool, get_int, get_string
 

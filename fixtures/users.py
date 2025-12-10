@@ -27,7 +27,7 @@ def staff_user(db, use_betamax, request):
     return UserFactory.create(is_staff=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 def index_user(db, use_betamax, request):
     """Create a user to be used for indexing"""
     if use_betamax:
@@ -37,14 +37,14 @@ def index_user(db, use_betamax, request):
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def logged_in_user(client, user):
     """Log the user in and yield the user object"""
     client.force_login(user)
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def logged_in_profile(client):
     """Add a Profile and logged-in User"""
     user = UserFactory.create(username="george")
@@ -66,8 +66,7 @@ def jwt_token(db, user, client, rf, settings):
 
 @pytest.fixture
 def client(db):
-    """
-    Similar to the builtin client but this provides the DRF client instead of the Django test client.
+    """Similar to the builtin client but this provides the DRF client instead of the Django test client.
     """
     return APIClient()
 

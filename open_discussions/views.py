@@ -1,22 +1,20 @@
-"""
-open_discussions views
+"""open_discussions views
 """
 from django.conf import settings
 from django.http import (
     Http404,
     HttpResponse,
-    HttpResponseNotFound,
-    HttpResponseForbidden,
     HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
 )
 from django.shortcuts import render
 from django.urls import reverse
-from social_django.utils import load_strategy, load_backend
+from social_django.utils import load_backend, load_strategy
 
 from course_catalog.permissions import is_staff_list_editor
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions import features
-
 from profiles.models import SOCIAL_SITE_NAME_MAP
 
 

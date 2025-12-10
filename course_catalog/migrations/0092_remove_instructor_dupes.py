@@ -6,8 +6,7 @@ from search.search_index_helpers import upsert_course
 
 
 def remove_dupes(apps, schema_editor):
-    """
-    Find CourseInstructors with dupe full names, pick the one with most info to keep,
+    """Find CourseInstructors with dupe full names, pick the one with most info to keep,
     delete the other(s), update affected LearningResourceRuns
     """
     CourseInstructor = apps.get_model("course_catalog", "CourseInstructor")

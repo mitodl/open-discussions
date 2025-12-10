@@ -1,5 +1,4 @@
-"""
-Validate that our settings functions work
+"""Validate that our settings functions work
 """
 
 import importlib
@@ -29,11 +28,11 @@ class TestSettings(TestCase):
     """Validate that settings work as expected."""
 
     def reload_settings(self):
-        """
-        Reload settings module with cleanup to restore it.
+        """Reload settings module with cleanup to restore it.
 
         Returns:
             dict: dictionary of the newly reloaded settings ``vars``
+
         """
         importlib.reload(sys.modules["open_discussions.settings"])
         # Restore settings to original settings after test
@@ -54,11 +53,10 @@ class TestSettings(TestCase):
                 "storages.backends.s3boto3.S3Boto3Storage",
             )
 
-        with self.assertRaises(ImproperlyConfigured):
-            with mock.patch.dict(
-                "os.environ", {"OPEN_DISCUSSIONS_USE_S3": "True"}, clear=True
-            ):
-                self.reload_settings()
+        with self.assertRaises(ImproperlyConfigured), mock.patch.dict(
+            "os.environ", {"OPEN_DISCUSSIONS_USE_S3": "True"}, clear=True
+        ):
+            self.reload_settings()
 
         # Verify it all works with it enabled and configured 'properly'
         with mock.patch.dict(
@@ -80,7 +78,6 @@ class TestSettings(TestCase):
 
     def test_admin_settings(self):
         """Verify that we configure email with environment variable"""
-
         with mock.patch.dict(
             "os.environ",
             {**REQUIRED_SETTINGS, "OPEN_DISCUSSIONS_ADMIN_EMAIL": ""},
@@ -105,7 +102,6 @@ class TestSettings(TestCase):
 
     def test_db_ssl_enable(self):
         """Verify that we can enable/disable database SSL with a var"""
-
         # Check default state is SSL on
         with mock.patch.dict("os.environ", REQUIRED_SETTINGS, clear=True):
             settings_vars = self.reload_settings()
@@ -149,14 +145,12 @@ class TestSettings(TestCase):
 
     @staticmethod
     def test_semantic_version():
-        """
-        Verify that we have a semantic compatible version.
+        """Verify that we have a semantic compatible version.
         """
         semantic_version.Version(settings.VERSION)
 
     def test_required_settings(self):
-        """
-        Assert that an exception is raised if any of the required settings are missing
+        """Assert that an exception is raised if any of the required settings are missing
         """
         for key in REQUIRED_SETTINGS:
             required_settings = {**REQUIRED_SETTINGS}
@@ -166,8 +160,7 @@ class TestSettings(TestCase):
                     self.reload_settings()
 
     def test_djoser_confirm_url(self):
-        """
-        Assert that the PASSWORD_RESET_CONFIRM_URL setting value produces a
+        """Assert that the PASSWORD_RESET_CONFIRM_URL setting value produces a
         URL that
         """
         token = "4xj-8aa0d06b40f1c067b464"
@@ -178,7 +171,7 @@ class TestSettings(TestCase):
         reverse_url = reverse(
             "password-reset-confirm", kwargs=dict(uid=uid, token=token)
         )
-        assert reverse_url == "/{}".format(template_generated_url)
+        assert reverse_url == f"/{template_generated_url}"
 
     def test_server_side_cursors_disabled(self):
         """DISABLE_SERVER_SIDE_CURSORS should be true by default"""

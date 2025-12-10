@@ -69,13 +69,13 @@ FAKE_SEARCH_RESPONSE = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def search_view():
     """Fixture with relevant properties for testing the search view"""
     return SimpleNamespace(url=reverse("search"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def related_posts_view(settings):
     """Fixture with relevant properties for testing the related posts view"""
     settings.FEATURES["RELATED_POSTS_UI"] = True

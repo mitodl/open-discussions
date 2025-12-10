@@ -1,29 +1,27 @@
 """Views for REST APIs for channels"""
+from cairosvg import svg2png  # pylint:disable=no-name-in-module
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.decorators.cache import cache_page
-
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from rest_framework.response import Response
-
-from cairosvg import svg2png  # pylint:disable=no-name-in-module
+from rest_framework.views import APIView
 
 from open_discussions.permissions import (
-    IsStaffPermission,
     AnonymousAccessReadonlyPermission,
+    IsStaffPermission,
 )
 from profiles.models import Profile, UserWebsite
 from profiles.permissions import HasEditPermission, HasSiteEditPermission
 from profiles.serializers import (
-    UserSerializer,
     ProfileSerializer,
+    UserSerializer,
     UserWebsiteSerializer,
 )
-from profiles.utils import generate_svg_avatar, DEFAULT_PROFILE_IMAGE
+from profiles.utils import DEFAULT_PROFILE_IMAGE, generate_svg_avatar
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -89,8 +87,7 @@ class UserContributionListView(APIView):
         }
 
     def get(self, request, *args, **kwargs):
-        """
-        View method for HTTP GET request (deprecated - discussions removed)
+        """View method for HTTP GET request (deprecated - discussions removed)
         Returns empty list as posts/comments no longer exist
         """
         object_type = self.kwargs["object_type"]

@@ -1,6 +1,4 @@
-"""
-Django settings for open_discussions.
-
+"""Django settings for open_discussions.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.10/topics/settings/
@@ -226,7 +224,7 @@ STATIC_URL = "/static/"
 CLOUDFRONT_DIST = get_string("CLOUDFRONT_DIST", None)
 if CLOUDFRONT_DIST:
     STATIC_URL = urljoin(
-        "https://{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST), STATIC_URL
+        f"https://{CLOUDFRONT_DIST}.cloudfront.net", STATIC_URL
     )
 
 STATIC_ROOT = "staticfiles"
@@ -517,8 +515,8 @@ LOGGING = {
             "format": (
                 "[%(asctime)s] %(levelname)s %(process)d [%(name)s] "
                 "%(filename)s:%(lineno)d - "
-                "[{hostname}] - %(message)s"
-            ).format(hostname=HOSTNAME),
+                f"[{HOSTNAME}] - %(message)s"
+            ),
             "datefmt": "%Y-%m-%d %H:%M:%S",
         }
     },
@@ -589,7 +587,7 @@ if OPEN_DISCUSSIONS_USE_S3 and (
 if OPEN_DISCUSSIONS_USE_S3:
     # Configure Django Storages to use Cloudfront distribution for S3 assets
     if CLOUDFRONT_DIST:
-        AWS_S3_CUSTOM_DOMAIN = "{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST)
+        AWS_S3_CUSTOM_DOMAIN = f"{CLOUDFRONT_DIST}.cloudfront.net"
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     AWS_DEFAULT_ACL = "public-read"
 
@@ -818,7 +816,7 @@ if DEBUG:
 
 
 def setup_x509():
-    """write the moira x509 certification & key to files"""
+    """Write the moira x509 certification & key to files"""
     from open_discussions.utils import write_x509_files
 
     write_x509_files()

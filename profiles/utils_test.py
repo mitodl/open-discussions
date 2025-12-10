@@ -1,8 +1,8 @@
-""" Tests for profiles.utils """
+"""Tests for profiles.utils"""
 import re
-from io import BytesIO
-from urllib.parse import urlparse, parse_qs
 import xml.etree.ElementTree as etree
+from io import BytesIO
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from PIL import Image
@@ -10,63 +10,59 @@ from PIL import Image
 from open_discussions.factories import UserFactory
 from open_discussions.utils import generate_filepath
 from profiles.utils import (
-    profile_image_upload_uri,
-    profile_image_upload_uri_small,
-    profile_image_upload_uri_medium,
-    image_uri,
     DEFAULT_PROFILE_IMAGE,
-    update_full_name,
-    generate_svg_avatar,
-    generate_initials,
     article_image_uri,
+    generate_initials,
+    generate_svg_avatar,
+    image_uri,
+    profile_image_upload_uri,
+    profile_image_upload_uri_medium,
+    profile_image_upload_uri_small,
+    update_full_name,
 )
 
 
 def test_upload_url(user):
-    """
-    profile_image_upload_uri should make an upload path with a timestamp
+    """profile_image_upload_uri should make an upload path with a timestamp
     """
     name = "name"
     ext = ".jpg"
-    filename = "{name}{ext}".format(name=name, ext=ext)
+    filename = f"{name}{ext}"
     url = profile_image_upload_uri(user.profile, filename)
     assert url.startswith(
-        "profile/{username}/{name}-".format(username=user.username, name=name)
+        f"profile/{user.username}/{name}-"
     )
-    assert url.endswith("{ext}".format(ext=ext))
+    assert url.endswith(f"{ext}")
 
 
 def test_small(user):
-    """
-    profile_image_upload_uri_small should make an upload path with a timestamp
+    """profile_image_upload_uri_small should make an upload path with a timestamp
     """
     name = "name"
     ext = ".jpg"
-    filename = "{name}{ext}".format(name=name, ext=ext)
+    filename = f"{name}{ext}"
     url = profile_image_upload_uri_small(user.profile, filename)
     assert url.startswith(
-        "profile/{username}/{name}-".format(username=user.username, name=name)
+        f"profile/{user.username}/{name}-"
     )
-    assert url.endswith("_small{ext}".format(ext=ext))
+    assert url.endswith(f"_small{ext}")
 
 
 def test_medium(user):
-    """
-    profile_image_upload_uri_medium should make an upload path with a timestamp
+    """profile_image_upload_uri_medium should make an upload path with a timestamp
     """
     name = "name"
     ext = ".jpg"
-    filename = "{name}{ext}".format(name=name, ext=ext)
+    filename = f"{name}{ext}"
     url = profile_image_upload_uri_medium(user.profile, filename)
     assert url.startswith(
-        "profile/{username}/{name}-".format(username=user.username, name=name)
+        f"profile/{user.username}/{name}-"
     )
-    assert url.endswith("_medium{ext}".format(ext=ext))
+    assert url.endswith(f"_medium{ext}")
 
 
 def test_too_long_name(user):
-    """
-    A name which is too long should get truncated to 100 characters
+    """A name which is too long should get truncated to 100 characters
     """
     filename = "{}.jpg".format("a" * 150)
     full_path = profile_image_upload_uri(user.profile, filename)
@@ -76,8 +72,7 @@ def test_too_long_name(user):
 
 
 def test_too_long_prefix(user):
-    """
-    A name which is too long should get truncated to 100 characters
+    """A name which is too long should get truncated to 100 characters
     """
     filename = "{}.jpg".format("a" * 150)
     with pytest.raises(ValueError) as ex:
@@ -87,8 +82,7 @@ def test_too_long_prefix(user):
 
 @pytest.mark.django_db
 def test_profile_img_url_uploaded_image():
-    """
-    Test that the correct profile image URL is returned for a profile with an uploaded image
+    """Test that the correct profile image URL is returned for a profile with an uploaded image
     """
     profile = UserFactory.create().profile
     image = Image.new("RGBA", size=(50, 50), color=(155, 0, 0))
@@ -101,8 +95,7 @@ def test_profile_img_url_uploaded_image():
 
 @pytest.mark.django_db
 def test_profile_img_url_micromaster_image():
-    """
-    Test that the correct profile image URL is returned for a profile with a micromasters profile URL
+    """Test that the correct profile image URL is returned for a profile with a micromasters profile URL
     """
     profile = UserFactory.create().profile
     profile.image_file = profile.image_medium_file = profile.image_small_file = None
@@ -122,7 +115,7 @@ def test_profile_img_url_gravatar_fullname():
     assert profile_image.startswith("https://www.gravatar.com/avatar/")
     params_d = parse_qs(urlparse(profile_image).query)["d"][0]
     assert params_d.endswith(
-        "profile/{}/64/fff/579cf9.png".format(profile.user.username)
+        f"profile/{profile.user.username}/64/fff/579cf9.png"
     )
 
 
@@ -168,9 +161,9 @@ def test_get_svg_avatar():
     assert root.tag == "{http://www.w3.org/2000/svg}svg"
     circle = root.find("{http://www.w3.org/2000/svg}circle")
     assert circle.get("cx") == str(int(size / 2))
-    assert "#{}".format(bgcolor) in circle.get("style")
+    assert f"#{bgcolor}" in circle.get("style")
     text = root.find("{http://www.w3.org/2000/svg}text")
-    assert text.get("fill") == "#{}".format(color)
+    assert text.get("fill") == f"#{color}"
     assert text.text == "TU"
 
 

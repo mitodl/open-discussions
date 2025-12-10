@@ -1,14 +1,13 @@
-""" Tests for profile model """
+"""Tests for profile model"""
 import pytest
 from django.core.files.uploadedfile import UploadedFile
 
-from profiles.models import SITE_TYPE_OPTIONS, PERSONAL_SITE_TYPE, SOCIAL_SITE_NAME_MAP
+from profiles.models import PERSONAL_SITE_TYPE, SITE_TYPE_OPTIONS, SOCIAL_SITE_NAME_MAP
 
 
 @pytest.mark.parametrize("update_image", [True, False])
 def test_image_update(user, profile_image, update_image):
-    """
-    Test that small and medium images are created only when update_image is True
+    """Test that small and medium images are created only when update_image is True
     """
     profile = user.profile
     image_size = len(profile_image.getvalue())
@@ -27,8 +26,7 @@ def test_image_update(user, profile_image, update_image):
 
 
 def test_null_image(user):
-    """
-    If the main image is null the thumbnails should be too
+    """If the main image is null the thumbnails should be too
     """
     profile = user.profile
     assert profile.image_small_file is not None
@@ -41,8 +39,7 @@ def test_null_image(user):
 
 
 def test_social_site_name_map():
-    """
-    Test that all social sites are represented with a human-friendly name
+    """Test that all social sites are represented with a human-friendly name
     """
     social_site_type_options = set(SITE_TYPE_OPTIONS)
     social_site_type_options.remove(PERSONAL_SITE_TYPE)

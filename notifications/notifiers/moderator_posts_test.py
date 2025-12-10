@@ -1,13 +1,15 @@
 """Tests for comments notifier"""
-from django.core.mail import EmailMessage
 import pytest
+from django.core.mail import EmailMessage
 
 from notifications.factories import NotificationSettingsFactory
-from notifications.models import EmailNotification
+from notifications.models import (
+    FREQUENCY_IMMEDIATE,
+    NOTIFICATION_TYPE_MODERATOR,
+    EmailNotification,
+)
 from notifications.notifiers import moderator_posts
-from notifications.models import NOTIFICATION_TYPE_MODERATOR, FREQUENCY_IMMEDIATE
 from open_discussions.test_utils import any_instance_of
-
 
 pytestmark = [pytest.mark.django_db]
 

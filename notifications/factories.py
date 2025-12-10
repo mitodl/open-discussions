@@ -1,23 +1,23 @@
 """Factories for making test data"""
 import factory
+import pytz
 from factory import Faker, SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
-import pytz
 
-from open_discussions.factories import UserFactory
 from notifications.models import (
-    NotificationSettings,
-    EmailNotification,
     FREQUENCIES,
-    FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
-    FREQUENCY_WEEKLY,
+    FREQUENCY_IMMEDIATE,
     FREQUENCY_NEVER,
-    NOTIFICATION_TYPES,
-    NOTIFICATION_TYPE_FRONTPAGE,
+    FREQUENCY_WEEKLY,
     NOTIFICATION_TYPE_COMMENTS,
+    NOTIFICATION_TYPE_FRONTPAGE,
+    NOTIFICATION_TYPES,
+    EmailNotification,
+    NotificationSettings,
 )
+from open_discussions.factories import UserFactory
 
 
 class NotificationSettingsFactory(DjangoModelFactory):

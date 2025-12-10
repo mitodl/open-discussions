@@ -1,5 +1,4 @@
-"""
-Email APIs
+"""Email APIs
 
 Example usage:
 
@@ -18,9 +17,9 @@ messages = messages_for_recipients([
 # send the emails
 send_messages(messages)
 """
-from email.utils import formataddr
 import logging
 import re
+from email.utils import formataddr
 
 from anymail.message import AnymailMessage
 from bs4 import BeautifulSoup
@@ -34,8 +33,7 @@ log = logging.getLogger()
 
 
 def safe_format_recipients(recipients):
-    """
-    Returns a "safe" list of formatted recipients.
+    """Returns a "safe" list of formatted recipients.
     This means if MAILGUN_RECIPIENT_OVERRIDE is set, we only use that.
 
     Args:
@@ -43,6 +41,7 @@ def safe_format_recipients(recipients):
 
     Returns:
         list of (str, User): list of recipient emails to send to
+
     """
     if not recipients:
         return []
@@ -59,21 +58,20 @@ def safe_format_recipients(recipients):
 
 
 def can_email_user(user):
-    """
-    Returns True if the user has an email and hasn't opted out
+    """Returns True if the user has an email and hasn't opted out
 
     Args:
         user (User): user to checklist
 
     Returns:
         bool: True if we can email this user
+
     """
     return bool(user.email)
 
 
 def context_for_user(*, user=None, extra_context=None):
-    """
-    Returns an email context for the given user
+    """Returns an email context for the given user
 
     Args:
         user (User): user this email is being sent to
@@ -81,8 +79,8 @@ def context_for_user(*, user=None, extra_context=None):
 
     Returns:
         dict: the context for this user
-    """
 
+    """
     context = {
         "base_url": settings.SITE_BASE_URL,
         "site_name": settings.OPEN_DISCUSSIONS_TITLE,
@@ -103,8 +101,7 @@ def context_for_user(*, user=None, extra_context=None):
 
 
 def render_email_templates(template_name, context):
-    """
-    Renders the email templates for the email
+    """Renders the email templates for the email
 
     Args:
         template_name (str): name of the template, this should match a directory in mail/templates
@@ -112,13 +109,14 @@ def render_email_templates(template_name, context):
 
     Returns:
         (str, str, str): tuple of the templates for subject, text_body, html_body
+
     """
     subject_text = render_to_string(
-        "{}/subject.txt".format(template_name), context
+        f"{template_name}/subject.txt", context
     ).rstrip()
 
     context.update({"subject": subject_text})
-    html_text = render_to_string("{}/body.html".format(template_name), context)
+    html_text = render_to_string(f"{template_name}/body.html", context)
 
     # pynliner internally uses bs4, which we can now modify the inlined version into a plaintext version
     # this avoids parsing the body twice in bs4
@@ -142,8 +140,7 @@ def render_email_templates(template_name, context):
 
 
 def messages_for_recipients(recipients_and_contexts, template_name):
-    """
-    Creates the messages to the recipients using the templates
+    """Creates the messages to the recipients using the templates
 
     Args:
         recipients_and_contexts (list of (str, dict)): list of users and their contexts as a dict
@@ -151,6 +148,7 @@ def messages_for_recipients(recipients_and_contexts, template_name):
 
     Yields:
         EmailMultiAlternatives: email message with rendered content
+
     """
     with mail.get_connection(settings.NOTIFICATION_EMAIL_BACKEND) as connection:
         for recipient, context in recipients_and_contexts:
@@ -169,11 +167,11 @@ def messages_for_recipients(recipients_and_contexts, template_name):
 
 
 def send_messages(messages):
-    """
-    Sends the messages and logs any exceptions
+    """Sends the messages and logs any exceptions
 
     Args:
         messages (list of EmailMultiAlternatives): list of messages to send
+
     """
     for msg in messages:
         try:

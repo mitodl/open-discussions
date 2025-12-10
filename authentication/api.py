@@ -15,8 +15,7 @@ log = logging.getLogger()
 
 
 def create_user(username, email, profile_data=None, user_extra=None):
-    """
-    Ensures the user exists
+    """Ensures the user exists
 
     Args:
         email (str): the user's email
@@ -24,6 +23,7 @@ def create_user(username, email, profile_data=None, user_extra=None):
 
     Returns:
         User: the user
+
     """
     defaults = {}
 
@@ -45,8 +45,7 @@ def create_user(username, email, profile_data=None, user_extra=None):
 
 
 def create_or_update_micromasters_social_auth(user, uid, details):
-    """
-    Creates or updates MicroMasters social auth for a user
+    """Creates or updates MicroMasters social auth for a user
 
     Args:
         user (User): user to create the auth for
@@ -55,6 +54,7 @@ def create_or_update_micromasters_social_auth(user, uid, details):
 
     Returns:
         UserSocialAuth: the created social auth record
+
     """
     # avoid a circular import
     from social_django.utils import STORAGE, STRATEGY, load_backend

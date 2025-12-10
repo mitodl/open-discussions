@@ -1,9 +1,9 @@
 """Markdown widget serializer"""
+from widgets.serializers.react_fields import ReactMarkdownWysiwygField
 from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
 )
-from widgets.serializers.react_fields import ReactMarkdownWysiwygField
 
 
 class MarkdownWidgetSerializerConfigSerializer(WidgetConfigSerializer):

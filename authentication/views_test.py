@@ -84,16 +84,16 @@ def assert_api_call(
     return actual
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_email_send(mocker):
     """Mock the email send API"""
-    yield mocker.patch("mail.verification_api.send_verification_email")
+    return mocker.patch("mail.verification_api.send_verification_email")
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_recaptcha_success(mocker):
     """Mock Google recaptcha request"""
-    yield mocker.patch(
+    return mocker.patch(
         "authentication.views.requests.post",
         return_value=MockResponse(
             content='{"success": true}', status_code=status.HTTP_200_OK
@@ -101,10 +101,10 @@ def mock_recaptcha_success(mocker):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_recaptcha_failure(mocker):
     """Mock Google recaptcha request"""
-    yield mocker.patch(
+    return mocker.patch(
         "authentication.views.requests.post",
         return_value=MockResponse(
             content='{"success": false, "error-codes": ["bad-request"]}',
@@ -113,7 +113,7 @@ def mock_recaptcha_failure(mocker):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_email_exists(client, email_user):
     """Yield a function for this step"""
 
@@ -138,10 +138,10 @@ def login_email_exists(client, email_user):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_email_next(client, email_user):
     """Yield a function for this step"""
 
@@ -166,10 +166,10 @@ def login_email_next(client, email_user):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_email_mm_only(client, mm_user):
     """Yield a function for this step"""
 
@@ -191,10 +191,10 @@ def login_email_mm_only(client, mm_user):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_email_saml_exists(client, user, settings):
     """Yield a function for this step"""
 
@@ -225,10 +225,10 @@ def login_email_saml_exists(client, user, settings):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def register_email_exists(client, user, mock_email_send):
     """Yield a function for this step"""
 
@@ -252,10 +252,10 @@ def register_email_exists(client, user, mock_email_send):
         mock_email_send.assert_not_called()
         return result
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def register_mm_exists(client, mm_user, mock_email_send):
     """Yield a function for this step"""
 
@@ -284,10 +284,10 @@ def register_mm_exists(client, mm_user, mock_email_send):
         mock_email_send.assert_not_called()
         return result
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_email_not_exists(client):
     """Yield a function for this step"""
 
@@ -308,10 +308,10 @@ def login_email_not_exists(client):
         assert User.objects.filter(email=NEW_EMAIL).exists() is False
         return result
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def register_email_not_exists(client, mock_email_send):
     """Yield a function for this step"""
 
@@ -332,10 +332,10 @@ def register_email_not_exists(client, mock_email_send):
         assert User.objects.filter(email=NEW_EMAIL).exists() is False
         return result
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def register_email_not_exists_with_recaptcha(
     settings, client, mock_email_send, mock_recaptcha_success
 ):
@@ -363,10 +363,10 @@ def register_email_not_exists_with_recaptcha(
         mock_email_send.assert_called_once()
         return result
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def register_email_not_exists_with_recaptcha_invalid(
     settings, client, mock_email_send, mock_recaptcha_failure
 ):
@@ -391,10 +391,10 @@ def register_email_not_exists_with_recaptcha_invalid(
         mock_email_send.assert_not_called()
         return result
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_password_valid(client, user):
     """Yield a function for this step"""
     password = "password1"
@@ -421,10 +421,10 @@ def login_password_valid(client, user):
             expect_authenticated=True,
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_password_user_inactive(client, user):
     """Yield a function for this step"""
     password = "password1"
@@ -450,10 +450,10 @@ def login_password_user_inactive(client, user):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def login_password_invalid(client, user):
     """Yield a function for this step"""
 
@@ -477,10 +477,10 @@ def login_password_invalid(client, user):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def redeem_confirmation_code(client, mock_email_send):
     """Yield a function for this step"""
 
@@ -502,10 +502,10 @@ def redeem_confirmation_code(client, mock_email_send):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def redeem_confirmation_code_twice(client, mock_email_send):
     """Yield a function for this step"""
 
@@ -530,10 +530,10 @@ def redeem_confirmation_code_twice(client, mock_email_send):
             },
         )
 
-    yield run_step
+    return run_step
 
 
-@pytest.fixture()
+@pytest.fixture
 def register_profile_details(client):
     """Yield a function for this step"""
 
@@ -557,7 +557,7 @@ def register_profile_details(client):
             expect_authenticated=True,
         )
 
-    yield run_step
+    return run_step
 
 
 @pytest.mark.betamax
@@ -601,8 +601,7 @@ def test_login_register_flows(request, steps):
 
 
 def test_new_register_no_session_partial(client):
-    """
-    When a user registers for the first time and a verification email is sent, the partial
+    """When a user registers for the first time and a verification email is sent, the partial
     token should be cleared from the session. The Partial object associated with that token should
     only be used when it's matched from the email verification link.
     """
@@ -716,15 +715,14 @@ class TestDjoserViews:
     def test_password_reset_coerce_204(
         self, mocker, client, user, url, patch_view_method
     ):
-        """
-        Verify that password reset views coerce a 204 response to a 200 in order
+        """Verify that password reset views coerce a 204 response to a 200 in order
         to play nice with redux-hammock.
         """
         mock_response = MockResponse(
             content=None, status_code=status.HTTP_204_NO_CONTENT
         )
         patched_base_method = mocker.patch(
-            "authentication.views.UserViewSet.{}".format(patch_view_method),
+            f"authentication.views.UserViewSet.{patch_view_method}",
             return_value=mock_response,
         )
         client.force_login(user)
@@ -744,8 +742,7 @@ class TestDjoserViews:
     def test_password_change_session_update(
         self, mocker, response_status, expected_session_update, client, user
     ):
-        """
-        Tests that the password change view updates the Django session when the
+        """Tests that the password change view updates the Django session when the
         request succeeds.
         """
         mock_response = MockResponse(content=None, status_code=response_status)

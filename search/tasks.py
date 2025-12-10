@@ -70,11 +70,11 @@ PARTIAL_UPDATE_TASK_SETTINGS = dict(
 
 @contextmanager
 def wrap_retry_exception(*exception_classes):
-    """
-    Wrap exceptions with RetryException so Celery can use it for autoretry
+    """Wrap exceptions with RetryException so Celery can use it for autoretry
 
     Args:
         *exception_classes (tuple of type): Exception classes which should become RetryException
+
     """
     try:
         yield
@@ -109,13 +109,13 @@ def upsert_profile(profile_id):
 
 
 def _update_fields_by_username(username, field_dict, object_types):
-    """
-    Runs a task to update a field value for all docs associated with a given user.
+    """Runs a task to update a field value for all docs associated with a given user.
 
     Args:
         username (str): The username to query by
         field_dict (dict): Dictionary of fields to update
         object_types (list of str): The object types to update
+
     """
     api.update_field_values_by_query(
         query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
@@ -126,12 +126,12 @@ def _update_fields_by_username(username, field_dict, object_types):
 
 @app.task
 def update_author_posts_comments(profile_id):  # pylint: disable=unused-argument
-    """
-    Deprecated - Update author name and avatar in all associated post and comment docs.
+    """Deprecated - Update author name and avatar in all associated post and comment docs.
     Posts and comments removed - this is now a no-op.
 
     Args:
         profile_id: Profile ID (deprecated)
+
     """
 
 
@@ -162,7 +162,6 @@ def upsert_course(course_id):
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
 def upsert_content_file(file_id):
     """Upsert content file based on stored database information"""
-
     content_file_obj = ContentFile.objects.get(id=file_id)
     content_file_data = OSContentFileSerializer(content_file_obj).data
     api.upsert_document(
@@ -281,16 +280,14 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
 
 @app.task
 def update_field_values_by_query(query, field_dict, object_types):
-    """
-    Task that makes a request to update a field value for all ES documents that match some query.
+    """Task that makes a request to update a field value for all ES documents that match some query.
     """
     return api.update_field_values_by_query(query, field_dict, object_types)
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_profiles(ids, update_only=False):
-    """
-    Index user profiles by a list of Profile.id
+    """Index user profiles by a list of Profile.id
 
     Args:
         ids(list of int): List of profile id's
@@ -309,8 +306,7 @@ def index_profiles(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_profiles(ids):
-    """
-    Index user profiles by a list of Profile.id
+    """Index user profiles by a list of Profile.id
 
     Args:
         ids(list of int): List of profile id's
@@ -329,8 +325,7 @@ def bulk_deindex_profiles(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_courses(ids, update_only=False):
-    """
-    Index courses
+    """Index courses
 
     Args:
         ids(list of int): List of course id's
@@ -351,8 +346,7 @@ def index_courses(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_courses(ids):
-    """
-    Deindex courses by a list of course.id
+    """Deindex courses by a list of course.id
 
     Args:
         ids(list of int): List of course id's
@@ -371,8 +365,7 @@ def bulk_deindex_courses(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_course_content_files(course_ids, update_only=False):
-    """
-    Index content files for a list of course ids
+    """Index content files for a list of course ids
 
     Args:
         course_ids(list of int): List of course id's
@@ -393,8 +386,7 @@ def index_course_content_files(course_ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_run_content_files(run_id, update_only=False):
-    """
-    Index content files for a LearningResourceRun
+    """Index content files for a LearningResourceRun
 
     Args:
         run_id(int): LearningResourceRun id
@@ -415,8 +407,7 @@ def index_run_content_files(run_id, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def deindex_run_content_files(run_id):
-    """
-    Deindex content files for a LearningResourceRun
+    """Deindex content files for a LearningResourceRun
 
     Args:
         run_id(int): LearningResourceRun id
@@ -435,8 +426,7 @@ def deindex_run_content_files(run_id):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_programs(ids, update_only=False):
-    """
-    Index programs
+    """Index programs
 
     Args:
         ids(list of int): List of program id's
@@ -456,8 +446,7 @@ def index_programs(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_programs(ids):
-    """
-    Deindex programs
+    """Deindex programs
 
     Args:
         ids(list of int): List of program id's
@@ -476,8 +465,7 @@ def bulk_deindex_programs(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_user_lists(ids, update_only=False):
-    """
-    Index UserLists
+    """Index UserLists
 
     Args:
         ids(list of int): List of UserList id's
@@ -497,8 +485,7 @@ def index_user_lists(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_user_lists(ids):
-    """
-    Deindex UserLists
+    """Deindex UserLists
 
     Args:
         ids(list of int): List of UserList id's
@@ -517,8 +504,7 @@ def bulk_deindex_user_lists(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_staff_lists(ids, update_only=False):
-    """
-    Index StaffLists
+    """Index StaffLists
 
     Args:
         ids(list of int): List of StaffList id's
@@ -538,8 +524,7 @@ def index_staff_lists(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_staff_lists(ids):
-    """
-    Deindex StaffLists
+    """Deindex StaffLists
 
     Args:
         ids(list of int): List of StaffList id's
@@ -558,8 +543,7 @@ def bulk_deindex_staff_lists(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_videos(ids, update_only=False):
-    """
-    Index Videos
+    """Index Videos
 
     Args:
         ids(list of int): List of Video id's
@@ -579,8 +563,7 @@ def index_videos(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_videos(ids):
-    """
-    Deindex videos
+    """Deindex videos
 
     Args:
         ids(list of int): List of video id's
@@ -599,12 +582,12 @@ def bulk_deindex_videos(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_podcasts(ids, update_only=False):
-    """
-    Index Podcasts
+    """Index Podcasts
 
     Args:
         ids(list of int): List of Podcast id's
         update_only (bool): update existing index only
+
     """
     try:
         with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
@@ -619,8 +602,7 @@ def index_podcasts(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_podcasts(ids):
-    """
-    Deindex podcasts
+    """Deindex podcasts
 
     Args:
         ids(list of int): List of podcast id's
@@ -639,12 +621,12 @@ def bulk_deindex_podcasts(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_podcast_episodes(ids, update_only=False):
-    """
-    Index PodcastEpisodes
+    """Index PodcastEpisodes
 
     Args:
         ids(list of int): List of PodcastEpisode id's
         update_only (bool): update existing index only
+
     """
     try:
         with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
@@ -659,8 +641,7 @@ def index_podcast_episodes(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_podcast_episodes(ids):
-    """
-    Deindex podcast_episodes
+    """Deindex podcast_episodes
 
     Args:
         ids(list of int): List of podcast_episode id's
@@ -679,8 +660,7 @@ def bulk_deindex_podcast_episodes(ids):
 
 @app.task(bind=True)
 def start_recreate_index(self, indexes):
-    """
-    Wipe and recreate index and mapping, and index all items.
+    """Wipe and recreate index and mapping, and index all items.
     """
     try:
         new_backing_indices = {
@@ -815,8 +795,7 @@ def start_recreate_index(self, indexes):
 @app.task(bind=True)
 def start_update_index(self, indexes, platform):
     # pylint: disable=too-many-branches
-    """
-    Wipe and recreate index and mapping, and index all items.
+    """Wipe and recreate index and mapping, and index all items.
     """
     try:
         log.info("starting to index %s objects...", ", ".join(indexes))
@@ -895,13 +874,11 @@ def get_update_profiles_tasks():
 
 
 def get_update_courses_tasks(blocklisted_ids, platform):
-    """
-    Get list of tasks to update courses
+    """Get list of tasks to update courses
     Args:
         blocklisted_ids(list of int): List of course id's to exclude
         platform(str): Platform filter for the task
     """
-
     course_update_query = (
         Course.objects.filter(published=True)
         .exclude(course_id__in=blocklisted_ids)
@@ -936,13 +913,11 @@ def get_update_courses_tasks(blocklisted_ids, platform):
 
 
 def get_update_resource_files_tasks(blocklisted_ids, platform):
-    """
-    Get list of tasks to update course files
+    """Get list of tasks to update course files
     Args:
         blocklisted_ids(list of int): List of course id's to exclude
         platform(str): Platform filter for the task
     """
-
     if platform is None or platform in RESOURCE_FILE_PLATFORMS:
         course_update_query = (
             Course.objects.filter(published=True)
@@ -964,13 +939,11 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
                 chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
-    else:
-        return []
+    return []
 
 
 def get_update_programs_tasks():
-    """
-    Get list of tasks to update programs
+    """Get list of tasks to update programs
     """
     index_tasks = [
         index_programs.si(ids, True)
@@ -996,10 +969,8 @@ def get_update_programs_tasks():
 
 
 def get_update_user_lists_tasks():
+    """Get list of tasks to update user lists
     """
-    Get list of tasks to update user lists
-    """
-
     index_tasks = [
         index_user_lists.si(ids, True)
         for ids in chunks(
@@ -1024,10 +995,8 @@ def get_update_user_lists_tasks():
 
 
 def get_update_staff_lists_tasks():
+    """Get list of tasks to update staff lists
     """
-    Get list of tasks to update staff lists
-    """
-
     index_tasks = [
         index_staff_lists.si(ids, True)
         for ids in chunks(
@@ -1053,10 +1022,8 @@ def get_update_staff_lists_tasks():
 
 
 def get_update_videos_tasks():
+    """Get list of tasks to update videos
     """
-    Get list of tasks to update videos
-    """
-
     index_tasks = [
         index_videos.si(ids, True)
         for ids in chunks(
@@ -1081,8 +1048,7 @@ def get_update_videos_tasks():
 
 
 def get_update_podcasts_tasks():
-    """
-    Get list of tasks to update podcasts
+    """Get list of tasks to update podcasts
     """
     index_tasks = [
         index_podcasts.si(ids, True)
@@ -1108,8 +1074,7 @@ def get_update_podcasts_tasks():
 
 
 def get_update_podcast_episodes_tasks():
-    """
-    Get list of tasks to update podcast episodes
+    """Get list of tasks to update podcast episodes
     """
     index_tasks = [
         index_podcast_episodes.si(ids, True)
@@ -1136,12 +1101,12 @@ def get_update_podcast_episodes_tasks():
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def finish_recreate_index(results, backing_indices):
-    """
-    Swap reindex backing index with default backing index
+    """Swap reindex backing index with default backing index
 
     Args:
         results (list or bool): Results saying whether the error exists
         backing_indices (dict): The backing OpenSearch indices keyed by object type
+
     """
     errors = merge_strings(results)
     if errors:

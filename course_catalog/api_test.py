@@ -1,5 +1,4 @@
-"""
-Test course_catalog.api
+"""Test course_catalog.api
 """
 import json
 from datetime import datetime, timedelta
@@ -51,17 +50,15 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def mitx_valid_data():
+    """Test MITx course data
     """
-    Test MITx course data
-    """
-    with open("./test_json/test_mitx_course.json", "r") as test_data:
+    with open("./test_json/test_mitx_course.json") as test_data:
         return json.load(test_data)["results"][0]
 
 
 @pytest.fixture
 def ocw_valid_data():
-    """
-    Test OCW course data
+    """Test OCW course data
     """
     return {
         "uid": "e9387c256bae4ca99cce88fd8b7f8272",
@@ -143,8 +140,7 @@ def ocw_valid_data():
 
 @pytest.fixture
 def ocw_next_valid_data():
-    """
-    Return valid ocw-next data
+    """Return valid ocw-next data
     """
     return {
         "course_title": "Unified Engineering I, II, III, \u0026 IV",
@@ -211,8 +207,7 @@ def ocw_next_valid_data():
 def test_deserializing_a_valid_ocw_course(
     mock_course_index_functions, ocw_valid_data, published
 ):
-    """
-    Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
+    """Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
     """
     digest_ocw_course(ocw_valid_data, now_in_utc(), published)
     assert Course.objects.count() == 1
@@ -273,8 +268,7 @@ def test_deserializing_a_valid_ocw_course(
 def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
     mock_course_index_functions, ocw_valid_data
 ):
-    """
-    Verify that course values are not overwritten if the course already has a newer run
+    """Verify that course values are not overwritten if the course already has a newer run
     """
     course = CourseFactory.create(
         platform=PlatformType.ocw.value,
@@ -297,8 +291,7 @@ def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
 def test_deserializing_a_valid_ocw_course_with_keep_existing_image_src(
     mock_course_index_functions, ocw_valid_data
 ):
-    """
-    Verify that image_src is not overwritten if keep_existing_image_src=True
+    """Verify that image_src is not overwritten if keep_existing_image_src=True
     """
     course = CourseFactory.create(
         platform=PlatformType.ocw.value,
@@ -315,8 +308,7 @@ def test_deserializing_a_valid_ocw_course_with_keep_existing_image_src(
 
 
 def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
-    """
-    Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
+    """Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
     """
     ocw_valid_data.pop("course_id")
     digest_ocw_course(ocw_valid_data, now_in_utc(), True)
@@ -324,8 +316,7 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
 
 
 def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data, mocker):
-    """
-    Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
+    """Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
     """
     mock_log = mocker.patch("course_catalog.api.log.error")
     ocw_valid_data["enrollment_start"] = "This is not a date"
@@ -339,8 +330,7 @@ def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data, mocker):
 def test_deserializing_a_valid_ocw_next_course(
     settings, mock_course_index_functions, ocw_next_valid_data
 ):
-    """
-    Verify that OCWNextSerializer successfully de-serialize a JSON object and create Course model instance
+    """Verify that OCWNextSerializer successfully de-serialize a JSON object and create Course model instance
     """
     settings.OCW_NEXT_BASE_URL = "https://ocw-test.mit.edu"
     uid = "e9387c256bae4ca99cce88fd8b7f8272"
@@ -393,8 +383,7 @@ def test_deserializing_a_valid_ocw_next_course(
 
 
 def test_deserialzing_an_invalid_ocw_next_course(ocw_next_valid_data):
-    """
-    Verifies that OCWNextSerializer validation works correctly if the OCW course has invalid values
+    """Verifies that OCWNextSerializer validation works correctly if the OCW course has invalid values
     """
     uid = "e9387c256bae4ca99cce88fd8b7f8272"
     course_prefix = "courses/my-course"
@@ -649,7 +638,6 @@ def test_sync_ocw_next_course_already_synched(
     settings, mocker, overwrite, start_timestamp
 ):
     """The course should be overwritten only if there is new data or overwrite is true"""
-
     mock_upsert = mocker.patch("course_catalog.api.upsert_course")
     mocker.patch("course_catalog.api.load_content_files")
 
@@ -694,7 +682,6 @@ def test_sync_ocw_next_course_already_synched(
 @mock_s3
 def test_sync_ocw_next_courses(settings, mocker):
     """Test sync_ocw_next_courses"""
-
     setup_s3_ocw_next(settings)
     overwrite = True
     start_timestamp = datetime(2020, 12, 15, tzinfo=pytz.utc)

@@ -29,8 +29,7 @@ def mock_course_index_functions(mocker):
 
 
 def setup_s3(settings):
-    """
-    Set up the fake s3 data
+    """Set up the fake s3 data
     """
     # Fake the settings
     settings.AWS_ACCESS_KEY_ID = "abc"
@@ -49,7 +48,7 @@ def setup_s3(settings):
     test_bucket = conn.Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
     for file in TEST_JSON_FILES:
         file_key = TEST_JSON_PATH.replace("./test_json/", "") + "/" + file
-        with open(TEST_JSON_PATH + "/" + file, "r") as f:
+        with open(TEST_JSON_PATH + "/" + file) as f:
             test_bucket.put_object(Key=file_key, Body=f.read())
 
     # Create our upload bucket
@@ -62,8 +61,7 @@ def setup_s3(settings):
 
 
 def setup_s3_ocw_next(settings):
-    """
-    Set up the fake s3 data
+    """Set up the fake s3 data
     """
     # Fake the settings
     settings.AWS_ACCESS_KEY_ID = "abc"
@@ -90,8 +88,7 @@ def setup_s3_ocw_next(settings):
 
 
 def add_file_to_bucket_recursive(bucket, file_base, s3_base, file_object):
-    """
-    Add file to fake s3 bucket
+    """Add file to fake s3 bucket
     """
     local_path = file_base + "/" + file_object
     file_key = s3_base + "/" + file_object
@@ -99,8 +96,8 @@ def add_file_to_bucket_recursive(bucket, file_base, s3_base, file_object):
     if file_object[0] == ".":
         return
 
-    elif isfile(join(file_base, file_object)):
-        with open(local_path, "r") as f:
+    if isfile(join(file_base, file_object)):
+        with open(local_path) as f:
             bucket.put_object(Key=file_key, Body=f.read())
     else:
         for child in listdir(local_path):

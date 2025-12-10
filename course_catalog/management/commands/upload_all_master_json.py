@@ -14,16 +14,12 @@ class Command(BaseCommand):
         """Run Upload OCW master json"""
         task = upload_ocw_parsed_json.delay()
         self.stdout.write(
-            "Started celery task {task} to upload ocw master json files to s3".format(
-                task=task
-            )
+            f"Started celery task {task} to upload ocw master json files to s3"
         )
         self.stdout.write("Waiting on task...")
         start = now_in_utc()
         task.get()
         total_seconds = (now_in_utc() - start).total_seconds()
         self.stdout.write(
-            "Finished uploading ocw master json files to s3, took {} seconds".format(
-                total_seconds
-            )
+            f"Finished uploading ocw master json files to s3, took {total_seconds} seconds"
         )

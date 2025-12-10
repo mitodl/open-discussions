@@ -17,9 +17,9 @@ from open_discussions.permissions import (
     ObjectOnlyPermissions,
     channel_exists,
     channel_is_mod_editable,
+    is_admin_user,
     is_moderator,
     is_readonly,
-    is_admin_user,
 )
 
 pytestmark = pytest.mark.usefixtures("mock_channel_exists")
@@ -77,8 +77,7 @@ def test_is_staff_user(
 def test_channel_is_mod_editable(
     mocker, membership_is_managed, expected, db
 ):  # pylint: disable=unused-argument
-    """
-    channel_is_mod_editable should be true if the channel exists and the membership is not managed by micromasters
+    """channel_is_mod_editable should be true if the channel exists and the membership is not managed by micromasters
     or another external server
     """
     channel_name = "abc"
@@ -94,8 +93,7 @@ def test_channel_is_mod_editable(
 
 @pytest.mark.parametrize("is_staff", [True, False])
 def test_is_staff_permission(mocker, is_staff):
-    """
-    Test that IsStaffPermission checks that the user is a staff user
+    """Test that IsStaffPermission checks that the user is a staff user
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
@@ -117,8 +115,7 @@ def test_is_staff_permission(mocker, is_staff):
     ],
 )
 def test_is_staff_or_readonly_permission(mocker, is_staff, readonly, expected):
-    """
-    Test that staff users or readonly verbs are allowed
+    """Test that staff users or readonly verbs are allowed
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
@@ -145,8 +142,7 @@ def test_is_staff_or_readonly_permission(mocker, is_staff, readonly, expected):
     ],
 )
 def test_is_staff_or_moderator_permission(mocker, is_staff, moderator, expected):
-    """
-    Test that staff users or moderators are allowed
+    """Test that staff users or moderators are allowed
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
@@ -167,8 +163,7 @@ def test_is_staff_or_moderator_permission(mocker, is_staff, moderator, expected)
 
 @pytest.mark.parametrize("exception_cls", [PrawRedirect, PrawForbidden])
 def test_is_staff_or_moderator_exceptions(mocker, user, exception_cls):
-    """
-    Test that user is deemed not a moderator if praw raises a forbidden or redirect error
+    """Test that user is deemed not a moderator if praw raises a forbidden or redirect error
     """
     perm = IsStaffOrModeratorPermission()
     request = mocker.Mock(user=user)
@@ -196,8 +191,7 @@ def test_is_staff_or_moderator_exceptions(mocker, user, exception_cls):
 def test_is_staff_moderator_or_readonly_permission(
     mocker, is_staff, moderator, readonly, expected
 ):
-    """
-    Test that staff users or moderators are allowed
+    """Test that staff users or moderators are allowed
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
@@ -225,8 +219,7 @@ def test_is_staff_moderator_or_readonly_permission(
 
 @pytest.mark.parametrize("exception_cls", [PrawRedirect, PrawForbidden])
 def test_is_staff_moderator_or_readonly_exceptions(mocker, user, exception_cls):
-    """
-    Test that user is deemed not a moderator if praw raises a forbidden or redirect error
+    """Test that user is deemed not a moderator if praw raises a forbidden or redirect error
     """
     perm = IsStaffModeratorOrReadonlyPermission()
     request = mocker.Mock(user=user)
@@ -252,8 +245,7 @@ def test_is_staff_moderator_or_readonly_exceptions(mocker, user, exception_cls):
 def test_is_own_subscription_permission(
     mocker, logged_in_username, req_body_username, url_kwarg_username, expected
 ):
-    """
-    Test that IsOwnSubscriptionOrAdminPermission returns True if the user is adding/deleting
+    """Test that IsOwnSubscriptionOrAdminPermission returns True if the user is adding/deleting
     their own resource
     """
     view = mocker.Mock(kwargs={"subscriber_name": url_kwarg_username})
@@ -270,8 +262,7 @@ def test_is_own_subscription_permission(
 
 
 def test_contributor_permission_self_delete(mocker):
-    """
-    Test that users can delete their own contributor status
+    """Test that users can delete their own contributor status
     """
     mocker.patch("open_discussions.permissions.is_admin_user", return_value=False)
     mocker.patch("open_discussions.permissions.is_moderator", return_value=False)
@@ -308,8 +299,7 @@ def test_contributor_permission_self_delete(mocker):
 def test_contributor_permission(  # pylint:disable=unused-argument,too-many-arguments
     mocker, is_staff, moderator, mod_editable, readonly, expected
 ):
-    """
-    Test who can view and edit via the contributor REST API
+    """Test who can view and edit via the contributor REST API
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
@@ -364,8 +354,7 @@ def test_contributor_permission(  # pylint:disable=unused-argument,too-many-argu
 def test_moderator_permission(  # pylint:disable=unused-argument,too-many-arguments
     mocker, readonly, is_staff, mod_editable, moderator, expected
 ):
-    """
-    Test who can view and edit via the moderator REST API
+    """Test who can view and edit via the moderator REST API
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_readonly_mock = mocker.patch(
@@ -401,8 +390,7 @@ def test_moderator_permission(  # pylint:disable=unused-argument,too-many-argume
     [("GET", True), ("HEAD", True), ("OPTIONS", True), ("POST", False), ("PUT", False)],
 )
 def test_anonymous_readonly(method, result, mocker):
-    """
-    Test that anonymous users are allowed for readonly verbs
+    """Test that anonymous users are allowed for readonly verbs
     """
     perm = AnonymousAccessReadonlyPermission()
     request = mocker.Mock(user=AnonymousUser(), method=method)
@@ -411,8 +399,7 @@ def test_anonymous_readonly(method, result, mocker):
 
 @pytest.mark.parametrize("method", ["GET", "HEAD", "OPTIONS", "POST", "PUT"])
 def test_not_anonymous(method, mocker):
-    """
-    Authenticated users are always allowed by this permission class
+    """Authenticated users are always allowed by this permission class
     """
     perm = AnonymousAccessReadonlyPermission()
     request = mocker.Mock(user=mocker.Mock(is_anonymous=False), method=method)
@@ -424,8 +411,7 @@ def test_not_anonymous(method, mocker):
 )
 @pytest.mark.django_db
 def test_channel_exists(mocker, name, raises_404):
-    """
-    channel_exists function should raise an Http404 if channel name is not None and doesn't exist
+    """channel_exists function should raise an Http404 if channel name is not None and doesn't exist
     """
     channel_view = mocker.Mock(kwargs={"channel_name": name})
     if name and not raises_404:

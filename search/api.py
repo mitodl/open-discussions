@@ -4,9 +4,9 @@ from collections import Counter, defaultdict
 from operator import itemgetter
 
 from django.conf import settings
+from nested_lookup import nested_lookup
 from opensearch_dsl import Q, Search
 from opensearch_dsl.query import MoreLikeThis
-from nested_lookup import nested_lookup
 
 from course_catalog.constants import PrivacyLevel
 from course_catalog.models import FavoriteItem
@@ -20,31 +20,30 @@ from search.constants import (
     LEARNING_RESOURCE_TYPES,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
+    RESOURCE_FILE_TYPE,
     USER_LIST_TYPE,
     USER_PATH_TYPE,
     VALID_OBJECT_TYPES,
-    RESOURCE_FILE_TYPE,
 )
 
 SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
 
 
 def gen_profile_id(profile_id):
-    """
-    Generates the OpenSearch document id for a profile
+    """Generates the OpenSearch document id for a profile
 
     Args:
         profile_id (str): The username of a Profile object
 
     Returns:
         str: The OpenSearch document id for this object
+
     """
-    return "u_{}".format(profile_id)
+    return f"u_{profile_id}"
 
 
 def gen_course_id(platform, course_id):
-    """
-    Generates the OpenSearch document id for a course
+    """Generates the OpenSearch document id for a course
 
     Args:
         platform (str): The platform of a Course object
@@ -52,14 +51,14 @@ def gen_course_id(platform, course_id):
 
     Returns:
         str: The OpenSearch document id for this object
+
     """
     safe_id = urlsafe_b64encode(course_id.encode("utf-8")).decode("utf-8").rstrip("=")
-    return "co_{}_{}".format(platform, safe_id)
+    return f"co_{platform}_{safe_id}"
 
 
 def gen_content_file_id(key):
-    """
-    Generates the OpenSearch document id for a ContentFile
+    """Generates the OpenSearch document id for a ContentFile
 
     Args:
         run_id (str): The run id of a ContentFile object
@@ -67,93 +66,93 @@ def gen_content_file_id(key):
 
     Returns:
         str: The OpenSearch document id for this object
+
     """
     safe_key = urlsafe_b64encode(key.encode("utf-8")).decode("utf-8").rstrip("=")
-    return "cf_{}".format(safe_key)
+    return f"cf_{safe_key}"
 
 
 def gen_program_id(program_obj):
-    """
-    Generates the OpenSearch document id for a Program
+    """Generates the OpenSearch document id for a Program
 
     Args:
         program_obj (Program): The Program object
 
     Returns:
         str: The OpenSearch document id for this object
+
     """
-    return "program_{}".format(program_obj.id)
+    return f"program_{program_obj.id}"
 
 
 def gen_user_list_id(user_list_obj):
-    """
-    Generates the OpenSearch document id for a UserList
+    """Generates the OpenSearch document id for a UserList
 
     Args:
         user_list_obj (UserList): The UserList object
 
     Returns:
         str: The OpenSearch document id for this object
+
     """
-    return "user_list_{}".format(user_list_obj.id)
+    return f"user_list_{user_list_obj.id}"
 
 
 def gen_staff_list_id(staff_list_obj):
-    """
-    Generates the OpenSearch document id for a StaffList
+    """Generates the OpenSearch document id for a StaffList
 
     Args:
         staff_list_obj (StaffList): The StaffList object
 
     Returns:
         str: The OpenSearch document id for this object
+
     """
-    return "staff_list_{}".format(staff_list_obj.id)
+    return f"staff_list_{staff_list_obj.id}"
 
 
 def gen_video_id(video_obj):
-    """
-    Generates the OpenSearch document id for a Video
+    """Generates the OpenSearch document id for a Video
 
     Args:
         video_obj (Video): The Video object
 
     Returns:
         str: The opensearch document id for this object
+
     """
-    return "video_{}_{}".format(video_obj.platform, video_obj.video_id)
+    return f"video_{video_obj.platform}_{video_obj.video_id}"
 
 
 def gen_podcast_id(podcast_obj):
-    """
-    Generates the opensearch document id for a Podcast
+    """Generates the opensearch document id for a Podcast
 
     Args:
         podcast_obj (Podcast): The Podcast object
 
     Returns:
         str: The opensearch document id for this object
+
     """
-    return "podcast_{}".format(podcast_obj.id)
+    return f"podcast_{podcast_obj.id}"
 
 
 def gen_podcast_episode_id(podcast_episode_obj):
-    """
-    Generates the opensearch document id for a Podcast
+    """Generates the opensearch document id for a Podcast
 
     Args:
         podcast_episode_obj (PodcastEpisode): The PodcastEpisode object
 
     Returns:
         str: The opensearch document id for this object
+
     """
-    return "podcast_ep_{}".format(podcast_episode_obj.id)
+    return f"podcast_ep_{podcast_episode_obj.id}"
 
 
 # pylint: disable=invalid-unary-operand-type
 def _apply_general_query_filters(search, user):
-    """
-    Applies a series of filters to a Search object so permissions are respected, deleted
+    """Applies a series of filters to a Search object so permissions are respected, deleted
     objects are ignored, etc.
 
     search (opensearch_dsl.Search): Search object
@@ -161,6 +160,7 @@ def _apply_general_query_filters(search, user):
 
     Returns:
         opensearch_dsl.Search: Search object with filters applied
+
     """
     # No discussion filtering needed anymore - discussions removed
     return search
@@ -168,8 +168,7 @@ def _apply_general_query_filters(search, user):
 
 # pylint: disable=invalid-unary-operand-type
 def _apply_learning_query_filters(search, user):
-    """
-    Applies a series of filters to a Search object so permissions are respected, deleted
+    """Applies a series of filters to a Search object so permissions are respected, deleted
     objects are ignored, etc.
 
     search (opensearch_dsl.Search): Search object
@@ -177,6 +176,7 @@ def _apply_learning_query_filters(search, user):
 
     Returns:
         opensearch_dsl.Search: Search object with filters applied
+
     """
     # Search public user lists (and user's own lists if logged in)
     if features.is_enabled(features.USER_LIST_SEARCH):
@@ -200,8 +200,7 @@ def _apply_learning_query_filters(search, user):
 
 
 def is_learning_query(query):
-    """
-    Return True if the query includes learning resource types, False otherwise
+    """Return True if the query includes learning resource types, False otherwise
 
     Args:
         query (dict): The query sent to opensearch
@@ -215,8 +214,7 @@ def is_learning_query(query):
 
 
 def relevant_indexes(query):
-    """
-    Return True if the query includes learning resource types, False otherwise
+    """Return True if the query includes learning resource types, False otherwise
 
     Args:
         query (dict): The query sent to opensearch
@@ -243,8 +241,7 @@ def relevant_indexes(query):
 
 
 def execute_search(*, user, query):
-    """
-    Execute a search based on the query
+    """Execute a search based on the query
 
     Args:
         user (User): The user executing the search. Used to determine filters to enforce permissions.
@@ -252,6 +249,7 @@ def execute_search(*, user, query):
 
     Returns:
         dict: The opensearch response dict
+
     """
     indexes = ",".join(relevant_indexes(query))
     search = Search(index=indexes)
@@ -263,9 +261,7 @@ def execute_search(*, user, query):
 
 
 def execute_learn_search(*, user, query):
-    """
-    Execute a learning resources search based on the query
-
+    """Execute a learning resources search based on the query
 
     Args:
         user (User): The user executing the search. Used to determine filters to enforce permissions.
@@ -273,6 +269,7 @@ def execute_learn_search(*, user, query):
 
     Returns:
         dict: The opensearch response dict
+
     """
     indexes = ",".join(relevant_indexes(query))
     search = Search(index=indexes)
@@ -283,16 +280,15 @@ def execute_learn_search(*, user, query):
 
 
 def _transform_search_results_suggest_with_compatability(search_result):
-    """
-    Transform suggest results from opensearch
+    """Transform suggest results from opensearch
 
     Args:
         search_result (dict): The results from opensearch
 
     Returns:
         dict: The opensearch response dict with transformed suggestions
-    """
 
+    """
     es_suggest = search_result.pop("suggest", {})
     search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
     if (
@@ -323,8 +319,7 @@ def _transform_search_results_suggest_with_compatability(search_result):
 
 # pylint: disable=too-many-branches, too-many-locals
 def transform_results(search_result, user, department_filters):
-    """
-    Transform podcast and podcast episode, and userlist and learning path in aggregations
+    """Transform podcast and podcast episode, and userlist and learning path in aggregations
     Add 'is_favorite' and 'lists' fields to the '_source' attributes for learning resources.
 
     Args:
@@ -333,8 +328,8 @@ def transform_results(search_result, user, department_filters):
 
     Returns:
         dict: The OpenSearch response dict with transformed aggregates and source values
-    """
 
+    """
     for aggregation_key in [
         "type",
         "topics",
@@ -431,27 +426,24 @@ def transform_results(search_result, user, department_filters):
 
 
 def _transform_search_result_total_es7(result):
-    """
-    Replace value depending on whether getting sent an int or dict per es6 or 7
+    """Replace value depending on whether getting sent an int or dict per es6 or 7
     Args:
         result (dict): The single result from OpenSearch results
     """
     total = result.get("hits", {}).get("total", {})
     if isinstance(total, int):
         return total
-    else:
-        return total.get("value", 0)
+    return total.get("value", 0)
 
 
 def _transform_search_results_coursenum(search_result, department_filters):
-    """
-    Replace coursenum in search results with the smallest coursenum from a department in department_filters
+    """Replace coursenum in search results with the smallest coursenum from a department in department_filters
 
     Args:
         search_result (dict): The results from OpenSearch
         department_filters (list(string)): list of filtered departments
-    """
 
+    """
     for hit in search_result.get("hits", {}).get("hits", []):
         department_course_numbers = hit.get("_source", {}).get(
             "department_course_numbers"
@@ -474,16 +466,16 @@ def _transform_search_results_coursenum(search_result, department_filters):
 
 
 def find_similar_resources(*, user, value_doc):
-    """
-    Execute a "more like this" query to find learning resources that are similar to the one provided.
+    """Execute a "more like this" query to find learning resources that are similar to the one provided.
 
-     Args:
+    Args:
         user (User): The user executing the search
         value_doc (dict):
             a document representing the data fields we want to search with
 
     Returns:
         dict: The OpenSearch response dict
+
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index)
@@ -531,8 +523,7 @@ def find_similar_resources(*, user, value_doc):
 
 
 def get_similar_topics(value_doc, num_topics, min_term_freq, min_doc_freq):
-    """
-    Get a list of similar topics based on text values
+    """Get a list of similar topics based on text values
 
     Args:
         value_doc (dict):
@@ -547,6 +538,7 @@ def get_similar_topics(value_doc, num_topics, min_term_freq, min_doc_freq):
     Returns:
         list of str:
             list of topic values
+
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index)

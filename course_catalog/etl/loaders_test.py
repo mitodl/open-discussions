@@ -786,7 +786,6 @@ def test_load_playlist_user_list(
 ):
     # pylint: disable=too-many-arguments
     """Test that load_playlist_user_list updates or create the user list"""
-
     settings.OPEN_VIDEO_USER_LIST_OWNER = user.username
 
     playlist = PlaylistFactory.create(has_user_list=has_user_list)

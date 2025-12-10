@@ -8,13 +8,13 @@ import pytest
 from course_catalog.constants import PlatformType
 from course_catalog.etl import pipelines
 from course_catalog.etl.constants import (
-    ProgramLoaderConfig,
     CourseLoaderConfig,
     LearningResourceRunLoaderConfig,
     OfferedByLoaderConfig,
+    ProgramLoaderConfig,
 )
 from course_catalog.etl.prolearn import PROLEARN_DEPARTMENT_MAPPING
-from course_catalog.factories import ProgramFactory, CourseFactory
+from course_catalog.factories import CourseFactory, ProgramFactory
 
 
 @contextmanager
@@ -179,7 +179,6 @@ def test_youtube_etl():
 
 def test_podcast_etl():
     """Verify that podcast etl pipeline executes correctly"""
-
     with reload_mocked_pipeline(
         patch("course_catalog.etl.podcast.extract", autospec=True),
         patch("course_catalog.etl.podcast.transform", autospec=True),
@@ -197,8 +196,7 @@ def test_podcast_etl():
 
 @pytest.mark.django_db
 def test_prolearn_programs_etl():
-    """
-    Verify that the prolearn programs etl executes correctly
+    """Verify that the prolearn programs etl executes correctly
     """
     platforms = PROLEARN_DEPARTMENT_MAPPING.keys()
     mock_programs = ProgramFactory.create_batch(len(platforms))
@@ -223,8 +221,7 @@ def test_prolearn_programs_etl():
 
 @pytest.mark.django_db
 def test_prolearn_courses_etl():
-    """
-    Verify that the prolearn courses etl executes correctly
+    """Verify that the prolearn courses etl executes correctly
     """
     platforms = PROLEARN_DEPARTMENT_MAPPING.keys()
     mock_courses = CourseFactory.create_batch(len(platforms))

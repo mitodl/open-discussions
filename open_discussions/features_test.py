@@ -52,8 +52,7 @@ def test_if_feature_enabled(
     update_value,
     expected_result_value,
 ):
-    """
-    Tests that if_feature_enabled turns a decorated function into a no-op if the
+    """Tests that if_feature_enabled turns a decorated function into a no-op if the
     given feature flag is disabled.
     """
     key = "feature_key"

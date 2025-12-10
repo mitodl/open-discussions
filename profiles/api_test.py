@@ -4,15 +4,11 @@ import pytest
 from open_discussions.factories import UserFactory
 from profiles import api
 from profiles.api import (
-    get_site_type_from_url,
     after_profile_created_or_updated,
+    get_site_type_from_url,
 )
 from profiles.models import (
     Profile,
-    FACEBOOK_DOMAIN,
-    TWITTER_DOMAIN,
-    LINKEDIN_DOMAIN,
-    PERSONAL_SITE_TYPE,
 )
 
 pytestmark = pytest.mark.django_db

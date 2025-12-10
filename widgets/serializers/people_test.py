@@ -1,11 +1,10 @@
 """Tests for people widget serializer"""
 import pytest
 
-from profiles.serializers import ProfileSerializer
 from profiles.models import Profile
+from profiles.serializers import ProfileSerializer
 from widgets.factories import WidgetInstanceFactory
 from widgets.serializers import people
-
 
 pytestmark = pytest.mark.django_db
 

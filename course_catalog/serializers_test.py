@@ -1,5 +1,4 @@
-"""
-Test course_catalog serializers
+"""Test course_catalog serializers
 """
 import pytest
 
@@ -64,8 +63,7 @@ datetime_millis_format = "%Y-%m-%dT%H:%M:%S.%fZ"
     ],
 )
 def test_serialize_course_related_models(offered_by):
-    """
-    Verify that a serialized course contains attributes for related objects
+    """Verify that a serialized course contains attributes for related objects
     """
     course = CourseFactory(
         offered_by=offered_by, topics=CourseTopicFactory.create_batch(3)
@@ -91,8 +89,7 @@ def test_serialize_course_related_models(offered_by):
 
 
 def test_serialize_courserun_related_models():
-    """
-    Verify that a serialized course run contains attributes for related objects
+    """Verify that a serialized course run contains attributes for related objects
     """
     courserun = LearningResourceRunFactory(
         prices=CoursePriceFactory.create_batch(2),
@@ -109,8 +106,7 @@ def test_serialize_courserun_related_models():
 
 
 def test_serialize_program_related_models():
-    """
-    Verify that a serialized program contains attributes for related objects
+    """Verify that a serialized program contains attributes for related objects
     """
     program = ProgramFactory.create(topics=CourseTopicFactory.create_batch(3))
     ProgramItemCourseFactory.create_batch(4, program=program)
@@ -132,8 +128,7 @@ def test_serialize_program_related_models():
     ],
 )
 def test_generic_foreign_key_serializer_classes(factory, valid_type):
-    """
-    Test that generic foreign key serializer properly accepts expected classes and rejects others
+    """Test that generic foreign key serializer properly accepts expected classes and rejects others
     """
     userlist = UserListFactory.create()
     obj = getattr(factories, factory).create()
@@ -156,8 +151,7 @@ def test_generic_foreign_key_serializer_classes(factory, valid_type):
     ],
 )
 def test_userlist_serializer_validation(list_type, valid):
-    """
-    Test that the UserListSerializer validates list_type and topics correctly
+    """Test that the UserListSerializer validates list_type and topics correctly
     """
     topics = CourseTopicFactory.create_batch(2)
     data = {
@@ -181,8 +175,7 @@ def test_userlist_serializer_validation(list_type, valid):
     ],
 )
 def test_userlist_serializer_validation_bad_topic(data, error):
-    """
-    Test that the UserListSerializer invalidates a non-existent topic
+    """Test that the UserListSerializer invalidates a non-existent topic
     """
     data = {
         "title": "My List",
@@ -208,8 +201,7 @@ def test_userlist_serializer_validation_bad_topic(data, error):
 def test_userlistitem_serializer_validation(
     content_type, factory, valid_type, object_exists
 ):
-    """
-    Test that the UserListItemSerializer validates content_type and object correctly
+    """Test that the UserListItemSerializer validates content_type and object correctly
     """
     userlist = UserListFactory.create()
     # pylint:disable=redefined-builtin
@@ -225,8 +217,7 @@ def test_userlistitem_serializer_validation(
 
 
 def test_favorites_serializer():
-    """
-    Test that the favorite serializer generic foreign key works and also rejects unexpected classes
+    """Test that the favorite serializer generic foreign key works and also rejects unexpected classes
     """
     user = UserFactory.create()
     course = CourseFactory.create()
@@ -296,8 +287,7 @@ def test_favorites_serializer():
     ],
 )
 def test_stafflist_generic_foreign_key_serializer_classes(factory, valid_type):
-    """
-    Test that generic foreign key serializer properly accepts expected classes and rejects others for staff lists
+    """Test that generic foreign key serializer properly accepts expected classes and rejects others for staff lists
     """
     stafflist = StaffListFactory.create()
     obj = getattr(factories, factory).create()
@@ -320,8 +310,7 @@ def test_stafflist_generic_foreign_key_serializer_classes(factory, valid_type):
     ],
 )
 def test_stafflist_serializer_validation(list_type, valid):
-    """
-    Test that the StaffListSerializer validates list_type and topics correctly
+    """Test that the StaffListSerializer validates list_type and topics correctly
     """
     topics = CourseTopicFactory.create_batch(2)
     data = {
@@ -345,8 +334,7 @@ def test_stafflist_serializer_validation(list_type, valid):
     ],
 )
 def test_stafflist_serializer_validation_bad_topic(data, error):
-    """
-    Test that the StaffListSerializer invalidates a non-existent topic
+    """Test that the StaffListSerializer invalidates a non-existent topic
     """
     serializer_data = {
         "title": "My List",
@@ -372,8 +360,7 @@ def test_stafflist_serializer_validation_bad_topic(data, error):
 def test_stafflistitem_serializer_validation(
     content_type, factory, valid_type, object_exists
 ):
-    """
-    Test that the StaffListItemSerializer validates content_type and object correctly
+    """Test that the StaffListItemSerializer validates content_type and object correctly
     """
     stafflist = StaffListFactory.create()
     # pylint:disable=redefined-builtin

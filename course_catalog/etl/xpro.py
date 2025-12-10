@@ -1,10 +1,10 @@
 """xPro course catalog ETL"""
 import copy
 import logging
-from dateutil.parser import parse
 
 import pytz
 import requests
+from dateutil.parser import parse
 from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType
@@ -17,14 +17,14 @@ OFFERED_BY = [{"name": OfferedBy.xpro.value}]
 
 
 def _parse_datetime(value):
-    """
-    Parses an xPro datetime string
+    """Parses an xPro datetime string
 
     Args:
         value(str): the datetime in string format
 
     Returns:
         datetime: the parsed datetime
+
     """
     return parse(value).replace(tzinfo=pytz.utc) if value else None
 
@@ -44,14 +44,14 @@ def extract_courses():
 
 
 def _transform_run(course_run):
-    """
-    Transforms a course run into our normalized data structure
+    """Transforms a course run into our normalized data structure
 
     Args:
         course_run (dict): course run data
 
     Returns:
         dict: normalized course run data
+
     """
     return {
         "run_id": course_run["courseware_id"],
@@ -79,14 +79,14 @@ def _transform_run(course_run):
 
 
 def _transform_course(course):
-    """
-    Transforms a course into our normalized data structure
+    """Transforms a course into our normalized data structure
 
     Args:
         course (dict): course data
 
     Returns:
         dict: normalized course data
+
     """
     return {
         "course_id": course["readable_id"],
@@ -108,14 +108,14 @@ def _transform_course(course):
 
 
 def transform_courses(courses):
-    """
-    Transforms a list of courses into our normalized data structure
+    """Transforms a list of courses into our normalized data structure
 
     Args:
         courses (list of dict): courses data
 
     Returns:
         list of dict: normalized courses data
+
     """
     return [_transform_course(course) for course in courses]
 

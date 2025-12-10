@@ -1,5 +1,4 @@
-"""
-Admin site bindings for authentication
+"""Admin site bindings for authentication
 """
 
 from django.contrib import admin

@@ -1,5 +1,4 @@
-"""
-Test tasks
+"""Test tasks
 """
 import json
 from contextlib import contextmanager
@@ -48,16 +47,14 @@ pytestmark = pytest.mark.django_db
 
 @contextmanager
 def does_not_raise():
-    """
-    Mock expression that does not raise an error
+    """Mock expression that does not raise an error
     """
     yield
 
 
 @pytest.fixture
 def mock_logger(mocker):
-    """
-    Mock log exception
+    """Mock log exception
     """
     return mocker.patch("course_catalog.api.log.exception")
 
@@ -154,8 +151,7 @@ def test_get_ocw_next_data(
 
 @mock_s3
 def test_get_ocw_next_courses(settings, mocker, mocked_celery):
-    """
-    Test get_ocw_next_courses
+    """Test get_ocw_next_courses
     """
     setup_s3_ocw_next(settings)
     mocker.patch("course_catalog.api.upsert_course")
@@ -189,8 +185,7 @@ def test_get_ocw_courses(
     mock_blocklist,
     blocklisted,
 ):
-    """
-    Test ocw sync task
+    """Test ocw sync task
     """
     setup_s3(settings)
 
@@ -317,8 +312,7 @@ def test_get_ocw_typeerror(mocker, settings):
 
 
 def test_get_ocw_data_no_settings(settings):
-    """
-    No data should be imported if OCW settings are missing
+    """No data should be imported if OCW settings are missing
     """
     settings.AWS_ACCESS_KEY_ID = None
     get_ocw_data.delay(force_overwrite=True, upload_to_s3=True)
@@ -327,8 +321,7 @@ def test_get_ocw_data_no_settings(settings):
 
 @mock_s3
 def test_get_ocw_data_error_parsing(settings, mocker, mock_logger, mocked_celery):
-    """
-    Test that an error parsing ocw data is correctly logged
+    """Test that an error parsing ocw data is correctly logged
     """
     mocker.patch(
         "course_catalog.api.OCWParser.setup_s3_uploading", side_effect=Exception
@@ -347,8 +340,7 @@ def test_get_ocw_data_error_parsing(settings, mocker, mock_logger, mocked_celery
 
 @mock_s3
 def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger, mocked_celery):
-    """
-    Test that an error reading from S3 is correctly logged
+    """Test that an error reading from S3 is correctly logged
     """
     mocker.patch("course_catalog.api.get_s3_object_and_read", side_effect=Exception)
     setup_s3(settings)
@@ -367,8 +359,7 @@ def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger, mocked_cel
 @mock_s3
 @pytest.mark.parametrize("image_only", [True, False])
 def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mocked_celery):
-    """
-    Test that the ocw parser uploads all files or just images depending on settings
+    """Test that the ocw parser uploads all files or just images depending on settings
     """
     settings.OCW_UPLOAD_IMAGE_ONLY = image_only
     mock_upload_all = mocker.patch(
@@ -388,8 +379,7 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mocked_c
 
 @mock_s3
 def test_upload_ocw_parsed_json(settings, mocker):
-    """
-    Test that ocw_upload_parsed_json uploads to S3
+    """Test that ocw_upload_parsed_json uploads to S3
     """
     setup_s3(settings)
 
@@ -598,7 +588,6 @@ def test_get_youtube_data(mocker, settings, channel_ids):
 
 def test_get_youtube_transcripts(mocker):
     """Verify that get_youtube_transcripts invokes correct course_catalog.etl.youtube functions"""
-
     mock_course_catalog_youtube = mocker.patch("course_catalog.tasks.youtube")
 
     get_youtube_transcripts(created_after=None, created_minutes=2000, overwrite=True)

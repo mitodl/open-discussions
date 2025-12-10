@@ -16,14 +16,14 @@ log = logging.getLogger()
 
 
 def _is_mit_course(course):
-    """
-    Helper function to determine if a course is an MIT course
+    """Helper function to determine if a course is an MIT course
 
     Args:
         course (dict): The JSON object representing the course with all its course runs
 
     Returns:
         bool: indicates whether the course is owned by MIT
+
     """
     for owner in course.get("owners"):
         if owner["key"] in MIT_OWNER_KEYS:
@@ -32,14 +32,14 @@ def _is_mit_course(course):
 
 
 def _load_edx_topic_mappings():
-    """
-    Loads the topic mappings from the crosswalk CSV file
+    """Loads the topic mappings from the crosswalk CSV file
 
     Returns:
         dict:
             the mapping dictionary
+
     """
-    with open("course_catalog/data/edx-topic-mappings.csv", "r") as mapping_file:
+    with open("course_catalog/data/edx-topic-mappings.csv") as mapping_file:
         # drop the column headers (first row)
         # assumes the csv is in "source topic, dest target" format
         return dict(list(csv.reader(mapping_file))[1:])
@@ -49,8 +49,7 @@ EDX_TOPIC_MAPPINGS = SimpleLazyObject(_load_edx_topic_mappings)
 
 
 def _remap_mitx_topics(course):
-    """
-    Remap mitx topics using a crosswalk csv, excluding topics that don't appear in the mapping
+    """Remap mitx topics using a crosswalk csv, excluding topics that don't appear in the mapping
 
     Args:
         course (dict): The JSON object representing the course with all its course runs
@@ -58,6 +57,7 @@ def _remap_mitx_topics(course):
     Returns:
         dict:
             the course with the remapped topics
+
     """
     topics = []
     for topic in course.get("topics", []):

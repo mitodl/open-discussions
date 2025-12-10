@@ -26,7 +26,7 @@ def test_csv_batch_file():
 
             raise _ContextManagerEntered
 
-    with open(batch_file.file.name, "r") as csv_file:
+    with open(batch_file.file.name) as csv_file:
         assert csv_file.read().splitlines() == ["email"]
 
     os.remove(batch_file.file.name)

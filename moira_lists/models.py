@@ -6,8 +6,7 @@ from open_discussions.models import TimestampedModel
 
 
 class MoiraList(TimestampedModel):
-    """
-    Moira list
+    """Moira list
     """
 
     name = models.CharField(max_length=250, unique=True, primary_key=True)
@@ -17,4 +16,4 @@ class MoiraList(TimestampedModel):
         return self.name
 
     def __repr__(self):
-        return "<MoiraList: {self.name!r}>".format(self=self)
+        return f"<MoiraList: {self.name!r}>"

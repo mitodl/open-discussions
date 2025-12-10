@@ -3,33 +3,33 @@ import logging
 
 from django.conf import settings
 
-from notifications.notifiers.exceptions import (
-    UnsupportedNotificationTypeError,
-    CancelNotificationError,
-)
+from notifications import tasks
 from notifications.models import (
-    EmailNotification,
-    NotificationSettings,
-    NOTIFICATION_TYPE_FRONTPAGE,
-    NOTIFICATION_TYPE_COMMENTS,
-    NOTIFICATION_TYPE_MODERATOR,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
+    NOTIFICATION_TYPE_COMMENTS,
+    NOTIFICATION_TYPE_FRONTPAGE,
+    NOTIFICATION_TYPE_MODERATOR,
+    EmailNotification,
+    NotificationSettings,
 )
 from notifications.notifiers import frontpage
-from notifications import tasks
+from notifications.notifiers.exceptions import (
+    CancelNotificationError,
+    UnsupportedNotificationTypeError,
+)
 from open_discussions.utils import chunks
 
 log = logging.getLogger()
 
 
 def ensure_notification_settings(user, skip_moderator_setting=False):
-    """
-    Populates user with notification settings
+    """Populates user with notification settings
 
     Args:
         user (User): user to create settings for
         skip_moderator_setting (boolean): Skip moderator notification creation (deprecated)
+
     """
     existing_notification_types = NotificationSettings.objects.filter(
         user=user
@@ -51,11 +51,11 @@ def ensure_notification_settings(user, skip_moderator_setting=False):
 
 
 def attempt_send_notification_batch(notification_settings_ids):
-    """
-    Attempts to send notification for the given batch of ids
+    """Attempts to send notification for the given batch of ids
 
     Args:
         notification_settings_ids (list of int): list of NotificationSettings.ids
+
     """
     notification_settings = NotificationSettings.objects.filter(
         id__in=notification_settings_ids
@@ -95,14 +95,14 @@ def get_weekly_frontpage_settings_ids():
 
 
 def _get_notifier_for_notification(notification):
-    """
-    Get the notifier for the notification's type
+    """Get the notifier for the notification's type
 
     Args:
         notification (NotificationBase): the notification to get a notifier for
 
     Returns:
         Notifier: instance of the notifier to use
+
     """
     notification_settings = NotificationSettings.objects.get(
         user=notification.user, notification_type=notification.notification_type
@@ -110,25 +110,20 @@ def _get_notifier_for_notification(notification):
 
     if notification.notification_type == NOTIFICATION_TYPE_FRONTPAGE:
         return frontpage.FrontpageDigestNotifier(notification_settings)
-    elif notification.notification_type == NOTIFICATION_TYPE_MODERATOR:
+    if notification.notification_type == NOTIFICATION_TYPE_MODERATOR:
         # Moderator notifications no longer supported - discussions removed
         return None
-    elif notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
+    if notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
         # Comment notifications no longer supported - discussions removed
         return None
-    else:
-        raise UnsupportedNotificationTypeError(
-            "Notification type '{}' is unsupported".format(
-                notification.notification_type
-            )
-        )
+    raise UnsupportedNotificationTypeError(
+        f"Notification type '{notification.notification_type}' is unsupported"
+    )
 
 
 def send_unsent_email_notifications():
+    """Send all notifications that haven't been sent yet
     """
-    Send all notifications that haven't been sent yet
-    """
-
     for notification_ids in chunks(
         EmailNotification.objects.filter(state=EmailNotification.STATE_PENDING)
         .exclude(notification_type=NOTIFICATION_TYPE_FRONTPAGE)
@@ -154,11 +149,11 @@ def send_unsent_email_notifications():
 
 
 def send_email_notification_batch(notification_ids):
-    """
-    Sends a batch of notifications
+    """Sends a batch of notifications
 
     Args:
         notification_ids (list of int): notification ids to send
+
     """
     for notification in EmailNotification.objects.filter(id__in=notification_ids):
         try:
@@ -173,19 +168,16 @@ def send_email_notification_batch(notification_ids):
 
 
 def send_comment_notifications(post_id, comment_id, new_comment_id):
-    """
-    Deprecated - comment notifications no longer supported.
+    """Deprecated - comment notifications no longer supported.
     Kept as stub for Phase 3 cleanup.
     """
-    pass
 
 
 def send_moderator_notifications(post_id, channel_name):
-    """
-    Sends post notifications to channel moderators (deprecated - no-op)
+    """Sends post notifications to channel moderators (deprecated - no-op)
 
     Args:
         post_id (str): base36 post id
         channel_name (str): channel_name
+
     """
-    pass

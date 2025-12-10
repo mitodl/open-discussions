@@ -1,5 +1,4 @@
-"""
-Tests for the indexing API
+"""Tests for the indexing API
 """
 import pytest
 

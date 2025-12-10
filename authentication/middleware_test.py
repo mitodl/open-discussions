@@ -2,7 +2,6 @@
 from urllib.parse import quote
 
 import pytest
-
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.shortcuts import reverse
 from rest_framework import status
@@ -10,8 +9,8 @@ from social_core.exceptions import AuthAlreadyAssociated
 from social_django.utils import load_backend, load_strategy
 
 from authentication.middleware import (
-    SocialAuthExceptionRedirectMiddleware,
     BlockedIPMiddleware,
+    SocialAuthExceptionRedirectMiddleware,
 )
 from authentication.models import BlockedIPRange
 from open_discussions.factories import UserFactory

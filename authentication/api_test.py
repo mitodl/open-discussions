@@ -1,14 +1,15 @@
 """API tests"""
 from typing import Literal
-from django.contrib.auth import get_user_model
+
 import pytest
+from django.contrib.auth import get_user_model
 from social_django.models import UserSocialAuth
 
 from authentication import api
 from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from notifications.models import NotificationSettings
-from profiles.models import Profile
 from open_discussions.test_utils import any_instance_of
+from profiles.models import Profile
 
 User = get_user_model()
 

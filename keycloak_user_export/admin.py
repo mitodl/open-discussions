@@ -1,5 +1,6 @@
 """keycloak_user_export admin"""
 from django.contrib import admin
+
 from keycloak_user_export.models import UserExportToKeycloak
 
 

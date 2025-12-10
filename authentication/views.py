@@ -132,8 +132,7 @@ class RegisterDetailsView(SocialAuthAPIView):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_social_auth_types(request):
-    """
-    View that returns a serialized list of the logged-in user's UserSocialAuth types
+    """View that returns a serialized list of the logged-in user's UserSocialAuth types
     """
     social_auths = (
         UserSocialAuth.objects.filter(user=request.user).values("provider").distinct()
@@ -168,8 +167,7 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
     """Custom class to modify base functionality in Djoser's PasswordResetEmail class"""
 
     def send(self, to, *args, **kwargs):
-        """
-        Overrides djoser.email.PasswordResetEmail#send to use our mail API.
+        """Overrides djoser.email.PasswordResetEmail#send to use our mail API.
         """
         context = self.get_context_data()
         context.update(self.context)
@@ -197,8 +195,7 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
 
 
 class CustomDjoserAPIView(UserViewSet, ActionViewMixin):
-    """
-    Overrides post methods of a Djoser view and adds one extra piece of logic:
+    """Overrides post methods of a Djoser view and adds one extra piece of logic:
 
     In version 0.30.0, the fetch function in redux-hammock does not handle responses
     with empty response data. Djoser returns 204's with empty response data, so we are
@@ -232,8 +229,7 @@ class CustomDjoserAPIView(UserViewSet, ActionViewMixin):
 
     @action(["post"], detail=False)
     def set_password(self, request, *args, **kwargs):
-        """
-        Overrides CustomDjoserAPIView.post to update the session after a successful
+        """Overrides CustomDjoserAPIView.post to update the session after a successful
         password change. Without this explicit refresh, the user's session would be
         invalid and they would be logged out.
         """
@@ -248,8 +244,7 @@ class CustomDjoserAPIView(UserViewSet, ActionViewMixin):
 @permission_classes([IsAuthenticated, IsStaffPermission])
 @authentication_classes([BearerAuthentication])
 def get_user_details_for_keycloak(request, email):
-    """
-    Endpoint for the Keycloak plug-in: https://github.com/daniel-frak/keycloak-user-migration.
+    """Endpoint for the Keycloak plug-in: https://github.com/daniel-frak/keycloak-user-migration.
 
     Args:
         email (string): The email of a user record in Open Discussions.
@@ -264,6 +259,7 @@ def get_user_details_for_keycloak(request, email):
             provided.
             Both requests will respond with a 404 if no Open Discussion's user
             has an email matching the email argument.
+
     """
     user = User.objects.filter(email=email).first()
     if user:
@@ -271,34 +267,29 @@ def get_user_details_for_keycloak(request, email):
             body = json.loads(request.body)
             if "password" in body and user.check_password(body["password"]):
                 return Response({}, status=status.HTTP_200_OK)
-            else:
-                return Response({}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            response = {
-                "email": user.email,
-                "username": user.email,
-                "firstName": user.first_name,
-                "lastName": user.last_name,
-                "enabled": True,
-                "emailVerified": True,
-                "attributes": {},
-                "roles": ["default-roles-olapps"],
-                "groups": [],
-                "requiredActions": [],
-            }
-            return Response(response, status=status.HTTP_200_OK)
-    else:
-        raise Http404("User not found")
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
+        response = {
+            "email": user.email,
+            "username": user.email,
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+            "enabled": True,
+            "emailVerified": True,
+            "attributes": {},
+            "roles": ["default-roles-olapps"],
+            "groups": [],
+            "requiredActions": [],
+        }
+        return Response(response, status=status.HTTP_200_OK)
+    raise Http404("User not found")
 
 
 class CustomLogoutView(views.LogoutView):
-    """
-    Ends the user's Keycloak session in additional to the built in Django logout.
+    """Ends the user's Keycloak session in additional to the built in Django logout.
     """
 
     def _keycloak_logout_url(self, user):
-        """
-        Returns the OpenID Connect logout URL for a user based on their SocialAuth record's id_token
+        """Returns the OpenID Connect logout URL for a user based on their SocialAuth record's id_token
         and the currently configured Keycloak environment variables.
 
         Args:
@@ -306,6 +297,7 @@ class CustomLogoutView(views.LogoutView):
 
         Returns:
             string: The URL to redirect the user to in order to logout.
+
         """
         strategy = load_strategy()
         storage = strategy.storage
@@ -316,25 +308,21 @@ class CustomLogoutView(views.LogoutView):
         return f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout?id_token_hint={id_token}"
 
     def post(self, request, *args, **kwargs):
-        """
-        POST endpoint for logging a user out.
+        """POST endpoint for logging a user out.
         Raises 404 if the user is not included in the request.
         """
         user = getattr(request, "user", None)
         if user and user.is_authenticated:
             super().post(request)
             return redirect(self._keycloak_logout_url(user))
-        else:
-            raise Http404("Not currently logged in.")
+        raise Http404("Not currently logged in.")
 
     def get(self, request, *args, **kwargs):
-        """
-        GET endpoint for loggin a user out.
+        """GET endpoint for loggin a user out.
         Raises 404 if the user is not included in the request.
         """
         user = getattr(request, "user", None)
         if user and user.is_authenticated:
             super().get(request)
             return redirect(self._keycloak_logout_url(user))
-        else:
-            raise Http404("Not currently logged in.")
+        raise Http404("Not currently logged in.")

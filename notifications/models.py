@@ -92,8 +92,7 @@ class NotificationSettings(TimestampedModel):
 
 
 class NotificationBase(TimestampedModel):
-    """
-    Abstract base model for notifications
+    """Abstract base model for notifications
 
     The intent here is to keep a core base behavior that is simple, but allow
     specific delivery mechanisms to add their own fields by having them be separate tables

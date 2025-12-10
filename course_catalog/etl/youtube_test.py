@@ -1,23 +1,24 @@
 """Tests for Video ETL functions"""
 # pylint: disable=redefined-outer-name
+import json
 from collections import defaultdict
-from unittest.mock import Mock, MagicMock
+from datetime import datetime
 from glob import glob
 from os.path import basename
-import json
-from datetime import datetime
-import pytest
-import pytz
+from unittest.mock import MagicMock, Mock
+
 import googleapiclient.errors
+import pytest
 import pytube
+import pytz
 
 from course_catalog.constants import OfferedBy, PlatformType
+from course_catalog.etl import youtube
 from course_catalog.etl.exceptions import (
-    ExtractVideoException,
     ExtractPlaylistException,
     ExtractPlaylistItemException,
+    ExtractVideoException,
 )
-from course_catalog.etl import youtube
 from course_catalog.factories import VideoFactory
 
 
@@ -30,7 +31,7 @@ def youtube_api_responses():
     for pathname in sorted(glob("test_json/youtube/*.json")):
         mod_name, func_name, _, _ = basename(pathname).split(".")
 
-        with open(pathname, "r") as f:
+        with open(pathname) as f:
             mock_responses[(mod_name, func_name)].append(json.load(f))
 
     for (mod_name, func_name), side_effects in mock_responses.items():
@@ -78,7 +79,6 @@ def mock_channel_file(
     offered_by, channel_id, playlist_id, create_user_list=False, user_list_title=None
 ):
     """Mock video channel github file"""
-
     content = f"""---
 offered_by: {offered_by}
 channel_id: {channel_id}
@@ -92,7 +92,6 @@ playlists:
 
 def mock_channel_file_with_wildcard(channel_id, ignore_playlist_id):
     """Mock video channel github file"""
-
     content = f"""---
     channel_id: {channel_id}
     playlists:
@@ -343,7 +342,7 @@ def test_extract_with_exception(
     """Test youtube video ETL"""
     # error on the first call, this will consistently be the first channel
     side_effect = youtube_api_responses[operation_key][:]
-    side_effect[0] = googleapiclient.errors.HttpError(MagicMock(), bytes())
+    side_effect[0] = googleapiclient.errors.HttpError(MagicMock(), b"")
 
     channels_list = youtube_api_responses[("channels", "list")]
     playlists_list = youtube_api_responses[("playlists", "list")]
@@ -432,7 +431,7 @@ def test_extract_with_no_channels(mocker, yaml_parser_response):
 
 
 def test_transform_video(extracted_and_transformed_values):
-    """test youtube transform for a video"""
+    """Test youtube transform for a video"""
     extracted, transformed = extracted_and_transformed_values
     result = youtube.transform_video(extracted[0][2][0][1][0], OfferedBy.ocw.value)
     assert result == transformed[0]["playlists"][0]["videos"][0]
@@ -443,7 +442,7 @@ def test_transform_video(extracted_and_transformed_values):
 def test_transform_playlist(
     extracted_and_transformed_values, has_user_list, user_list_title
 ):
-    """test youtube transform for a playlist"""
+    """Test youtube transform for a playlist"""
     extracted, transformed = extracted_and_transformed_values
     result = youtube.transform_playlist(
         extracted[0][2][0][0],
@@ -460,7 +459,7 @@ def test_transform_playlist(
 
 
 def test_transform(extracted_and_transformed_values):
-    """test youtube transform"""
+    """Test youtube transform"""
     extracted, transformed = extracted_and_transformed_values
     channels = youtube.transform(extracted)
     assert (
@@ -561,10 +560,8 @@ def test_get_youtube_transcripts_with_a_retry(mocker):
 
 @pytest.mark.usefixtures("video_settings")
 def test_get_youtube_transcripts_with_multiple_consecutive_failures(mocker):
+    """Verify that get_youtube_transcript downloads stops after 15 videos fail to download with VideoUnavailable error
     """
-    Verify that get_youtube_transcript downloads stops after 15 videos fail to download with VideoUnavailable error
-    """
-
     mock_video = Mock(id=1)
     video_list = [mock_video for _ in range(20)]
 
@@ -596,7 +593,6 @@ def test_get_youtube_videos_for_transcripts_job(
     overwrite, created_after, created_minutes
 ):
     """Verify that get_youtube_videos_for_transcripts_job applies filters correctly"""
-
     video1 = VideoFactory.create(transcript="saved already")
     video2 = VideoFactory.create(transcript="")
     video3 = VideoFactory.create(transcript="saved already")

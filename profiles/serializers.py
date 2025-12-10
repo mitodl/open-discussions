@@ -1,25 +1,23 @@
-"""
-Serializers for profile REST APIs
+"""Serializers for profile REST APIs
 """
 import re
 
+import ulid
 from django.contrib.auth import get_user_model
 from django.db import transaction
-
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-import ulid
 
 from authentication import api as auth_api
-from profiles.api import get_site_type_from_url, after_profile_created_or_updated
+from profiles.api import after_profile_created_or_updated, get_site_type_from_url
 from profiles.models import (
-    Profile,
-    PROFILE_PROPS,
-    UserWebsite,
     PERSONAL_SITE_TYPE,
+    PROFILE_PROPS,
     SOCIAL_SITE_NAME_MAP,
+    Profile,
+    UserWebsite,
 )
-from profiles.utils import image_uri, IMAGE_MEDIUM, IMAGE_SMALL
+from profiles.utils import IMAGE_MEDIUM, IMAGE_SMALL, image_uri
 
 User = get_user_model()
 
@@ -53,8 +51,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return ""
 
     def validate_location(self, location):
-        """
-        Validator for location.
+        """Validator for location.
         """
         if location and (
             not isinstance(location, dict) or ("value" not in location.keys())
@@ -74,8 +71,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             return instance
 
     def to_representation(self, instance):
-        """
-        Overridden serialization method. Adds serialized UserWebsites if an option in the context indicates that
+        """Overridden serialization method. Adds serialized UserWebsites if an option in the context indicates that
         it should be included.
         """
         data = super().to_representation(instance)
@@ -120,8 +116,7 @@ class UserWebsiteSerializer(serializers.ModelSerializer):
     """Serializer for UserWebsite"""
 
     def validate_url(self, value):
-        """
-        Validator for url. Prepends http protocol to the url if the protocol wasn't already included in the value.
+        """Validator for url. Prepends http protocol to the url if the protocol wasn't already included in the value.
         """
         url = "" if not value else value.lower()
         if not re.search(r"^http[s]?://", url):
@@ -129,8 +124,7 @@ class UserWebsiteSerializer(serializers.ModelSerializer):
         return url
 
     def to_internal_value(self, data):
-        """
-        Overridden deserialization method. Changes the default behavior in the following ways:
+        """Overridden deserialization method. Changes the default behavior in the following ways:
         1) Gets the profile id from a given username.
         2) Calculates the site_type from the url value and adds it to the internal value.
         """
@@ -148,8 +142,7 @@ class UserWebsiteSerializer(serializers.ModelSerializer):
         return internal_value
 
     def run_validators(self, value):
-        """
-        Overridden validation method. Changes the default behavior in the following ways:
+        """Overridden validation method. Changes the default behavior in the following ways:
         1) If the user submitted a URL to save as a specific site type (personal/social),
             ensure that the URL entered matches that submitted site type.
         2) If the data provided violates the uniqueness of the site type for the given user, coerce
@@ -173,7 +166,7 @@ class UserWebsiteSerializer(serializers.ModelSerializer):
                     }
                 )
             # The URL is for a social site, but was submitted as a personal site
-            elif (
+            if (
                 calculated_site_type in SOCIAL_SITE_NAME_MAP
                 and submitted_site_type == PERSONAL_SITE_TYPE
             ):
@@ -194,8 +187,7 @@ class UserWebsiteSerializer(serializers.ModelSerializer):
                 )
 
     def to_representation(self, instance):
-        """
-        Overridden serialization method. Excludes 'profile' from the serialized data as it isn't relevant as a
+        """Overridden serialization method. Excludes 'profile' from the serialized data as it isn't relevant as a
         serialized field (we only need to deserialize that value).
         """
         data = super().to_representation(instance)
