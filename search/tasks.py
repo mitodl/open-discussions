@@ -129,7 +129,7 @@ def update_author_posts_comments(profile_id):
     """
     Deprecated - Update author name and avatar in all associated post and comment docs.
     Posts and comments removed - this is now a no-op.
-    
+
     Args:
         profile_id: Profile ID (deprecated)
     """

@@ -10,7 +10,7 @@ class FrontpageDigestNotifier(EmailNotifier):
     def __init__(self, notification_settings):
         """
         Initialize the notifier with notification settings
-        
+
         Args:
             notification_settings: NotificationSettings instance
         """

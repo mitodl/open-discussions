@@ -66,4 +66,3 @@ class EmailNotificationFactory(DjangoModelFactory):
             sent_at=Faker("past_datetime", tzinfo=pytz.utc),
         )
         sending = factory.Trait(state=EmailNotification.STATE_SENDING)
-
