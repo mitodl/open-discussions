@@ -18,8 +18,7 @@ log = logging.getLogger(__name__)
 
 
 class ESView(APIView):
-    """Parent class for views that execute ES searches
-    """
+    """Parent class for views that execute ES searches"""
 
     def handle_exception(self, exc):
         if isinstance(exc, TransportError):
@@ -31,8 +30,7 @@ class ESView(APIView):
 
 @method_decorator(blocked_ip_exempt, name="dispatch")
 class SearchView(ESView):
-    """View for executing searches of posts, comments, profiles, learning resources
-    """
+    """View for executing searches of posts, comments, profiles, learning resources"""
 
     permission_classes = ()
 
@@ -48,8 +46,7 @@ class SearchView(ESView):
 
 @method_decorator(blocked_ip_exempt, name="dispatch")
 class SimilarResourcesView(ESView):
-    """View for retrieving similar learning resources
-    """
+    """View for retrieving similar learning resources"""
 
     permission_classes = ()
 

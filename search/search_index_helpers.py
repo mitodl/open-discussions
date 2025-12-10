@@ -34,8 +34,7 @@ log = logging.getLogger()
 
 
 def try_with_retry_as_task(function, *args):
-    """Try running the task, if it errors, run it as a celery task.
-    """
+    """Try running the task, if it errors, run it as a celery task."""
     try:
         function(*args)
     except Exception:  # pylint:disable=broad-except

@@ -7,8 +7,7 @@ from open_discussions.utils import now_in_utc
 
 
 class TimestampedModelQuerySet(QuerySet):
-    """Subclassed QuerySet for TimestampedModelManager
-    """
+    """Subclassed QuerySet for TimestampedModelManager"""
 
     def update(self, **kwargs):
         """Automatically update updated_on timestamp when .update(). This is because .update()
@@ -21,8 +20,7 @@ class TimestampedModelQuerySet(QuerySet):
 
 
 class TimestampedModel(Model):
-    """Base model for create/update timestamps
-    """
+    """Base model for create/update timestamps"""
 
     objects = TimestampedModelQuerySet.as_manager()
     created_on = DateTimeField(auto_now_add=True)  # UTC

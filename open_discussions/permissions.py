@@ -134,8 +134,7 @@ class IsOwnSubscriptionOrAdminPermission(permissions.BasePermission):
 
 
 class ContributorPermissions(permissions.BasePermission):
-    """Only staff and moderators should be able to see and edit the list of contributors
-    """
+    """Only staff and moderators should be able to see and edit the list of contributors"""
 
     def has_permission(self, request, view):
         if not channel_exists(view):
@@ -153,8 +152,7 @@ class ContributorPermissions(permissions.BasePermission):
 
 
 class ModeratorPermissions(permissions.BasePermission):
-    """All users should be able to see a list of moderators. Only staff and moderators should be able to edit it.
-    """
+    """All users should be able to see a list of moderators. Only staff and moderators should be able to edit it."""
 
     def has_permission(self, request, view):
         return channel_exists(view) and (

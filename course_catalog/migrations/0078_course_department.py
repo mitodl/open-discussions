@@ -10,8 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [("course_catalog", "0077_learningresourcerun_slug")]
 
     def backfill_department(apps, schema_editor):
-        """Backfills department values for existing Courses
-        """
+        """Backfills department values for existing Courses"""
         Course = apps.get_model("course_catalog", "Course")
         LearningResourceRun = apps.get_model("course_catalog", "LearningResourceRun")
         ContentType = apps.get_model("contenttypes", "ContentType")

@@ -7,8 +7,7 @@ from search.search_index_helpers import deindex_course
 
 
 def delete_resources(apps, schema_editor):
-    """Delete all courses, runs, and bootcamps.  They will need to be imported again.
-    """
+    """Delete all courses, runs, and bootcamps.  They will need to be imported again."""
     Course = apps.get_model("course_catalog", "Course")
     CourseRun = apps.get_model("course_catalog", "CourseRun")
     Bootcamp = apps.get_model("course_catalog", "Bootcamp")

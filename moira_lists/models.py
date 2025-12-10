@@ -6,8 +6,7 @@ from open_discussions.models import TimestampedModel
 
 
 class MoiraList(TimestampedModel):
-    """Moira list
-    """
+    """Moira list"""
 
     name = models.CharField(max_length=250, unique=True, primary_key=True)
     users = models.ManyToManyField(User, related_name="moira_lists")

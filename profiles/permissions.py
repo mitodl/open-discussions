@@ -12,12 +12,10 @@ def is_owner_or_privileged_user(obj_user, request):
 
 
 class HasEditPermission(permissions.BasePermission):
-    """Only profile's User, or Jwt/Staff, or superuser has permission to edit a profile.
-    """
+    """Only profile's User, or Jwt/Staff, or superuser has permission to edit a profile."""
 
     def has_object_permission(self, request, view, obj):
-        """Only allow editing for owner of the profile, jwt_staff, or superusers
-        """
+        """Only allow editing for owner of the profile, jwt_staff, or superusers"""
         if request.method in permissions.SAFE_METHODS:
             return True
 

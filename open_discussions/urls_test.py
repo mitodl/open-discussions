@@ -23,19 +23,29 @@ def test_index():
 )
 def test_post_slug_match(post_slug):
     """Test that our post slug regex correctly matches valid values"""
-    assert reverse(
-        "channel-post",
-        kwargs={"channel_name": "channel1", "post_id": "1n", "post_slug": post_slug},
-    ) == f"/c/channel1/1n/{quote_plus(post_slug)}"
-    assert reverse(
-        "channel-post-comment",
-        kwargs={
-            "channel_name": "channel1",
-            "post_id": "1n",
-            "post_slug": post_slug,
-            "comment_id": "b4",
-        },
-    ) == f"/c/channel1/1n/{quote_plus(post_slug)}/comment/b4"
+    assert (
+        reverse(
+            "channel-post",
+            kwargs={
+                "channel_name": "channel1",
+                "post_id": "1n",
+                "post_slug": post_slug,
+            },
+        )
+        == f"/c/channel1/1n/{quote_plus(post_slug)}"
+    )
+    assert (
+        reverse(
+            "channel-post-comment",
+            kwargs={
+                "channel_name": "channel1",
+                "post_id": "1n",
+                "post_slug": post_slug,
+                "comment_id": "b4",
+            },
+        )
+        == f"/c/channel1/1n/{quote_plus(post_slug)}/comment/b4"
+    )
 
 
 @pytest.mark.parametrize("post_slug", ["spaced slug", "non-alphanum-$"])

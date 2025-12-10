@@ -98,12 +98,8 @@ class Profile(models.Model):
                 )
 
                 # name doesn't matter here, we use upload_to to produce that
-                self.image_small_file.save(
-                    f"{uuid4().hex}.jpg", small_thumbnail
-                )
-                self.image_medium_file.save(
-                    f"{uuid4().hex}.jpg", medium_thumbnail
-                )
+                self.image_small_file.save(f"{uuid4().hex}.jpg", small_thumbnail)
+                self.image_medium_file.save(f"{uuid4().hex}.jpg", medium_thumbnail)
             else:
                 self.image_small_file = None
                 self.image_medium_file = None

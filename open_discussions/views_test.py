@@ -97,48 +97,6 @@ def test_channel_redirect(client, url, redirect):
     assert last_url == redirect
 
 
-@pytest.mark.parametrize("removed", [True, False])
-def test_missing_post_404(client, removed):
-    """Test that the 404 page works"""
-    post = PostFactory.create(removed=removed)
-
-    resp = client.get(
-        reverse(
-            "channel-post",
-            kwargs=dict(
-                channel_name=post.channel.name, post_id=post.post_id, post_slug="slug"
-            ),
-        )
-    )
-    if removed:
-        assert resp.status_code == status.HTTP_404_NOT_FOUND
-    else:
-        assert resp.status_code == status.HTTP_200_OK
-
-
-@pytest.mark.parametrize("removed", [True, False])
-def test_missing_post_comments_404(client, removed):
-    """Test that the 404 page works"""
-    post = PostFactory.create(removed=removed)
-    comment = CommentFactory.create()
-
-    resp = client.get(
-        reverse(
-            "channel-post-comment",
-            kwargs=dict(
-                channel_name=post.channel.name,
-                post_id=post.post_id,
-                post_slug="slug",
-                comment_id=comment.comment_id,
-            ),
-        )
-    )
-    if removed:
-        assert resp.status_code == status.HTTP_404_NOT_FOUND
-    else:
-        assert resp.status_code == status.HTTP_200_OK
-
-
 def test_facebook_user_agent(client):
     """Test that a Facebook crawler will be served a special html template"""
     response = client.get(

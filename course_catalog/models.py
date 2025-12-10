@@ -118,8 +118,7 @@ class LearningResourceGenericRelationsMixin(models.Model):
 
 
 class CourseInstructor(TimestampedModel):
-    """Instructors for all courses
-    """
+    """Instructors for all courses"""
 
     first_name = models.CharField(max_length=128, null=True, blank=True)
     last_name = models.CharField(max_length=128, null=True, blank=True)
@@ -133,8 +132,7 @@ class CourseInstructor(TimestampedModel):
 
 
 class CourseTopic(TimestampedModel):
-    """Topics for all courses (e.g. "History")
-    """
+    """Topics for all courses (e.g. "History")"""
 
     name = models.CharField(max_length=128, unique=True)
 
@@ -143,8 +141,7 @@ class CourseTopic(TimestampedModel):
 
 
 class CoursePrice(TimestampedModel):
-    """Price model for all courses (e.g. "price": 0.00, "mode": "audit")
-    """
+    """Price model for all courses (e.g. "price": 0.00, "mode": "audit")"""
 
     price = models.DecimalField(decimal_places=2, max_digits=12)
     mode = models.CharField(max_length=128)
@@ -164,8 +161,7 @@ class LearningResourceOfferor(TimestampedModel):
 
 
 class LearningResource(TimestampedModel):
-    """Base class for all learning resource models under course_catalog app.
-    """
+    """Base class for all learning resource models under course_catalog app."""
 
     title = models.CharField(max_length=256)
     short_description = models.TextField(null=True, blank=True)
@@ -178,8 +174,7 @@ class LearningResource(TimestampedModel):
 
 
 class AbstractCourse(LearningResource):
-    """Abstract data model for course models
-    """
+    """Abstract data model for course models"""
 
     full_description = models.TextField(null=True, blank=True)
     image_src = models.TextField(max_length=2048, null=True, blank=True)
@@ -203,8 +198,7 @@ class AbstractCourse(LearningResource):
 
 
 class LearningResourceRun(AbstractCourse):
-    """Model for course runs
-    """
+    """Model for course runs"""
 
     run_id = models.CharField(max_length=128)
     platform = models.CharField(max_length=128)
@@ -259,8 +253,7 @@ class LearningResourceRun(AbstractCourse):
 
 
 class ContentFile(TimestampedModel):
-    """ContentFile model for courserun files
-    """
+    """ContentFile model for courserun files"""
 
     uid = models.CharField(max_length=36, null=True, blank=True)
     key = models.CharField(max_length=1024, null=True, blank=True)
@@ -309,8 +302,7 @@ def get_max_length(field):
 
 
 class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
-    """Course model for courses on all platforms
-    """
+    """Course model for courses on all platforms"""
 
     objects = LearningResourceQuerySet.as_manager()
 
@@ -388,8 +380,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
 
 class List(LearningResource):
-    """List model tracks an ordered list of other LearningResources.
-    """
+    """List model tracks an ordered list of other LearningResources."""
 
     image_description = models.CharField(max_length=1024, null=True, blank=True)
 
@@ -417,8 +408,7 @@ class ListItem(TimestampedModel):
 
 
 class LearningList(List, LearningResourceGenericRelationsMixin):
-    """Abstract class and base for user lists and staff lists
-    """
+    """Abstract class and base for user lists and staff lists"""
 
     objects = LearningResourceQuerySet.as_manager()
 
@@ -448,8 +438,7 @@ class LearningList(List, LearningResourceGenericRelationsMixin):
 
 
 class UserList(LearningList):
-    """UserList is a user-created model tracking a restricted list of LearningResources.
-    """
+    """UserList is a user-created model tracking a restricted list of LearningResources."""
 
     image_src = models.ImageField(
         null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
@@ -460,8 +449,7 @@ class UserList(LearningList):
 
 
 class UserListItem(ListItem):
-    """ListItem model for UserLists
-    """
+    """ListItem model for UserLists"""
 
     content_type = models.ForeignKey(
         ContentType,
@@ -476,8 +464,7 @@ class UserListItem(ListItem):
 
 
 class StaffList(LearningList):
-    """StaffList is similar to UserList but can only be creadted/edited by a specific group of users
-    """
+    """StaffList is similar to UserList but can only be creadted/edited by a specific group of users"""
 
     image_src = models.ImageField(
         null=True, blank=True, max_length=2083, upload_to=staff_list_image_upload_uri
@@ -488,8 +475,7 @@ class StaffList(LearningList):
 
 
 class StaffListItem(ListItem):
-    """ListItem model for StaffLists
-    """
+    """ListItem model for StaffLists"""
 
     content_type = models.ForeignKey(
         ContentType,
@@ -504,8 +490,7 @@ class StaffListItem(ListItem):
 
 
 class Program(List, LearningResourceGenericRelationsMixin):
-    """Program model for MIT programs. Consists of specified list of LearningResources.
-    """
+    """Program model for MIT programs. Consists of specified list of LearningResources."""
 
     objects = LearningResourceQuerySet.as_manager()
 
@@ -531,8 +516,7 @@ class Program(List, LearningResourceGenericRelationsMixin):
 
 
 class ProgramItem(ListItem):
-    """ListItem model for Programs
-    """
+    """ListItem model for Programs"""
 
     program = models.ForeignKey(Program, related_name="items", on_delete=models.CASCADE)
 
@@ -614,8 +598,7 @@ class Video(LearningResource, LearningResourceGenericRelationsMixin):
 
 
 class Playlist(List, LearningResourceGenericRelationsMixin):
-    """Video playlist model, contains videos
-    """
+    """Video playlist model, contains videos"""
 
     objects = LearningResourceQuerySet.as_manager()
 

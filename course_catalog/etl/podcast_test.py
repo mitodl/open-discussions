@@ -52,8 +52,7 @@ rss_url: {rss_url}
 
 @pytest.fixture
 def mock_rss_request(mocker):
-    """Mock request data
-    """
+    """Mock request data"""
     mocker.patch(
         "course_catalog.etl.podcast.requests.get",
         side_effect=[mocker.Mock(content=rss_content())],
@@ -62,8 +61,7 @@ def mock_rss_request(mocker):
 
 @pytest.fixture
 def mock_rss_request_with_bad_rss_file(mocker):
-    """Mock request data
-    """
+    """Mock request data"""
     mocker.patch(
         "course_catalog.etl.podcast.requests.get",
         side_effect=[mocker.Mock(content=""), mocker.Mock(content=rss_content())],

@@ -21,8 +21,7 @@ pytestmark = pytest.mark.django_db
 
 @mock_s3
 def test_transform_ocw_next_content_files(settings, mocker):
-    """Test transform_ocw_next_content_files
-    """
+    """Test transform_ocw_next_content_files"""
     setup_s3_ocw_next(settings)
     s3_resource = boto3.resource("s3")
     mocker.patch(
@@ -93,8 +92,7 @@ def test_transform_ocw_next_content_files(settings, mocker):
 def test_transform_resource_needs_text_update(
     settings, mocker, overwrite, modified_after_last_import
 ):
-    """Test transform_resource
-    """
+    """Test transform_resource"""
     setup_s3_ocw_next(settings)
     s3_resource = boto3.resource("s3")
     mock_tika = mocker.patch(

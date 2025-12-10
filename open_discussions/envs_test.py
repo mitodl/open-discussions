@@ -28,8 +28,7 @@ FAKE_ENVIRONS = {
 
 
 def test_get_any():
-    """get_any should parse an environment variable into a bool, int, or a string
-    """
+    """get_any should parse an environment variable into a bool, int, or a string"""
     expected = {
         "true": True,
         "false": False,
@@ -50,8 +49,7 @@ def test_get_any():
 
 
 def test_get_string():
-    """get_string should get the string from the environment variable
-    """
+    """get_string should get the string from the environment variable"""
     with patch("open_discussions.envs.os", environ=FAKE_ENVIRONS):
         for key, value in FAKE_ENVIRONS.items():
             assert get_string(key, "default") == value
@@ -60,8 +58,7 @@ def test_get_string():
 
 
 def test_get_int():
-    """get_int should get the int from the environment variable, or raise an exception if it's not parseable as an int
-    """
+    """get_int should get the int from the environment variable, or raise an exception if it's not parseable as an int"""
     with patch("open_discussions.envs.os", environ=FAKE_ENVIRONS):
         assert get_int("positive", 1234) == 123
         assert get_int("negative", 1234) == -456
@@ -71,16 +68,15 @@ def test_get_int():
             if key not in ("positive", "negative", "zero"):
                 with pytest.raises(EnvironmentVariableParseException) as ex:
                     get_int(key, 1234)
-                assert ex.value.args[
-                    0
-                ] == f"Expected value in {key}={value} to be an int"
+                assert (
+                    ex.value.args[0] == f"Expected value in {key}={value} to be an int"
+                )
 
         assert get_int("missing", "default") == "default"
 
 
 def test_get_bool():
-    """get_bool should get the bool from the environment variable, or raise an exception if it's not parseable as a bool
-    """
+    """get_bool should get the bool from the environment variable, or raise an exception if it's not parseable as a bool"""
     with patch("open_discussions.envs.os", environ=FAKE_ENVIRONS):
         assert get_bool("true", 1234) is True
         assert get_bool("false", 1234) is False
@@ -89,16 +85,16 @@ def test_get_bool():
             if key not in ("true", "false"):
                 with pytest.raises(EnvironmentVariableParseException) as ex:
                     get_bool(key, 1234)
-                assert ex.value.args[
-                    0
-                ] == f"Expected value in {key}={value} to be a boolean"
+                assert (
+                    ex.value.args[0]
+                    == f"Expected value in {key}={value} to be a boolean"
+                )
 
         assert get_int("missing", "default") == "default"
 
 
 def test_get_list_of_str():
-    """get_list_of_str should parse a list of strings
-    """
+    """get_list_of_str should parse a list of strings"""
     with patch("open_discussions.envs.os", environ=FAKE_ENVIRONS):
         assert get_list_of_str("list_of_str", ["noth", "ing"]) == ["x", "y", "z"]
 
@@ -106,8 +102,9 @@ def test_get_list_of_str():
             if key != "list_of_str":
                 with pytest.raises(EnvironmentVariableParseException) as ex:
                     get_list_of_str(key, ["noth", "ing"])
-                assert ex.value.args[
-                    0
-                ] == f"Expected value in {key}={value} to be a list of str"
+                assert (
+                    ex.value.args[0]
+                    == f"Expected value in {key}={value} to be a list of str"
+                )
 
         assert get_list_of_str("missing", "default") == "default"

@@ -6,8 +6,7 @@ from open_discussions.utils import FeatureFlag
 
 
 class QueryStringFeatureFlagMiddleware:
-    """Extracts feature flags from the query string
-    """
+    """Extracts feature flags from the query string"""
 
     @classmethod
     def get_flag_key(cls, suffix):
@@ -71,8 +70,7 @@ class QueryStringFeatureFlagMiddleware:
 
 
 class CookieFeatureFlagMiddleware:
-    """Extracts feature flags from a cookie
-    """
+    """Extracts feature flags from a cookie"""
 
     @classmethod
     def decode_feature_flags(cls, value):

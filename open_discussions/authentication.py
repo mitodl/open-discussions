@@ -48,8 +48,7 @@ class StatelessTokenAuthentication(BaseAuthentication):
     """
 
     def authenticate(self, request):
-        """Attempts to authenticate using a stateless token
-        """
+        """Attempts to authenticate using a stateless token"""
         from open_discussions.auth_utils import unsign_and_verify_username_from_token
 
         if "HTTP_AUTHORIZATION" in request.META:

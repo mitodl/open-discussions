@@ -28,10 +28,8 @@ from search.constants import (
     MAPPING,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
-    POST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
-    RESOURCE_FILE_TYPE,
     SCRIPTING_LANG,
     STAFF_LIST_TYPE,
     UPDATE_CONFLICT_SETTING,
@@ -361,17 +359,6 @@ def index_items(documents, object_type, update_only, **kwargs):
                     raise ReindexException(
                         f"Error during bulk {object_type} insert: {errors}"
                     )
-
-
-def index_posts(ids, update_only=False):
-    """Index a list of posts by id
-
-    Args:
-        ids(list of int): List of Post id's
-        update_only (bool): Update existing index only
-
-    """
-    index_items(serialize_bulk_posts(ids), POST_TYPE, update_only)
 
 
 def index_profiles(ids, update_only=False):
@@ -704,8 +691,7 @@ def switch_indices(backing_index, object_type):
 
 
 def delete_orphaned_indices():
-    """Delete any indices without aliases and any reindexing aliases
-    """
+    """Delete any indices without aliases and any reindexing aliases"""
     conn = get_conn()
     indices = conn.indices.get_alias(index="*")
     for index in indices:

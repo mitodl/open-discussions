@@ -196,8 +196,7 @@ def test_podcast_etl():
 
 @pytest.mark.django_db
 def test_prolearn_programs_etl():
-    """Verify that the prolearn programs etl executes correctly
-    """
+    """Verify that the prolearn programs etl executes correctly"""
     platforms = PROLEARN_DEPARTMENT_MAPPING.keys()
     mock_programs = ProgramFactory.create_batch(len(platforms))
     with reload_mocked_pipeline(
@@ -221,8 +220,7 @@ def test_prolearn_programs_etl():
 
 @pytest.mark.django_db
 def test_prolearn_courses_etl():
-    """Verify that the prolearn courses etl executes correctly
-    """
+    """Verify that the prolearn courses etl executes correctly"""
     platforms = PROLEARN_DEPARTMENT_MAPPING.keys()
     mock_courses = CourseFactory.create_batch(len(platforms))
     with reload_mocked_pipeline(

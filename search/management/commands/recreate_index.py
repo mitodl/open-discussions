@@ -56,6 +56,4 @@ class Command(BaseCommand):
             raise CommandError(f"Recreate index errored: {error}")
 
         total_seconds = (now_in_utc() - start).total_seconds()
-        self.stdout.write(
-            f"Recreate index finished, took {total_seconds} seconds"
-        )
+        self.stdout.write(f"Recreate index finished, took {total_seconds} seconds")

@@ -20,8 +20,7 @@ sue@gmail.com: blocks `sue@gmail.com` and `bobbysue@gmail.com`<br/>
 
 
 class BlockedEmailRegex(TimestampedModel):
-    """An object indicating emails to block based on a matching regex string
-    """
+    """An object indicating emails to block based on a matching regex string"""
 
     match = models.CharField(
         max_length=256, null=False, blank=False, help_text=mark_safe(HELP_TEXT)
@@ -29,8 +28,7 @@ class BlockedEmailRegex(TimestampedModel):
 
 
 class BlockedIPRange(TimestampedModel):
-    """An object indicating ip ranges to block
-    """
+    """An object indicating ip ranges to block"""
 
     ip_start = models.GenericIPAddressField(null=False, blank=False)
     ip_end = models.GenericIPAddressField(null=False, blank=False)

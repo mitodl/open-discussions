@@ -24,8 +24,7 @@ def test_any_instance_of():
 
 
 def test_assert_not_raises_none():
-    """assert_not_raises should do nothing if no exception is raised
-    """
+    """assert_not_raises should do nothing if no exception is raised"""
     with assert_not_raises():
         pass
 

@@ -22,8 +22,7 @@ small_gif = (
 
 
 def test_serialize_user(user):
-    """Test serializing a user
-    """
+    """Test serializing a user"""
     profile = user.profile
 
     assert UserSerializer(user).data == {
@@ -48,8 +47,7 @@ def test_serialize_user(user):
 
 
 def test_serialize_create_user(db, mocker):
-    """Test creating a user
-    """
+    """Test creating a user"""
     profile = {
         "name": "name",
         "image": "image",
@@ -106,8 +104,7 @@ def test_serialize_create_user(db, mocker):
     ],
 )
 def test_update_user_profile(mocker, user, key, value):
-    """Test updating a profile via the UserSerializer
-    """
+    """Test updating a profile via the UserSerializer"""
     mock_after_profile_created_or_updated = mocker.patch(
         "profiles.serializers.after_profile_created_or_updated"
     )
@@ -174,8 +171,7 @@ def test_location_validation(user, data, is_valid):
     ],
 )
 def test_update_profile(mocker, user, key, value):
-    """Test updating a profile via the ProfileSerializer
-    """
+    """Test updating a profile via the ProfileSerializer"""
     mock_after_profile_created_or_updated = mocker.patch(
         "profiles.serializers.after_profile_created_or_updated"
     )
@@ -234,8 +230,7 @@ class TestUserWebsiteSerializer:
     """UserWebsiteSerializer tests"""
 
     def test_serialize(self):
-        """Test serializing a user website
-        """
+        """Test serializing a user website"""
         user_website = UserWebsiteFactory.build()
         assert UserWebsiteSerializer(user_website).data == {
             "id": user_website.id,
@@ -244,8 +239,7 @@ class TestUserWebsiteSerializer:
         }
 
     def test_deserialize(self, mocker, user):
-        """Test deserializing a user website
-        """
+        """Test deserializing a user website"""
         url = "https://example.com"
         site_type = "dummy"
         patched_get_site_type = mocker.patch(
@@ -266,8 +260,7 @@ class TestUserWebsiteSerializer:
         [("HTtPS://AbC.COM", "https://abc.com"), ("AbC.cOM", "http://abc.com")],
     )
     def test_user_website_url(self, mocker, user, input_url, exp_result_url):
-        """Test that deserializing a user website url adds a protocol if necessary and forces lowercase.
-        """
+        """Test that deserializing a user website url adds a protocol if necessary and forces lowercase."""
         site_type = "dummy"
         mocker.patch(
             "profiles.serializers.get_site_type_from_url", return_value=site_type
@@ -280,8 +273,7 @@ class TestUserWebsiteSerializer:
         assert serializer.validated_data["url"] == exp_result_url
 
     def test_site_uniqueness(self, user):
-        """Test that a user can only save one of a specific type of site
-        """
+        """Test that a user can only save one of a specific type of site"""
         UserWebsiteFactory.create(
             profile=user.profile, url="facebook.com/1", site_type=FACEBOOK_DOMAIN
         )

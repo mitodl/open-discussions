@@ -40,8 +40,7 @@ def after_profile_created_or_updated(profile):
     """
 
     def _after_profile_created_or_updated():
-        """Operations that should be run after the profile create or update is committed
-        """
+        """Operations that should be run after the profile create or update is committed"""
         search_index_helpers.upsert_profile(profile.id)
 
     # this will either get called when the outermost transaction commits or otherwise immediately

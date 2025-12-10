@@ -69,8 +69,7 @@ class HasUserListItemPermissions(BasePermission):
 
 
 class HasStaffListPermission(BasePermission):
-    """Permission to view/create/modify StaffLists
-    """
+    """Permission to view/create/modify StaffLists"""
 
     def has_permission(self, request, view):
         return (

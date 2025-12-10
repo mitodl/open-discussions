@@ -61,8 +61,6 @@ def test_after_profile_created_or_updated(mocker, user):
     )
 
 
-
-
 def test_get_site_type_from_url(url, exp_site_type):
     """Test that get_site_type_from_url returns the expected site type for a given URL value"""
     assert get_site_type_from_url(url) == exp_site_type

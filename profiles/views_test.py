@@ -16,8 +16,7 @@ pytestmark = [pytest.mark.django_db]
 
 
 def test_list_users(staff_client, staff_user):
-    """List users
-    """
+    """List users"""
     profile = staff_user.profile
     url = reverse("user_api-list")
     resp = staff_client.get(url)
@@ -52,8 +51,7 @@ def test_list_users(staff_client, staff_user):
 def test_create_user(
     staff_client, staff_user, mocker, uid, email_optin, toc_optin
 ):  # pylint: disable=too-many-arguments
-    """Create a user and assert the response
-    """
+    """Create a user and assert the response"""
     staff_user.email = ""
     staff_user.profile.email_optin = None
     staff_user.profile.save()
@@ -117,8 +115,7 @@ def test_create_user(
 
 
 def test_get_user(staff_client, user):
-    """Get a user
-    """
+    """Get a user"""
     profile = user.profile
     url = reverse("user_api-detail", kwargs={"username": user.username})
     resp = staff_client.get(url)
@@ -176,8 +173,7 @@ def test_get_profile(logged_in, user, user_client):
 @pytest.mark.parametrize("email_optin", [None, True, False])
 @pytest.mark.parametrize("toc_optin", [None, True, False])
 def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
-    """Update a users' profile
-    """
+    """Update a users' profile"""
     user.email = ""
     user.save()
     profile = user.profile
@@ -229,8 +225,7 @@ def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
 
 
 def test_patch_username(staff_client, user):
-    """Trying to update a users's username does not change anything
-    """
+    """Trying to update a users's username does not change anything"""
     url = reverse("user_api-detail", kwargs={"username": user.username})
     resp = staff_client.patch(url, data={"username": "notallowed"})
     assert resp.status_code == 200
@@ -238,8 +233,7 @@ def test_patch_username(staff_client, user):
 
 
 def test_patch_profile_by_user(client, logged_in_profile):
-    """Test that users can update their profiles, including profile images
-    """
+    """Test that users can update their profiles, including profile images"""
     url = reverse(
         "profile_api-detail", kwargs={"user__username": logged_in_profile.user.username}
     )
@@ -275,8 +269,7 @@ def test_patch_profile_by_user(client, logged_in_profile):
 
 
 def test_initialized_avatar(client, user):
-    """Test that a PNG avatar image is returned for a user
-    """
+    """Test that a PNG avatar image is returned for a user"""
     url = reverse(
         "name-initials-avatar",
         kwargs={
@@ -295,8 +288,7 @@ def test_initialized_avatar(client, user):
 
 
 def test_initials_avatar_fake_user(client):
-    """Test that a default avatar image is returned for a fake user
-    """
+    """Test that a default avatar image is returned for a fake user"""
     url = reverse(
         "name-initials-avatar",
         kwargs={
@@ -309,102 +301,3 @@ def test_initials_avatar_fake_user(client):
     response = client.get(url, follow=True)
     last_url, _ = response.redirect_chain[-1]
     assert last_url.endswith(DEFAULT_PROFILE_IMAGE)
-
-
-class TestUserContributionListView:
-    """Tests for UserContributionListView"""
-
-    @pytest.fixture
-    def scenario(self, user_client, user):
-        """Common test data needed for class test cases"""
-        return SimpleNamespace(fake_pagination={"fake": "pagination"})
-
-    @pytest.mark.usefixtures("mock_req_channel_api")
-    @pytest.mark.parametrize("logged_in", [True, False])
-    def test_user_posts_view(
-        self,
-        mocker,
-        user_client,
-        user,
-        scenario,
-        post_proxy,
-        removed_post_proxy,
-        logged_in,
-    ):
-        """Test that a request for user posts fetches and serializes a user's posts correctly"""
-        mock_get_obj_list = mocker.patch(
-            "profiles.views.get_pagination_and_reddit_obj_list",
-            return_value=(
-                scenario.fake_pagination,
-                [
-                    post_proxy._self_submission,  # pylint: disable=protected-access
-                    removed_post_proxy._self_submission,  # pylint: disable=protected-access
-                ],
-            ),
-        )
-        mock_proxy_posts = mocker.patch(
-            "profiles.views.proxy_posts", return_value=[post_proxy, removed_post_proxy]
-        )
-        url = reverse(
-            "user-contribution-list",
-            kwargs={"username": user.username, "object_type": "posts"},
-        )
-        if not logged_in:
-            user_client.logout()
-        response = user_client.get(url)
-        assert mock_get_obj_list.called is True
-        assert mock_proxy_posts.called is True
-        resp_data = json.loads(response.content)
-        assert resp_data["pagination"] == scenario.fake_pagination
-        assert "posts" in resp_data
-        assert len(resp_data["posts"]) == 1
-        serialized_post = resp_data["posts"][0]
-        assert serialized_post == BasePostSerializer(post_proxy).data
-
-    @pytest.mark.usefixtures("mock_req_channel_api")
-    @pytest.mark.parametrize("logged_in", [True, False])
-    @pytest.mark.parametrize("removed", [True, False])
-    def test_user_comments_view(
-        self,
-        mocker,
-        user_client,
-        user,
-        scenario,
-        reddit_comment_obj,
-        logged_in,
-        removed,
-    ):
-        """Test that a request for user comments fetches and serializes a user's comments correctly"""
-        mock_get_obj_list = mocker.patch(
-            "profiles.views.get_pagination_and_reddit_obj_list",
-            return_value=(scenario.fake_pagination, [reddit_comment_obj]),
-        )
-        url = reverse(
-            "user-contribution-list",
-            kwargs={"username": user.username, "object_type": "comments"},
-        )
-        CommentFactory.create(comment_id=reddit_comment_obj.id, removed=removed)
-        if not logged_in:
-            user_client.logout()
-        response = user_client.get(url)
-        assert mock_get_obj_list.called is True
-        resp_data = json.loads(response.content)
-        assert resp_data["pagination"] == scenario.fake_pagination
-        assert "comments" in resp_data
-
-        if removed:
-            assert len(resp_data["comments"]) == 0
-        else:
-            serialized_comment = resp_data["comments"][0]
-            assert (
-                serialized_comment
-                == BaseCommentSerializer(
-                    reddit_comment_obj, context={"include_permalink_data": True}
-                ).data
-            )
-            # Channel name is not serialized for a comment by default. Since it's needed for the comment permalink, this
-            # view should include a flag that ensures that value is serialized.
-            assert (
-                serialized_comment["channel_name"]
-                == reddit_comment_obj.submission.subreddit.display_name
-            )

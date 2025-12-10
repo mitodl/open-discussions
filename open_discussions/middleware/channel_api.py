@@ -2,8 +2,7 @@
 
 
 class ChannelApiMiddleware:
-    """Middleware that makes a channel API object available to views (deprecated - no-op)
-    """
+    """Middleware that makes a channel API object available to views (deprecated - no-op)"""
 
     def __init__(self, get_response):
         self.get_response = get_response

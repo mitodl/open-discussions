@@ -50,16 +50,14 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def mitx_valid_data():
-    """Test MITx course data
-    """
+    """Test MITx course data"""
     with open("./test_json/test_mitx_course.json") as test_data:
         return json.load(test_data)["results"][0]
 
 
 @pytest.fixture
 def ocw_valid_data():
-    """Test OCW course data
-    """
+    """Test OCW course data"""
     return {
         "uid": "e9387c256bae4ca99cce88fd8b7f8272",
         "department_number": "2",
@@ -140,8 +138,7 @@ def ocw_valid_data():
 
 @pytest.fixture
 def ocw_next_valid_data():
-    """Return valid ocw-next data
-    """
+    """Return valid ocw-next data"""
     return {
         "course_title": "Unified Engineering I, II, III, \u0026 IV",
         "course_description": "The basic objective of Unified Engineering is to give a solid understanding of the fundamental disciplines of aerospace engineering, as well as their interrelationships and applications. These disciplines are Materials and Structures (M); Computers and Programming (C); Fluid Mechanics (F); Thermodynamics (T); Propulsion (P); and Signals and Systems (S). In choosing to teach these subjects in a unified manner, the instructors seek to explain the common intellectual threads in these disciplines, as well as their combined application to solve engineering Systems Problems (SP). Throughout the year, the instructors emphasize the connections among the disciplines",
@@ -207,8 +204,7 @@ def ocw_next_valid_data():
 def test_deserializing_a_valid_ocw_course(
     mock_course_index_functions, ocw_valid_data, published
 ):
-    """Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
-    """
+    """Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance"""
     digest_ocw_course(ocw_valid_data, now_in_utc(), published)
     assert Course.objects.count() == 1
     digest_ocw_course(ocw_valid_data, now_in_utc() - timedelta(hours=1), published)
@@ -268,8 +264,7 @@ def test_deserializing_a_valid_ocw_course(
 def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
     mock_course_index_functions, ocw_valid_data
 ):
-    """Verify that course values are not overwritten if the course already has a newer run
-    """
+    """Verify that course values are not overwritten if the course already has a newer run"""
     course = CourseFactory.create(
         platform=PlatformType.ocw.value,
         course_id=f'{ocw_valid_data["uid"]}+{ocw_valid_data["course_id"]}',
@@ -291,8 +286,7 @@ def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
 def test_deserializing_a_valid_ocw_course_with_keep_existing_image_src(
     mock_course_index_functions, ocw_valid_data
 ):
-    """Verify that image_src is not overwritten if keep_existing_image_src=True
-    """
+    """Verify that image_src is not overwritten if keep_existing_image_src=True"""
     course = CourseFactory.create(
         platform=PlatformType.ocw.value,
         course_id=f'{ocw_valid_data["uid"]}+{ocw_valid_data["course_id"]}',
@@ -308,16 +302,14 @@ def test_deserializing_a_valid_ocw_course_with_keep_existing_image_src(
 
 
 def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
-    """Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
-    """
+    """Verifies that OCWSerializer validation works correctly if the OCW course has invalid values"""
     ocw_valid_data.pop("course_id")
     digest_ocw_course(ocw_valid_data, now_in_utc(), True)
     assert not Course.objects.count()
 
 
 def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data, mocker):
-    """Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
-    """
+    """Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid"""
     mock_log = mocker.patch("course_catalog.api.log.error")
     ocw_valid_data["enrollment_start"] = "This is not a date"
     digest_ocw_course(ocw_valid_data, now_in_utc(), True)
@@ -330,8 +322,7 @@ def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data, mocker):
 def test_deserializing_a_valid_ocw_next_course(
     settings, mock_course_index_functions, ocw_next_valid_data
 ):
-    """Verify that OCWNextSerializer successfully de-serialize a JSON object and create Course model instance
-    """
+    """Verify that OCWNextSerializer successfully de-serialize a JSON object and create Course model instance"""
     settings.OCW_NEXT_BASE_URL = "https://ocw-test.mit.edu"
     uid = "e9387c256bae4ca99cce88fd8b7f8272"
     url_path = "courses/my-course"
@@ -383,8 +374,7 @@ def test_deserializing_a_valid_ocw_next_course(
 
 
 def test_deserialzing_an_invalid_ocw_next_course(ocw_next_valid_data):
-    """Verifies that OCWNextSerializer validation works correctly if the OCW course has invalid values
-    """
+    """Verifies that OCWNextSerializer validation works correctly if the OCW course has invalid values"""
     uid = "e9387c256bae4ca99cce88fd8b7f8272"
     course_prefix = "courses/my-course"
 

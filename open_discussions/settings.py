@@ -223,9 +223,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 CLOUDFRONT_DIST = get_string("CLOUDFRONT_DIST", None)
 if CLOUDFRONT_DIST:
-    STATIC_URL = urljoin(
-        f"https://{CLOUDFRONT_DIST}.cloudfront.net", STATIC_URL
-    )
+    STATIC_URL = urljoin(f"https://{CLOUDFRONT_DIST}.cloudfront.net", STATIC_URL)
 
 STATIC_ROOT = "staticfiles"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]

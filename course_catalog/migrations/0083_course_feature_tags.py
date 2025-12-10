@@ -15,8 +15,7 @@ def chunked_iterator(queryset):
 
 
 def set_feature_tags(apps, schema_editor):
-    """Save feature tags for every OCW course based on the run's raw_json
-    """
+    """Save feature tags for every OCW course based on the run's raw_json"""
     Course = apps.get_model("course_catalog", "Course")
     LearningResourceRun = apps.get_model("course_catalog", "LearningResourceRun")
     for run in chunked_iterator(

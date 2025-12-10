@@ -64,8 +64,7 @@ def test_userlist_object_permissions(mocker, user, is_public, is_author):
 
 
 def test_userlistitems_permissions_404(mocker, user):
-    """HasUserListItemPermissions.has_permission should return a 404 if the userlist doesn't exist.
-    """
+    """HasUserListItemPermissions.has_permission should return a 404 if the userlist doesn't exist."""
     request = mocker.MagicMock(method="GET", user=user)
 
     view = mocker.MagicMock(kwargs={"user_list_id": 99999})
@@ -181,8 +180,7 @@ def test_stafflist_object_permissions(mocker, user, is_public, is_editor):
 
 
 def test_stafflistitems_permissions_404(mocker, user):
-    """HasStaffListPermissions.has_permission should return a 404 if the stafflist doesn't exist.
-    """
+    """HasStaffListPermissions.has_permission should return a 404 if the stafflist doesn't exist."""
     request = mocker.MagicMock(method="GET", user=user)
 
     view = mocker.MagicMock(kwargs={"staff_list_id": 99999})

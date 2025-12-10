@@ -3,8 +3,7 @@ from notifications.notifiers.email import EmailNotifier
 
 
 class ModeratorPostsNotifier(EmailNotifier):
-    """Notifier for moderator post emails (deprecated - discussions removed)
-    """
+    """Notifier for moderator post emails (deprecated - discussions removed)"""
 
     def should_send_notification(self):
         """Returns False - moderator notifications disabled

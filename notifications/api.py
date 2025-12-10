@@ -5,6 +5,7 @@ from django.conf import settings
 
 from notifications import tasks
 from notifications.models import (
+    FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
     NOTIFICATION_TYPE_COMMENTS,
@@ -122,8 +123,7 @@ def _get_notifier_for_notification(notification):
 
 
 def send_unsent_email_notifications():
-    """Send all notifications that haven't been sent yet
-    """
+    """Send all notifications that haven't been sent yet"""
     for notification_ids in chunks(
         EmailNotification.objects.filter(state=EmailNotification.STATE_PENDING)
         .exclude(notification_type=NOTIFICATION_TYPE_FRONTPAGE)

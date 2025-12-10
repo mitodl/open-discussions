@@ -145,13 +145,11 @@ class TestSettings(TestCase):
 
     @staticmethod
     def test_semantic_version():
-        """Verify that we have a semantic compatible version.
-        """
+        """Verify that we have a semantic compatible version."""
         semantic_version.Version(settings.VERSION)
 
     def test_required_settings(self):
-        """Assert that an exception is raised if any of the required settings are missing
-        """
+        """Assert that an exception is raised if any of the required settings are missing"""
         for key in REQUIRED_SETTINGS:
             required_settings = {**REQUIRED_SETTINGS}
             del required_settings[key]

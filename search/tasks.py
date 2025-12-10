@@ -135,7 +135,6 @@ def update_author_posts_comments(profile_id):  # pylint: disable=unused-argument
     """
 
 
-
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
 def update_document_with_partial(
     doc_id, partial_data, object_type, retry_on_conflict=0
@@ -280,8 +279,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
 
 @app.task
 def update_field_values_by_query(query, field_dict, object_types):
-    """Task that makes a request to update a field value for all ES documents that match some query.
-    """
+    """Task that makes a request to update a field value for all ES documents that match some query."""
     return api.update_field_values_by_query(query, field_dict, object_types)
 
 
@@ -660,8 +658,7 @@ def bulk_deindex_podcast_episodes(ids):
 
 @app.task(bind=True)
 def start_recreate_index(self, indexes):
-    """Wipe and recreate index and mapping, and index all items.
-    """
+    """Wipe and recreate index and mapping, and index all items."""
     try:
         new_backing_indices = {
             obj_type: api.create_backing_index(obj_type) for obj_type in indexes
@@ -795,8 +792,7 @@ def start_recreate_index(self, indexes):
 @app.task(bind=True)
 def start_update_index(self, indexes, platform):
     # pylint: disable=too-many-branches
-    """Wipe and recreate index and mapping, and index all items.
-    """
+    """Wipe and recreate index and mapping, and index all items."""
     try:
         log.info("starting to index %s objects...", ", ".join(indexes))
 
@@ -943,8 +939,7 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
 
 
 def get_update_programs_tasks():
-    """Get list of tasks to update programs
-    """
+    """Get list of tasks to update programs"""
     index_tasks = [
         index_programs.si(ids, True)
         for ids in chunks(
@@ -969,8 +964,7 @@ def get_update_programs_tasks():
 
 
 def get_update_user_lists_tasks():
-    """Get list of tasks to update user lists
-    """
+    """Get list of tasks to update user lists"""
     index_tasks = [
         index_user_lists.si(ids, True)
         for ids in chunks(
@@ -995,8 +989,7 @@ def get_update_user_lists_tasks():
 
 
 def get_update_staff_lists_tasks():
-    """Get list of tasks to update staff lists
-    """
+    """Get list of tasks to update staff lists"""
     index_tasks = [
         index_staff_lists.si(ids, True)
         for ids in chunks(
@@ -1022,8 +1015,7 @@ def get_update_staff_lists_tasks():
 
 
 def get_update_videos_tasks():
-    """Get list of tasks to update videos
-    """
+    """Get list of tasks to update videos"""
     index_tasks = [
         index_videos.si(ids, True)
         for ids in chunks(
@@ -1048,8 +1040,7 @@ def get_update_videos_tasks():
 
 
 def get_update_podcasts_tasks():
-    """Get list of tasks to update podcasts
-    """
+    """Get list of tasks to update podcasts"""
     index_tasks = [
         index_podcasts.si(ids, True)
         for ids in chunks(
@@ -1074,8 +1065,7 @@ def get_update_podcasts_tasks():
 
 
 def get_update_podcast_episodes_tasks():
-    """Get list of tasks to update podcast episodes
-    """
+    """Get list of tasks to update podcast episodes"""
     index_tasks = [
         index_podcast_episodes.si(ids, True)
         for ids in chunks(

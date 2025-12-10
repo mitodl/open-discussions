@@ -27,8 +27,7 @@ from course_catalog.factories import (
     ],
 )
 def test_cascade_delete_listitems(kwargs):
-    """When a resource is deleted, UserListItems for that resource should be deleted
-    """
+    """When a resource is deleted, UserListItems for that resource should be deleted"""
     user_list = UserListFactory.create()
     list_item = UserListItemFactory.create(user_list=user_list, **kwargs)
     assert user_list.items.count() == 1
@@ -40,8 +39,7 @@ def test_cascade_delete_listitems(kwargs):
 @pytest.mark.django_db
 @pytest.mark.parametrize("platform", [PlatformType.xpro.value, PlatformType.ocw.value])
 def test_course_audience(platform):
-    """Should return the correct audience for the course
-    """
+    """Should return the correct audience for the course"""
     course = CourseFactory.create(platform=platform)
     if platform == PlatformType.xpro.value:
         assert course.audience == ["Professional Offerings"]
@@ -58,14 +56,16 @@ def test_course_audience(platform):
     "availability", [availability_type.value for availability_type in AvailabilityType]
 )
 def test_course_certification(platform, availability):
-    """Should return the correct certification for the course
-    """
+    """Should return the correct certification for the course"""
     course = CourseFactory.create(platform=platform)
     course.runs.set([LearningResourceRunFactory(availability=availability)])
 
     if platform == PlatformType.xpro.value:
         assert course.certification == ["Certificates"]
-    elif platform == PlatformType.ocw.value or availability == AvailabilityType.archived.value:
+    elif (
+        platform == PlatformType.ocw.value
+        or availability == AvailabilityType.archived.value
+    ):
         assert course.certification == []
     else:
         assert course.certification == ["Certificates"]
@@ -82,8 +82,7 @@ def test_course_certification(platform, availability):
     ],
 )
 def test_course_department_name(department, department_name):
-    """Should return the correct department name array for the course
-    """
+    """Should return the correct department name array for the course"""
     course = CourseFactory.create(department=department)
     assert course.department_name == department_name
 
@@ -94,8 +93,7 @@ def test_course_department_name(department, department_name):
     [(None, None), ([], None), (["1", "2"], "civil-and-environmental-engineering")],
 )
 def test_course_department_slug(department, department_slug):
-    """Should return the correct department name array for the course
-    """
+    """Should return the correct department name array for the course"""
     course = CourseFactory.create(department=department)
     assert course.department_slug == department_slug
 
@@ -105,8 +103,7 @@ def test_course_department_slug(department, department_slug):
     "offered_by", [OfferedBy.micromasters.value, OfferedBy.xpro.value]
 )
 def test_program_audience(offered_by):
-    """Should return the correct audience for the program
-    """
+    """Should return the correct audience for the program"""
     program = ProgramFactory.create()
     program.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
 
@@ -118,8 +115,7 @@ def test_program_audience(offered_by):
 
 @pytest.mark.django_db
 def test_userlist_audience():
-    """Should return the correct audience for the userlist
-    """
+    """Should return the correct audience for the userlist"""
     user_list = UserListFactory.create()
     open_learning_resource = CourseFactory.create(platform=PlatformType.ocw.value)
     not_open_learning_resource = CourseFactory.create(platform=PlatformType.xpro.value)
@@ -137,8 +133,7 @@ def test_userlist_audience():
 
 @pytest.mark.django_db
 def test_stafflist_audience():
-    """Should return the correct audience for the StaffList
-    """
+    """Should return the correct audience for the StaffList"""
     staff_list = StaffListFactory.create()
     open_learning_resource = CourseFactory.create(platform=PlatformType.ocw.value)
     not_open_learning_resource = CourseFactory.create(platform=PlatformType.xpro.value)

@@ -66,8 +66,7 @@ def jwt_token(db, user, client, rf, settings):
 
 @pytest.fixture
 def client(db):
-    """Similar to the builtin client but this provides the DRF client instead of the Django test client.
-    """
+    """Similar to the builtin client but this provides the DRF client instead of the Django test client."""
     return APIClient()
 
 

@@ -51,8 +51,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return ""
 
     def validate_location(self, location):
-        """Validator for location.
-        """
+        """Validator for location."""
         if location and (
             not isinstance(location, dict) or ("value" not in location.keys())
         ):
@@ -116,8 +115,7 @@ class UserWebsiteSerializer(serializers.ModelSerializer):
     """Serializer for UserWebsite"""
 
     def validate_url(self, value):
-        """Validator for url. Prepends http protocol to the url if the protocol wasn't already included in the value.
-        """
+        """Validator for url. Prepends http protocol to the url if the protocol wasn't already included in the value."""
         url = "" if not value else value.lower()
         if not re.search(r"^http[s]?://", url):
             return "%s%s" % ("http://", url)

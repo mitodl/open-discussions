@@ -53,8 +53,7 @@ log = logging.getLogger()
 
 
 class OSModelSerializer(serializers.ModelSerializer):
-    """Base opensearch serializer for model-based objects
-    """
+    """Base opensearch serializer for model-based objects"""
 
     object_type = None
 
@@ -94,8 +93,7 @@ class OSProxySerializer:
         return {}
 
     def serialize(self, discussions_obj):
-        """Serializes a reddit or django model object by modifying the results from a base serializer class
-        """
+        """Serializes a reddit or django model object by modifying the results from a base serializer class"""
         base_serialized = self.base_serializer(discussions_obj).data
         serialized = {
             **filter_dict_keys(base_serialized, self.use_keys),
@@ -106,8 +104,7 @@ class OSProxySerializer:
 
 
 class OSProfileSerializer(OSProxySerializer):
-    """opensearch serializer class for profiles
-    """
+    """opensearch serializer class for profiles"""
 
     object_type = PROFILE_TYPE
     use_keys = []
@@ -163,8 +160,7 @@ class LearningResourceSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(source="created_on", read_only=True)
 
     def get_minimum_price(self, instance):
-        """Minimum price from all learning resource runs
-        """
+        """Minimum price from all learning resource runs"""
         if hasattr(instance, "runs") and instance.runs:
             prices = [
                 run.prices.values_list("price", flat=True)
@@ -181,8 +177,7 @@ class LearningResourceSerializer(serializers.ModelSerializer):
 
 
 class OSResourceFileSerializerMixin(serializers.Serializer):
-    """opensearch base serializer mixin for resource files
-    """
+    """opensearch base serializer mixin for resource files"""
 
     object_type = RESOURCE_FILE_TYPE
     resource_relations = serializers.SerializerMethodField()
@@ -193,8 +188,7 @@ class OSResourceFileSerializerMixin(serializers.Serializer):
 
 
 class OSContentFileSerializer(OSResourceFileSerializerMixin, OSModelSerializer):
-    """OpenSearch serializer class for course run files
-    """
+    """OpenSearch serializer class for course run files"""
 
     run_id = serializers.CharField(source="run.run_id")
     run_title = serializers.CharField(source="run.title")
@@ -280,8 +274,7 @@ class OSContentFileSerializer(OSResourceFileSerializerMixin, OSModelSerializer):
 
 
 class OSRunSerializer(LearningResourceSerializer):
-    """opensearch serializer class for course runs
-    """
+    """opensearch serializer class for course runs"""
 
     prices = OSCoursePriceSerializer(many=True)
     instructors = serializers.SerializerMethodField()
@@ -289,8 +282,7 @@ class OSRunSerializer(LearningResourceSerializer):
     level = serializers.SerializerMethodField()
 
     def get_instructors(self, instance):
-        """Get a list of instructor names for the course run
-        """
+        """Get a list of instructor names for the course run"""
         return [
             (
                 instructor.full_name
@@ -300,15 +292,13 @@ class OSRunSerializer(LearningResourceSerializer):
         ]
 
     def get_availability(self, instance):
-        """Get the availability for a course run
-        """
+        """Get the availability for a course run"""
         if instance.availability:
             return instance.availability.title()
         return None
 
     def get_level(self, instance):
-        """Get the levels for a course run
-        """
+        """Get the levels for a course run"""
         if instance.level:
             return instance.level.split(", ")
         return None
@@ -344,8 +334,7 @@ class OSRunSerializer(LearningResourceSerializer):
 
 
 def get_ocw_departmet_course_number_dict(coursenum, primary):
-    """Class for generating ocw course number dictionary from a course number
-    """
+    """Class for generating ocw course number dictionary from a course number"""
     department_num = coursenum.split(".")[0]
 
     if department_num[0].isdigit() and len(department_num) == 1:
@@ -362,8 +351,7 @@ def get_ocw_departmet_course_number_dict(coursenum, primary):
 
 
 class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
-    """opensearch serializer class for courses
-    """
+    """opensearch serializer class for courses"""
 
     object_type = COURSE_TYPE
     resource_relations = {"name": "resource"}
@@ -374,16 +362,14 @@ class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
     default_search_priority = serializers.SerializerMethodField()
 
     def get_runs(self, course):
-        """Get published runs in reverse chronological order by best_start_date
-        """
+        """Get published runs in reverse chronological order by best_start_date"""
         return [
             OSRunSerializer(run).data
             for run in course.runs.exclude(published=False).order_by("-best_start_date")
         ]
 
     def get_department_course_numbers(self, course):
-        """Get department_course_numbers from course data
-        """
+        """Get department_course_numbers from course data"""
         if course.platform == PlatformType.ocw.value:
             department_course_numbers = [
                 get_ocw_departmet_course_number_dict(course.coursenum, True)
@@ -397,8 +383,7 @@ class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
         return []
 
     def get_default_search_priority(self, instance):
-        """Courses should have higer priority in the default search
-        """
+        """Courses should have higer priority in the default search"""
         return 1
 
     def to_representation(self, instance):
@@ -437,8 +422,7 @@ class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
 
 
 class OSProgramSerializer(OSModelSerializer, LearningResourceSerializer):
-    """opensearch serializer class for programs
-    """
+    """opensearch serializer class for programs"""
 
     object_type = PROGRAM_TYPE
 
@@ -446,8 +430,7 @@ class OSProgramSerializer(OSModelSerializer, LearningResourceSerializer):
     default_search_priority = serializers.SerializerMethodField()
 
     def get_default_search_priority(self, instance):
-        """Programs should have higer priority in the default search
-        """
+        """Programs should have higer priority in the default search"""
         return 1
 
     class Meta:
@@ -471,14 +454,12 @@ class OSProgramSerializer(OSModelSerializer, LearningResourceSerializer):
 
 
 class OSUserListSerializer(OSModelSerializer, LearningResourceSerializer):
-    """opensearch serializer class for UserLists
-    """
+    """opensearch serializer class for UserLists"""
 
     default_search_priority = serializers.SerializerMethodField()
 
     def get_default_search_priority(self, instance):
-        """User Lists should have lower priority in the default search
-        """
+        """User Lists should have lower priority in the default search"""
         return 0
 
     def to_representation(self, instance):
@@ -518,14 +499,12 @@ class OSUserListSerializer(OSModelSerializer, LearningResourceSerializer):
 
 
 class OSStaffListSerializer(OSModelSerializer, LearningResourceSerializer):
-    """opensearch serializer class for StaffLists
-    """
+    """opensearch serializer class for StaffLists"""
 
     default_search_priority = serializers.SerializerMethodField()
 
     def get_default_search_priority(self, instance):
-        """Staff Lists should have lower priority in the default search
-        """
+        """Staff Lists should have lower priority in the default search"""
         return 0
 
     def to_representation(self, instance):
@@ -572,8 +551,7 @@ class OSVideoSerializer(OSModelSerializer, LearningResourceSerializer):
     default_search_priority = serializers.SerializerMethodField()
 
     def get_default_search_priority(self, instance):
-        """Videos should have lower priority in the default search
-        """
+        """Videos should have lower priority in the default search"""
         return 0
 
     class Meta:
@@ -608,8 +586,7 @@ class OSPodcastSerializer(OSModelSerializer, LearningResourceSerializer):
     default_search_priority = serializers.SerializerMethodField()
 
     def get_default_search_priority(self, instance):
-        """Podcasts should have lower priority in the default search
-        """
+        """Podcasts should have lower priority in the default search"""
         return 0
 
     class Meta:
@@ -648,8 +625,7 @@ class OSPodcastEpisodeSerializer(OSModelSerializer, LearningResourceSerializer):
         return instance.podcast.title
 
     def get_default_search_priority(self, instance):
-        """User Lists should have lower priority in the default search
-        """
+        """User Lists should have lower priority in the default search"""
         return 0
 
     class Meta:

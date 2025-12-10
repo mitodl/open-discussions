@@ -97,6 +97,4 @@ class Command(BaseCommand):
             raise CommandError(f"Update index errored: {errors}")
 
         total_seconds = (now_in_utc() - start).total_seconds()
-        self.stdout.write(
-            f"Update index finished, took {total_seconds} seconds"
-        )
+        self.stdout.write(f"Update index finished, took {total_seconds} seconds")

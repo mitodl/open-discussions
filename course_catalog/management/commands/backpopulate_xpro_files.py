@@ -26,9 +26,7 @@ class Command(BaseCommand):
         """Run Populate xpro course run files"""
         chunk_size = options["chunk_size"]
         task = import_all_xpro_files.delay(chunk_size=chunk_size)
-        self.stdout.write(
-            f"Started task {task} to get xpro course run file data"
-        )
+        self.stdout.write(f"Started task {task} to get xpro course run file data")
         self.stdout.write("Waiting on task...")
         start = now_in_utc()
         task.get()

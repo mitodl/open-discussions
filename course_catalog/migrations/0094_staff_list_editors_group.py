@@ -6,14 +6,12 @@ from course_catalog import constants
 
 
 def add_staff_list_group(apps, schema_editor):
-    """Create the staff list editors group
-    """
+    """Create the staff list editors group"""
     Group.objects.get_or_create(name=constants.GROUP_STAFF_LISTS_EDITORS)
 
 
 def remove_staff_list_group(apps, schema_editor):
-    """Delete the staff list editors group
-    """
+    """Delete the staff list editors group"""
     Group.objects.filter(name=constants.GROUP_STAFF_LISTS_EDITORS).delete()
 
 

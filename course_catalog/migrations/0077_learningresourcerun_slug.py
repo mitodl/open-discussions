@@ -6,8 +6,7 @@ from course_catalog.constants import PlatformType
 
 
 def backfill_slug(apps, schema_editor):
-    """Backfills slug values for existing LearningResourceRuns
-    """
+    """Backfills slug values for existing LearningResourceRuns"""
     LearningResourceRun = apps.get_model("course_catalog", "LearningResourceRun")
     for run in LearningResourceRun.objects.filter(
         platform=PlatformType.ocw.value

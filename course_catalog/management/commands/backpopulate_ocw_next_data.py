@@ -40,9 +40,7 @@ class Command(BaseCommand):
         course_name = options.get("course_name")
         if options["delete"]:
             if course_name:
-                self.stdout.write(
-                    f"Deleting course={course_name}"
-                )
+                self.stdout.write(f"Deleting course={course_name}")
                 runs = LearningResourceRun.objects.filter(
                     slug=f"courses/{course_name}",
                     platform=PlatformType.ocw.value,

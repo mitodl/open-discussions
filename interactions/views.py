@@ -11,8 +11,7 @@ from interactions.serializers import (
 
 
 class DefaultPagination(LimitOffsetPagination):
-    """Pagination class for interaction viewsets which gets default_limit and max_limit from settings
-    """
+    """Pagination class for interaction viewsets which gets default_limit and max_limit from settings"""
 
     default_limit = 10
     max_limit = 100

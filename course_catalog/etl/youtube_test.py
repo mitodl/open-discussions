@@ -560,8 +560,7 @@ def test_get_youtube_transcripts_with_a_retry(mocker):
 
 @pytest.mark.usefixtures("video_settings")
 def test_get_youtube_transcripts_with_multiple_consecutive_failures(mocker):
-    """Verify that get_youtube_transcript downloads stops after 15 videos fail to download with VideoUnavailable error
-    """
+    """Verify that get_youtube_transcript downloads stops after 15 videos fail to download with VideoUnavailable error"""
     mock_video = Mock(id=1)
     video_list = [mock_video for _ in range(20)]
 

@@ -75,9 +75,7 @@ def get_api_key():
 
 
 def send_to_mailgun(csv_batch):
-    """Send the CSV file to mailgun
-
-    """
+    """Send the CSV file to mailgun"""
     with open(csv_batch.file.name) as csv_file:
         # send the temporary file up to mailgun
         resp = requests.post(
@@ -95,8 +93,7 @@ def batch_validation_csv_files(
     *,
     upload_batch_size: int,
 ):
-    """Yields CSV files to upload to mailgun
-    """
+    """Yields CSV files to upload to mailgun"""
     # create the iterator here so it can be reused across while loop steps
     user_chunks_iter = chunks(users.only("email"), chunk_size=1000)
 
@@ -142,8 +139,7 @@ def start_user_email_validation(
     *,
     upload_batch_size: int,
 ):
-    """Start the bulk verification of users' email addresses.
-    """
+    """Start the bulk verification of users' email addresses."""
     for csv_batch in batch_validation_csv_files(
         users,
         list_name_base,

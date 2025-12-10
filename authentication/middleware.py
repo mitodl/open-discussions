@@ -20,8 +20,7 @@ class SocialAuthExceptionRedirectMiddleware(SocialAuthExceptionMiddleware):
     """
 
     def process_exception(self, request, exception):
-        """Note: this is a subset of the SocialAuthExceptionMiddleware implementation
-        """
+        """Note: this is a subset of the SocialAuthExceptionMiddleware implementation"""
         strategy = getattr(request, "social_strategy", None)
         if strategy is None or self.raise_exception(request, exception):
             return None
@@ -34,13 +33,14 @@ class SocialAuthExceptionRedirectMiddleware(SocialAuthExceptionMiddleware):
             url = self.get_redirect_uri(request, exception)
 
             if url:
-                url += (("?" in url and "&") or "?") + f"message={quote(message)}&backend={backend_name}"
+                url += (
+                    ("?" in url and "&") or "?"
+                ) + f"message={quote(message)}&backend={backend_name}"
                 return redirect(url)
 
 
 class BlockedIPMiddleware(MiddlewareMixin):
-    """Only allow GET/HEAD requests for blocked ips, unless exempt or a superuser
-    """
+    """Only allow GET/HEAD requests for blocked ips, unless exempt or a superuser"""
 
     def process_view(
         self, request, callback, callback_args, callback_kwargs

@@ -132,8 +132,7 @@ class RegisterDetailsView(SocialAuthAPIView):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_social_auth_types(request):
-    """View that returns a serialized list of the logged-in user's UserSocialAuth types
-    """
+    """View that returns a serialized list of the logged-in user's UserSocialAuth types"""
     social_auths = (
         UserSocialAuth.objects.filter(user=request.user).values("provider").distinct()
     )
@@ -167,8 +166,7 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
     """Custom class to modify base functionality in Djoser's PasswordResetEmail class"""
 
     def send(self, to, *args, **kwargs):
-        """Overrides djoser.email.PasswordResetEmail#send to use our mail API.
-        """
+        """Overrides djoser.email.PasswordResetEmail#send to use our mail API."""
         context = self.get_context_data()
         context.update(self.context)
         with django_mail.get_connection(
@@ -285,8 +283,7 @@ def get_user_details_for_keycloak(request, email):
 
 
 class CustomLogoutView(views.LogoutView):
-    """Ends the user's Keycloak session in additional to the built in Django logout.
-    """
+    """Ends the user's Keycloak session in additional to the built in Django logout."""
 
     def _keycloak_logout_url(self, user):
         """Returns the OpenID Connect logout URL for a user based on their SocialAuth record's id_token

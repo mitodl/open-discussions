@@ -97,57 +97,48 @@ def image_uri(profile, image_field=IMAGE_SMALL):
 
 # These functions are referenced in migrations so be careful refactoring
 def profile_image_upload_uri(instance, filename):
-    """upload_to handler for Profile.image
-    """
+    """upload_to handler for Profile.image"""
     return generate_filepath(filename, instance.user.username, "", "profile")
 
 
 def profile_image_upload_uri_small(instance, filename):
-    """upload_to handler for Profile.image_small
-    """
+    """upload_to handler for Profile.image_small"""
     return generate_filepath(filename, instance.user.username, "_small", "profile")
 
 
 def profile_image_upload_uri_medium(instance, filename):
-    """upload_to handler for Profile.image_medium
-    """
+    """upload_to handler for Profile.image_medium"""
     return generate_filepath(filename, instance.user.username, "_medium", "profile")
 
 
 def avatar_uri(instance, filename):
-    """upload_to handler for Channel.avatar
-    """
+    """upload_to handler for Channel.avatar"""
     return generate_filepath(filename, instance.name, "_avatar", "channel")
 
 
 def avatar_uri_medium(instance, filename):
-    """upload_to handler for Channel.avatar_medium
-    """
+    """upload_to handler for Channel.avatar_medium"""
     return generate_filepath(filename, instance.name, "_avatar_medium", "channel")
 
 
 def avatar_uri_small(instance, filename):
-    """upload_to handler for Channel.avatar_small
-    """
+    """upload_to handler for Channel.avatar_small"""
     return generate_filepath(filename, instance.name, "_avatar_small", "channel")
 
 
 def banner_uri(instance, filename):
-    """upload_to handler for Channel.banner
-    """
+    """upload_to handler for Channel.banner"""
     return generate_filepath(filename, instance.name, "_banner", "channel")
 
 
 def article_image_uri(instance, filename):
-    """upload_to handler for Article.cover_image
-    """
+    """upload_to handler for Article.cover_image"""
     return generate_filepath(filename, instance.post.post_id, "_article", "article")
 
 
 @contextmanager
 def make_temp_image_file(*, width=500, height=500):
-    """Create a temporary PNG image to test image uploads
-    """
+    """Create a temporary PNG image to test image uploads"""
     with NamedTemporaryFile(suffix=".png") as image_file:
         image = Image.new("RGBA", size=(width, height), color=(256, 0, 0))
         image.save(image_file, "png")

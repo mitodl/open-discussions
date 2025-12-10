@@ -22,23 +22,20 @@ log = logging.getLogger()
 
 
 def user_list_image_upload_uri(instance, filename):
-    """upload_to handler for user-created UserList image
-    """
+    """upload_to handler for user-created UserList image"""
     return generate_filepath(
         filename, instance.author.username, instance.title, "user_list"
     )
 
 
 def staff_list_image_upload_uri(instance, filename):
-    """upload_to handler for user-created UserList image
-    """
+    """upload_to handler for user-created UserList image"""
     return generate_filepath(filename, "staff_list", instance.title, "")
 
 
 # NOTE: this is unused, but a migration references it, so we'll leave it until we decide to squash migrations or something
 def program_image_upload_uri(instance, filename):
-    """upload_to handler for Program image
-    """
+    """upload_to handler for Program image"""
     return generate_filepath(filename, instance.title, "", "program")
 
 
@@ -175,9 +172,7 @@ def semester_year_to_date(semester, year, ending=False):
         month_day = "01-31" if ending else "01-01"
     else:
         return None
-    return datetime.strptime(f"{year}-{month_day}", "%Y-%m-%d").replace(
-        tzinfo=pytz.UTC
-    )
+    return datetime.strptime(f"{year}-{month_day}", "%Y-%m-%d").replace(tzinfo=pytz.UTC)
 
 
 def get_list_items_by_resource(user, object_type, object_id):

@@ -3,8 +3,7 @@ from notifications.notifiers.email import EmailNotifier
 
 
 class FrontpageDigestNotifier(EmailNotifier):
-    """Notifier for frontpage digest emails (deprecated - discussions removed)
-    """
+    """Notifier for frontpage digest emails (deprecated - discussions removed)"""
 
     def __init__(self, notification_settings):
         """Initialize the notifier with notification settings

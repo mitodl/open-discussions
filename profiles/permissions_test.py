@@ -46,8 +46,7 @@ def test_is_owner_or_privileged_user(
 
 
 def test_can_edit_profile_staff(mocker, staff_user):
-    """Test that staff users are allowed to view/edit profiles
-    """
+    """Test that staff users are allowed to view/edit profiles"""
     request = mocker.Mock(user=staff_user)
     profile = staff_user.profile
     assert HasEditPermission().has_permission(request, mocker.Mock()) is True
@@ -63,8 +62,7 @@ def test_can_edit_profile_staff(mocker, staff_user):
 )
 @pytest.mark.parametrize("is_super", [True, False])
 def test_can_edit_other_profile(mocker, method, result, user, is_super):
-    """Test that non-staff users are not allowed to edit another user's profile
-    """
+    """Test that non-staff users are not allowed to edit another user's profile"""
     request = mocker.Mock(user=user, method=method)
     profile = UserFactory.create(is_superuser=is_super).profile
     assert (
@@ -76,8 +74,7 @@ def test_can_edit_other_profile(mocker, method, result, user, is_super):
 
 @pytest.mark.parametrize("method", ["GET", "HEAD", "OPTIONS", "POST", "PUT"])
 def test_can_edit_own_profile(mocker, method, user):
-    """Test that users are allowed to edit their own profile
-    """
+    """Test that users are allowed to edit their own profile"""
     request = mocker.Mock(user=user, method=method)
     profile = user.profile
     assert (

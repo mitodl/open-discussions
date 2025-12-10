@@ -24,8 +24,7 @@ class OfferedBy(Enum):
 
 
 class PlatformType(Enum):
-    """Enum for platforms
-    """
+    """Enum for platforms"""
 
     ocw = "ocw"
     mitx = "mitx"
@@ -57,8 +56,7 @@ RESOURCE_FILE_PLATFORMS = [PlatformType.ocw.value, *EDX_PLATFORMS]
 
 
 class ResourceType(Enum):
-    """Enum for resource types (for OCW and MitX)
-    """
+    """Enum for resource types (for OCW and MitX)"""
 
     course = "course"
     ocw_resource = "ocw_resource"
@@ -89,16 +87,14 @@ class UserListType(Enum):
 
 
 class StaffListType(Enum):
-    """Enum for StaffList objects; sorted = staffpath, unsorted = stafflist
-    """
+    """Enum for StaffList objects; sorted = staffpath, unsorted = stafflist"""
 
     PATH = "path"
     LIST = "list"
 
 
 class PrivacyLevel(Enum):
-    """Enum tracking privacy levels for user-created UserLists
-    """
+    """Enum tracking privacy levels for user-created UserLists"""
 
     private = "private"
     shared = "shared"

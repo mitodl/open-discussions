@@ -93,8 +93,6 @@ def gen_query_filters_mock(mocker):
     )
 
 
-
-
 def test_gen_video_id(mocker):
     """Test that gen_video_id returns an expected id"""
     assert (
@@ -113,21 +111,8 @@ def test_gen_video_id(mocker):
         (None, None, False),
     ],
 )
-def test_is_reddit_object_removed(
-    mocker, banned_by_val, approved_by_val, expected_value
-):
-    """Tests that is_reddit_object_removed returns the expected values based on the
-    banned_by and approved_by properties for the given object
-    """
-    reddit_obj = mocker.Mock(banned_by=banned_by_val, approved_by=approved_by_val)
-    assert is_reddit_object_removed(reddit_obj) is expected_value
-
-
 def test_execute_search(user, opensearch):
     """execute_search should execute an OpenSearch search"""
-    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
-    add_user_role(channels[0], "moderators", user)
-    add_user_role(channels[1], "contributors", user)
 
     query = {"a": "query"}
     opensearch.conn.search.return_value = {"hits": {"total": 10}}
@@ -156,21 +141,8 @@ def test_execute_search(user, opensearch):
                                             ]
                                         }
                                     },
-                                    {
-                                        "terms": {
-                                            "channel_type": [
-                                                CHANNEL_TYPE_PUBLIC,
-                                                CHANNEL_TYPE_RESTRICTED,
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_name": [
-                                                channel.name for channel in channels
-                                            ]
-                                        }
-                                    },
+                                    {"terms": {"channel_type": []}},
+                                    {"terms": {"channel_name": []}},
                                 ]
                             }
                         },
@@ -240,14 +212,7 @@ def test_execute_search_anonymous(opensearch):
                                             ]
                                         }
                                     },
-                                    {
-                                        "terms": {
-                                            "channel_type": [
-                                                CHANNEL_TYPE_PUBLIC,
-                                                CHANNEL_TYPE_RESTRICTED,
-                                            ]
-                                        }
-                                    },
+                                    {"terms": {"channel_type": []}},
                                 ]
                             }
                         },
@@ -326,9 +291,6 @@ def test_execute_learn_search(
     opensearch.conn.search.return_value = {
         "hits": {"total": {"value": 10, "relation": "eq"}}
     }
-    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
-    add_user_role(channels[0], "moderators", user)
-    add_user_role(channels[1], "contributors", user)
 
     if has_resource_type_subquery:
         query = {"a": {"bool": {"object_type": COURSE_TYPE}}}
@@ -488,7 +450,6 @@ def test_execute_learn_search_podcasts(settings, user, opensearch):
     }
 
 
-
 def test_find_similar_resources(settings, is_anonymous, opensearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
     resources_to_return = 5
@@ -573,8 +534,7 @@ def test_find_similar_resources(settings, is_anonymous, opensearch, user):
 def test_transform_results(
     user, is_anonymous, suggest_min_hits, max_suggestions, settings
 ):  # pylint: disable=too-many-locals
-    """transform_results should move scripted fields into the source result
-    """
+    """transform_results should move scripted fields into the source result"""
     settings.OPENSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
     settings.OPENSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
     favorited_course = CourseFactory.create()
@@ -710,8 +670,7 @@ def test_transform_results(
 @pytest.mark.parametrize("department_fitler", [["Chemistry", "Biology"], [], ["Math"]])
 @pytest.mark.django_db
 def test_transform_department_filter(department_fitler):
-    """transform_results should replace coursenum if there is a department filter
-    """
+    """transform_results should replace coursenum if there is a department filter"""
     course = CourseFactory.create(
         course_id="HASH+1.1",
         extra_course_numbers=["5.1", "7.1"],
@@ -759,8 +718,7 @@ def test_transform_department_filter(department_fitler):
 
 @pytest.mark.django_db
 def test_transform_department_name_aggregations():
-    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
-    """
+    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them"""
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
@@ -793,8 +751,7 @@ def test_transform_department_name_aggregations():
 
 @pytest.mark.django_db
 def test_transform_level_aggregation():
-    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
-    """
+    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them"""
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
@@ -844,8 +801,7 @@ def test_transform_level_aggregation():
 
 @pytest.mark.django_db
 def test_transform_topics_aggregations():
-    """Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
-    """
+    """Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them"""
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
@@ -915,8 +871,7 @@ def test_transform_resource_type_aggregations():
 def test_combine_type_buckets_in_aggregates(
     podcast_present_in_aggregate, userlist_present_in_aggregate
 ):
-    """transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data
-    """
+    """transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data"""
     type_buckets = []
 
     if podcast_present_in_aggregate:

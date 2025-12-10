@@ -48,8 +48,7 @@ def get_ocw_courses(
     utc_start_timestamp=None,
     force_s3_upload=False,
 ):
-    """Task to sync a batch of OCW courses
-    """
+    """Task to sync a batch of OCW courses"""
     if utc_start_timestamp:
         utc_start_timestamp = datetime.strptime(utc_start_timestamp, ISOFORMAT)
         utc_start_timestamp = utc_start_timestamp.replace(tzinfo=pytz.UTC)
@@ -67,8 +66,7 @@ def get_ocw_courses(
 def get_content_tasks(
     platform: str, chunk_size: int = None, s3_prefix: str = None
 ) -> list[Task]:
-    """Return a list of grouped celery tasks for indexing edx content
-    """
+    """Return a list of grouped celery tasks for indexing edx content"""
     if chunk_size is None:
         chunk_size = settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE
 
@@ -91,8 +89,7 @@ def get_content_tasks(
 
 @app.task(acks_late=True)
 def get_ocw_next_courses(*, url_paths, force_overwrite, utc_start_timestamp=None):
-    """Task to sync a batch of OCW Next courses
-    """
+    """Task to sync a batch of OCW Next courses"""
     if utc_start_timestamp:
         utc_start_timestamp = datetime.strptime(utc_start_timestamp, ISOFORMAT)
         utc_start_timestamp = utc_start_timestamp.replace(tzinfo=pytz.UTC)
@@ -113,8 +110,7 @@ def get_ocw_data(
     utc_start_timestamp=None,
     force_s3_upload=False,
 ):  # pylint:disable=too-many-locals,too-many-branches,too-many-arguments
-    """Task to sync OCW course data with database
-    """
+    """Task to sync OCW course data with database"""
     if not (
         settings.AWS_ACCESS_KEY_ID
         and settings.AWS_SECRET_ACCESS_KEY
@@ -169,8 +165,7 @@ def get_ocw_next_data(
     utc_start_timestamp=None,
     prefix=None,
 ):  # pylint:disable=too-many-locals,too-many-branches
-    """Task to sync OCW Next course data with database
-    """
+    """Task to sync OCW Next course data with database"""
     if not (
         settings.AWS_ACCESS_KEY_ID
         and settings.AWS_SECRET_ACCESS_KEY
@@ -224,8 +219,7 @@ def get_ocw_next_data(
 
 @app.task
 def get_ocw_files(ids=None):
-    """Task to sync OCW content files with database
-    """
+    """Task to sync OCW content files with database"""
     if not (
         settings.OCW_LEARNING_COURSE_BUCKET_NAME
         and settings.AWS_ACCESS_KEY_ID
@@ -260,8 +254,7 @@ def import_all_ocw_files(self, chunk_size):
 def get_content_files(
     ids: list[int], platform: str, keys: list[str], s3_prefix: str = None
 ):
-    """Task to sync edX course content files with database
-    """
+    """Task to sync edX course content files with database"""
     if not (
         settings.AWS_ACCESS_KEY_ID
         and settings.AWS_SECRET_ACCESS_KEY
@@ -308,8 +301,7 @@ def import_all_mitx_files(self, chunk_size=None):
 
 @app.task
 def upload_ocw_parsed_json():
-    """Task to upload all OCW Course master json data to S3
-    """
+    """Task to upload all OCW Course master json data to S3"""
     s3_bucket = boto3.resource(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,

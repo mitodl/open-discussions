@@ -23,47 +23,37 @@ from profiles.utils import (
 
 
 def test_upload_url(user):
-    """profile_image_upload_uri should make an upload path with a timestamp
-    """
+    """profile_image_upload_uri should make an upload path with a timestamp"""
     name = "name"
     ext = ".jpg"
     filename = f"{name}{ext}"
     url = profile_image_upload_uri(user.profile, filename)
-    assert url.startswith(
-        f"profile/{user.username}/{name}-"
-    )
+    assert url.startswith(f"profile/{user.username}/{name}-")
     assert url.endswith(f"{ext}")
 
 
 def test_small(user):
-    """profile_image_upload_uri_small should make an upload path with a timestamp
-    """
+    """profile_image_upload_uri_small should make an upload path with a timestamp"""
     name = "name"
     ext = ".jpg"
     filename = f"{name}{ext}"
     url = profile_image_upload_uri_small(user.profile, filename)
-    assert url.startswith(
-        f"profile/{user.username}/{name}-"
-    )
+    assert url.startswith(f"profile/{user.username}/{name}-")
     assert url.endswith(f"_small{ext}")
 
 
 def test_medium(user):
-    """profile_image_upload_uri_medium should make an upload path with a timestamp
-    """
+    """profile_image_upload_uri_medium should make an upload path with a timestamp"""
     name = "name"
     ext = ".jpg"
     filename = f"{name}{ext}"
     url = profile_image_upload_uri_medium(user.profile, filename)
-    assert url.startswith(
-        f"profile/{user.username}/{name}-"
-    )
+    assert url.startswith(f"profile/{user.username}/{name}-")
     assert url.endswith(f"_medium{ext}")
 
 
 def test_too_long_name(user):
-    """A name which is too long should get truncated to 100 characters
-    """
+    """A name which is too long should get truncated to 100 characters"""
     filename = "{}.jpg".format("a" * 150)
     full_path = profile_image_upload_uri(user.profile, filename)
     assert len(full_path) == 100
@@ -72,8 +62,7 @@ def test_too_long_name(user):
 
 
 def test_too_long_prefix(user):
-    """A name which is too long should get truncated to 100 characters
-    """
+    """A name which is too long should get truncated to 100 characters"""
     filename = "{}.jpg".format("a" * 150)
     with pytest.raises(ValueError) as ex:
         generate_filepath(filename, user.username, "x" * 150, "profile")
@@ -82,8 +71,7 @@ def test_too_long_prefix(user):
 
 @pytest.mark.django_db
 def test_profile_img_url_uploaded_image():
-    """Test that the correct profile image URL is returned for a profile with an uploaded image
-    """
+    """Test that the correct profile image URL is returned for a profile with an uploaded image"""
     profile = UserFactory.create().profile
     image = Image.new("RGBA", size=(50, 50), color=(155, 0, 0))
     profile.image_small_file.save(
@@ -95,8 +83,7 @@ def test_profile_img_url_uploaded_image():
 
 @pytest.mark.django_db
 def test_profile_img_url_micromaster_image():
-    """Test that the correct profile image URL is returned for a profile with a micromasters profile URL
-    """
+    """Test that the correct profile image URL is returned for a profile with a micromasters profile URL"""
     profile = UserFactory.create().profile
     profile.image_file = profile.image_medium_file = profile.image_small_file = None
     profile.image_medium = "http://testserver/profiles/image.jpg"
@@ -114,9 +101,7 @@ def test_profile_img_url_gravatar_fullname():
     profile_image = image_uri(profile, "image_small")
     assert profile_image.startswith("https://www.gravatar.com/avatar/")
     params_d = parse_qs(urlparse(profile_image).query)["d"][0]
-    assert params_d.endswith(
-        f"profile/{profile.user.username}/64/fff/579cf9.png"
-    )
+    assert params_d.endswith(f"profile/{profile.user.username}/64/fff/579cf9.png")
 
 
 @pytest.mark.django_db
@@ -181,18 +166,3 @@ def test_get_svg_avatar():
 def test_generate_initials(text, initials):
     """Test that expected initials are returned from text"""
     assert generate_initials(text) == initials
-
-
-@pytest.mark.django_db
-def test_article_image_uri():
-    """Test that article_image_uri provides the right URI for a post"""
-    article = ArticleFactory.create()
-    assert (
-        re.match(
-            r"article\/"
-            + article.post.post_id
-            + r"\/myfile\-\d{4}\-\d{2}\-\d{2}T\d{6}_article\.jpg",
-            article_image_uri(article, "myfile.jpg"),
-        )
-        is not None
-    )

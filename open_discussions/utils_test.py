@@ -35,8 +35,7 @@ def test_now_in_utc():
 
 
 def test_is_near_now():
-    """Test is_near_now for now
-    """
+    """Test is_near_now for now"""
     now = datetime.datetime.now(tz=pytz.UTC)
     assert is_near_now(now) is True
     later = now + datetime.timedelta(0, 6)
@@ -46,16 +45,14 @@ def test_is_near_now():
 
 
 def test_normalize_to_start_of_day():
-    """Test that normalize_to_start_of_day zeroes out the time components
-    """
+    """Test that normalize_to_start_of_day zeroes out the time components"""
     assert normalize_to_start_of_day(
         datetime.datetime(2018, 1, 3, 5, 6, 7)
     ) == datetime.datetime(2018, 1, 3)
 
 
 def test_chunks():
-    """Test for chunks
-    """
+    """Test for chunks"""
     input_list = list(range(113))
     output_list = []
     for nums in chunks(input_list):
@@ -74,8 +71,7 @@ def test_chunks():
 
 
 def test_chunks_iterable():
-    """Test that chunks works on non-list iterables too
-    """
+    """Test that chunks works on non-list iterables too"""
     count = 113
     input_range = range(count)
     chunk_output = []
@@ -98,8 +94,7 @@ def test_chunks_iterable():
     ],
 )
 def test_merge_strings(list_or_string, output):
-    """merge_strings should flatten a nested list of strings
-    """
+    """merge_strings should flatten a nested list of strings"""
     assert merge_strings(list_or_string) == output
 
 
@@ -157,8 +152,7 @@ def test_markdown_to_plain_text():
 @pytest.mark.django_db
 @pytest.mark.parametrize("chunk_size", [2, 3, 5, 7, 9, 10])
 def test_prefetched_iterator(chunk_size):
-    """prefetched_iterator should yield all items in the record set across chunk boundaries
-    """
+    """prefetched_iterator should yield all items in the record set across chunk boundaries"""
     users = UserFactory.create_batch(10)
     fetched_users = list(prefetched_iterator(User.objects.all(), chunk_size=chunk_size))
     assert len(users) == len(fetched_users)
@@ -167,8 +161,7 @@ def test_prefetched_iterator(chunk_size):
 
 
 def test_extract_values():
-    """extract_values should return the correct match from a dict
-    """
+    """extract_values should return the correct match from a dict"""
     test_json = {
         "a": {"b": {"c": [{"d": [1, 2, 3]}, {"d": [4, 5], "e": "f", "b": "g"}]}}
     }
@@ -187,11 +180,9 @@ def test_write_to_file():
 
 
 def test_get_field_names():
-    """Assert that get_field_names returns expected fields
-    """
+    """Assert that get_field_names returns expected fields"""
     # Test with User model instead of removed SpamCheckResult
     user_fields = get_field_names(User)
     assert "username" in user_fields
     assert "email" in user_fields
     assert "id" in user_fields
-

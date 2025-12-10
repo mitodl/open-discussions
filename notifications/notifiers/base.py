@@ -106,8 +106,7 @@ class BaseNotifier:
         return None
 
     def notify(self):
-        """Attempts to notify the recipient via email
-        """
+        """Attempts to notify the recipient via email"""
         return self._create_notification()
 
     def _create_notification(self):

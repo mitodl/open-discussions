@@ -111,9 +111,7 @@ def render_email_templates(template_name, context):
         (str, str, str): tuple of the templates for subject, text_body, html_body
 
     """
-    subject_text = render_to_string(
-        f"{template_name}/subject.txt", context
-    ).rstrip()
+    subject_text = render_to_string(f"{template_name}/subject.txt", context).rstrip()
 
     context.update({"subject": subject_text})
     html_text = render_to_string(f"{template_name}/body.html", context)
