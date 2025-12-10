@@ -11,7 +11,6 @@ import { CLEAR_SEARCH } from "../actions/search"
 import { makePostResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
-import { makeComment } from "../factories/comments"
 import { shouldIf } from "../lib/test_utils"
 
 describe("SearchPage", () => {
@@ -38,13 +37,6 @@ describe("SearchPage", () => {
     helper = new IntegrationTestHelper()
     helper.searchStub.returns(Promise.resolve(searchResponse))
     initialState = {
-      channels: {
-        data:   new Map([[channel.name, channel]]),
-        loaded: true
-      },
-      posts: {
-        data: new Map([[upvotedPost.id, upvotedPost]])
-      },
       search: {
         loaded: true,
         data:   {
@@ -85,16 +77,8 @@ describe("SearchPage", () => {
       text:          "text",
       resourceTypes: undefined
     })
-    assert.deepEqual(
-      inner.props().upvotedPosts.get(upvotedPost.id),
-      upvotedPost
-    )
     searchResponse.hits.hits.forEach((result, i) => {
       assert.deepEqual(inner.find("SearchResult").at(i).prop("result"), result)
-      assert.deepEqual(
-        inner.find("SearchResult").at(i).prop("upvotedPost"),
-        result.post_id === upvotedPost.id ? upvotedPost : null
-      )
     })
   })
 
@@ -245,10 +229,9 @@ describe("SearchPage", () => {
     assert.deepEqual(qs.parse(helper.currentLocation.search), { q: text, type })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      from:          0,
+      from:  0,
       text,
-      votedComments: new Map(),
-      error:         null
+      error: null
     })
   })
 
@@ -301,38 +284,13 @@ describe("SearchPage", () => {
     assert.deepEqual(qs.parse(helper.currentLocation.search), { type, q: text })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      from:          0,
+      from:  0,
       text,
-      error:         null,
-      votedComments: new Map()
+      error: null
     })
     assert.equal(
       store.getActions()[store.getActions().length - 2].type,
       actions.search.clear
-    )
-  })
-
-  it("shows NotFound if there is a 404 error", async () => {
-    const { inner } = await renderPage({
-      channels: {
-        error: {
-          errorStatusCode: 404
-        }
-      }
-    })
-    assert.isTrue(inner.find(".not-found").text().includes("Page not found"))
-  })
-
-  it("shows NotAuthorized if there is a 403 error", async () => {
-    const { inner } = await renderPage({
-      channels: {
-        error: {
-          errorStatusCode: 403
-        }
-      }
-    })
-    assert.isTrue(
-      inner.find(".not-found").text().includes("Stop! Who goes there?")
     )
   })
 
@@ -350,58 +308,19 @@ describe("SearchPage", () => {
     assert(store.getLastAction().type === CLEAR_SEARCH)
   })
 
-  //
-  ;[
-    [true, true, true, true],
-    [true, true, false, true],
-    [true, false, true, true],
-    [true, false, false, true],
-    [false, true, true, false],
-    [false, true, false, true],
-    [false, false, true, false],
-    [false, false, false, true]
-  ].forEach(([channelLoaded, searchLoaded, hasChannel, loaded]) => {
-    it(`has loaded=${String(loaded)} when channelLoaded=${String(
-      channelLoaded
-    )} and searchLoaded=${String(searchLoaded)} and it ${
-      hasChannel ? "has" : "doesn't have"
-    } a channel`, async () => {
-      const { inner } = await renderPage(
-        {
-          channels: {
-            loaded:     channelLoaded,
-            processing: !channelLoaded
-          },
-          search: {
-            loaded:     searchLoaded,
-            processing: !searchLoaded,
-            data:       {
-              initialLoad: true
-            }
+  it("has loaded=true (channels removed)", async () => {
+    const { inner } = await renderPage(
+      {
+        search: {
+          loaded:     false,
+          processing: true,
+          data:       {
+            initialLoad: true
           }
-        },
-        {
-          channelName: hasChannel ? channel.name : null
         }
-      )
-      assert.equal(inner.props().loaded, loaded)
-    })
-  })
-
-  it("calls updateVotedComments when upvote or downvote is triggered", async () => {
-    const { inner } = await renderPage()
-    const comments = [makeComment(makePost()), makeComment(makePost())]
-    helper.updateCommentStub.returns(Promise.resolve(comments[0]))
-    await inner.find("SearchResult").at(0).props().commentUpvote(comments[0])
-    assert.deepEqual(
-      inner.state().votedComments.get(comments[0].id),
-      comments[0]
+      },
+      {}
     )
-    helper.updateCommentStub.returns(Promise.resolve(comments[1]))
-    await inner.instance().downvote(comments[1])
-    assert.deepEqual(
-      inner.state().votedComments.get(comments[1].id),
-      comments[1]
-    )
+    assert.equal(inner.props().loaded, true)
   })
 })
