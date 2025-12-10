@@ -249,34 +249,23 @@ export class SearchPage extends React.Component<Props, State> {
 
 const mapStateToProps = (state, ownProps) => {
   const { channelName } = ownProps
-  const { channels, search } = state
-  const channel = channels.data.get(channelName)
-  const channelLoaded = channels.loaded
+  const { search } = state
   const searchLoaded = search.loaded
   const searchProcessing = search.processing
-  const loaded = (channels.error ? true : !!channel) && searchLoaded
-  const channelProcessing = channels.processing
-  const notFound = loaded
-    ? channels.error && channels.error.errorStatusCode === 404
-    : false
-  const notAuthorized = loaded
-    ? channels.error && channels.error.errorStatusCode === 403
-    : false
   const { results, total, suggest, initialLoad } = search.data
 
   return {
     results,
     total,
     initialLoad,
-    channel,
-    channelLoaded,
-    channelProcessing,
+    channel:           null,
+    channelLoaded:     true,
+    channelProcessing: false,
     channelName,
-    // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
-    // whenever the user makes a new search
-    loaded: channelName ? channelLoaded : true,
-    notFound,
-    notAuthorized,
+    // loaded is used in withLoading - always true for search page now that channels are removed
+    loaded:            true,
+    notFound:          false,
+    notAuthorized:     false,
     searchLoaded,
     searchProcessing,
     suggest

@@ -36,10 +36,6 @@ describe("ProfileEditPage", function() {
     SETTINGS.username = profile.username
     helper = new IntegrationTestHelper()
     helper.getProfileStub.returns(Promise.resolve(profile))
-    helper.getChannelsStub.returns(Promise.resolve([]))
-    helper.getChannelStub.returns(Promise.resolve([]))
-    helper.getUserPostsStub.returns(Promise.resolve([]))
-    helper.getUserCommentsStub.returns(Promise.resolve([]))
     helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
     helper.getFrontpageStub.returns(
       Promise.resolve({ posts: makeChannelPostList() })
@@ -53,13 +49,7 @@ describe("ProfileEditPage", function() {
     helper.cleanup()
   })
 
-  const basicProfileEditPageActions = [
-    actions.forms.FORM_BEGIN_EDIT,
-    actions.profiles.get.requestType,
-    actions.profiles.get.successType,
-    actions.subscribedChannels.get.requestType,
-    actions.subscribedChannels.get.successType
-  ]
+  const basicProfileEditPageActions = []
 
   const renderPage = async () => {
     const [wrapper] = await renderComponent(
