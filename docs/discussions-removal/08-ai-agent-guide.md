@@ -561,6 +561,98 @@ git revert <commit-hash>
 git push
 ```
 
+## Verification Process
+
+### Code Quality Checks
+
+After making changes, verify code quality with these checks:
+
+```bash
+# Python code formatting
+docker-compose exec web poetry run black --check .
+
+# Python linting
+docker-compose exec web poetry run pylint ./**/*.py
+
+# JavaScript/TypeScript formatting
+yarn run fmt-check
+
+# JavaScript/TypeScript linting
+yarn run lint-check
+```
+
+### Expected Results
+
+**Pylint**:
+- Score: ≥9.5/10
+- All errors in production code must be resolved
+- Test file errors for deprecated functionality are acceptable
+- Common issues to fix:
+  - Unused imports (W0611)
+  - Missing constructor parameters (E1120)
+  - Undefined variables (E0602)
+  - Import errors for removed modules (E0401, E0611)
+
+**Black**:
+- All files must pass formatting check
+- Run `black .` to auto-format if needed
+
+**ESLint/Prettier**:
+- No errors in production code
+- Follow project style guidelines
+
+### CI Workflow Validation
+
+Before pushing, verify the GitHub Actions workflow will pass:
+
+```bash
+# Check .github/workflows/ci.yml for required steps
+
+# Python tests workflow:
+# 1. Code formatting (black)
+# 2. Linting (pylint) 
+# 3. Unit tests
+# 4. Coverage report
+
+# JavaScript tests workflow:
+# 1. Webpack build
+# 2. Linting
+# 3. Code formatting
+# 4. SCSS lint
+# 5. TypeScript check
+# 6. Unit tests
+```
+
+### Manual Testing Checklist
+
+After code changes:
+
+- [ ] Application starts without errors
+- [ ] Home page loads correctly
+- [ ] Course catalog search works
+- [ ] User profiles accessible
+- [ ] No console errors in browser
+- [ ] No 500 errors in Django logs
+- [ ] Database migrations apply cleanly
+- [ ] No broken links in navigation
+
+### Common Issues and Resolutions
+
+**Issue**: Pylint errors for missing imports
+- **Solution**: Remove import statements for deleted modules
+
+**Issue**: Pylint errors for undefined variables
+- **Solution**: Remove or stub functions that reference deleted models
+
+**Issue**: Constructor parameter mismatches
+- **Solution**: Update `__init__` methods to match parent class signatures
+
+**Issue**: Black formatting failures
+- **Solution**: Run `poetry run black .` to auto-format
+
+**Issue**: Test failures for discussion features
+- **Solution**: Acceptable if tests are for deprecated functionality. Otherwise, update tests to remove discussion references.
+
 ## Support
 
 For complex decisions, AI agents should:
@@ -592,6 +684,8 @@ AI agent should generate a report:
 ## Verification
 - [x] Builds successfully
 - [x] Tests pass
+- [x] Pylint score ≥9.5/10
+- [x] Black formatting passes
 - [x] Manual testing complete
 - [x] Documentation updated
 
