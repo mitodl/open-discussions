@@ -374,8 +374,6 @@ def test_not_anonymous(method, mocker):
     assert perm.has_permission(request, mocker.Mock()) is True
 
 
-
-
 @pytest.mark.django_db
 def test_object_only_permissions(mocker):
     """Checks that ObjectOnlyPermissions.has_permission() returns True"""
