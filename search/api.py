@@ -8,15 +8,6 @@ from opensearch_dsl import Q, Search
 from opensearch_dsl.query import MoreLikeThis
 from nested_lookup import nested_lookup
 
-from channels.constants import (
-    CHANNEL_TYPE_PUBLIC,
-    CHANNEL_TYPE_RESTRICTED,
-    COMMENT_TYPE,
-    POST_TYPE,
-    ROLE_CONTRIBUTORS,
-    ROLE_MODERATORS,
-)
-from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
 from course_catalog.models import FavoriteItem
 from course_catalog.utils import get_list_items_by_resource
@@ -213,36 +204,8 @@ def _apply_general_query_filters(search, user):
     Returns:
         opensearch_dsl.Search: Search object with filters applied
     """
-    # Get the list of channels a logged in user is a contributor/moderator of
-    channel_names = (
-        sorted(
-            list(
-                ChannelGroupRole.objects.filter(
-                    group__user=user, role__in=(ROLE_CONTRIBUTORS, ROLE_MODERATORS)
-                )
-                .values_list("channel__name", flat=True)
-                .distinct()
-            )
-        )
-        if not user.is_anonymous
-        else []
-    )
-
-    # Search for comments and posts from channels
-    channels_filter = Q(
-        "terms", channel_type=[CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED]
-    ) | ~Q("terms", object_type=[COMMENT_TYPE, POST_TYPE])
-
-    # Exclude deleted comments and posts
-    content_filter = (Q("term", deleted=False) & Q("term", removed=False)) | ~Q(
-        "terms", object_type=[COMMENT_TYPE, POST_TYPE]
-    )
-
-    # Search public channels and channels user is a contributor/moderator of
-    if channel_names:
-        channels_filter = channels_filter | Q("terms", channel_name=channel_names)
-
-    return search.filter(channels_filter).filter(content_filter)
+    # No discussion filtering needed anymore - discussions removed
+    return search
 
 
 # pylint: disable=invalid-unary-operand-type

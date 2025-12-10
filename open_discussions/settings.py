@@ -118,8 +118,6 @@ INSTALLED_APPS = (
     "open_discussions",
     "authentication",
     "infinite_example",
-    "channels",
-    "channels_fields",
     "profiles",
     "mail",
     "notifications",
@@ -128,7 +126,6 @@ INSTALLED_APPS = (
     "course_catalog",
     "interactions",
     "moira_lists",
-    "discussions",
     "keycloak_user_export",
 )
 
@@ -142,7 +139,6 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "authentication.middleware.BlockedIPMiddleware",
-    "open_discussions.middleware.channel_api.ChannelApiMiddleware",
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 )

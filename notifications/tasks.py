@@ -4,7 +4,6 @@ from django.conf import settings
 
 from open_discussions.celery import app
 from open_discussions.utils import chunks
-from channels.models import Channel
 
 from notifications import api
 
