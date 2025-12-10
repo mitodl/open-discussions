@@ -2,10 +2,6 @@
 import React from "react"
 import ReactMarkdown from "react-markdown"
 
-import { addEditedMarker } from "../lib/reddit_objects"
-
-import type { Post, CommentInTree } from "../flow/discussionTypes"
-
 // this is our patched version of react-markdown
 // we need to fiddle with it to address this issue:
 // https://github.com/rexxars/react-markdown/issues/115
@@ -31,8 +27,4 @@ export const Markdown = (props: MarkdownProps) => (
     }}
     {...props}
   />
-)
-
-export const renderTextContent = (content: Post | CommentInTree) => (
-  <Markdown source={addEditedMarker(content)} />
 )

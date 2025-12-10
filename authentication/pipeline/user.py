@@ -16,7 +16,6 @@ from authentication.exceptions import (
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
-from channels import membership_api
 from moira_lists.tasks import update_user_moira_lists
 from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
@@ -262,16 +261,13 @@ def update_managed_channel_memberships(
     strategy, backend, user=None, **kwargs
 ):  # pylint: disable=unused-argument
     """
-    Update a user's managed channel memberships
+    Update a user's managed channel memberships (deprecated - no-op)
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
     """
-    if user and user.is_active:
-        membership_api.update_memberships_for_managed_channels(user_ids=[user.id])
-
     return {}
 
 

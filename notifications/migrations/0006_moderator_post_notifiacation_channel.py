@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("channels", "0026_channel_moderator_notifications"),
         ("notifications", "0005_moderator_post_notifications"),
     ]
 
@@ -15,12 +14,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="notificationsettings",
             name="channel",
-            field=models.ForeignKey(
+            field=models.IntegerField(
                 blank=True,
                 default=None,
                 null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                to="channels.Channel",
             ),
         ),
         migrations.AlterUniqueTogether(

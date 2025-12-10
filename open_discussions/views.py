@@ -5,16 +5,14 @@ from django.conf import settings
 from django.http import (
     Http404,
     HttpResponse,
-    HttpResponsePermanentRedirect,
     HttpResponseNotFound,
     HttpResponseForbidden,
     HttpResponseBadRequest,
 )
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.urls import reverse
 from social_django.utils import load_strategy, load_backend
 
-from channels.models import Post
 from course_catalog.permissions import is_staff_list_editor
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions import features
@@ -91,7 +89,6 @@ def _render_app(request, initial_state=None):  # pylint:disable=unused-argument
         "profile_ui_enabled": features.is_enabled(features.PROFILE_UI),
         "allow_saml_auth": features.is_enabled(features.SAML_AUTH),
         "allow_related_posts_ui": features.is_enabled(features.RELATED_POSTS_UI),
-        "embedlyKey": settings.EMBEDLY_KEY,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.OPENSEARCH_DEFAULT_PAGE_SIZE,
         "search_min_length": settings.OPENSEARCH_MIN_QUERY_SIZE,
@@ -110,24 +107,6 @@ def _render_app(request, initial_state=None):  # pylint:disable=unused-argument
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
     """Render the react app"""
-    return _render_app(request)
-
-
-def channel_post(request, **kwargs):
-    """Render a channel post's page as long as it isn't removed"""
-    post_id = kwargs.get("post_id", None)
-    if not post_id:
-        raise Http404("No post specified")
-
-    post = get_object_or_404(Post, post_id=post_id)
-    if post.removed and (
-        request.user.is_anonymous
-        or not (
-            request.channel_api.is_moderator(post.channel.name, request.user.username)
-        )
-    ):
-        raise Http404("Post doesn't exist")
-
     return _render_app(request)
 
 
@@ -162,8 +141,3 @@ def saml_metadata(request):
     )
     metadata, _ = saml_backend.generate_metadata_xml()
     return HttpResponse(content=metadata, content_type="text/xml")
-
-
-def channel_redirect(request):
-    """Redirect all URL's starting with `channel/` to `c/`"""
-    return HttpResponsePermanentRedirect(request.path.replace("channel/", "c/", 1))
