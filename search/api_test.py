@@ -112,33 +112,6 @@ def test_execute_search(user, opensearch):
         body=query,
         index=["testindex_all_default"],
     )
-                                                {"term": {"removed": False}},
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                    ]
-                }
-            },
-        },
-        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
-    )
 
 
 def test_execute_search_anonymous(opensearch):
