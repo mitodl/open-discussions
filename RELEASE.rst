@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+Version 0.235.0
+---------------
+
+- doc: Add docs for removing Reddit dependency and making posts/comments readonly
+- chore(deps): update dependency axios to v1.7.4 [security] (#4246)
+- chore: Remove issue and PR templates in favor of org-level templates
+- chore(deps): update dependency social-auth-app-django to v5.6.0 [security] (#4403)
+- fix(deps): update dependency django to v4.2.25 [security] (#4402)
+- security: disable yarn postinstall scripts (#4401)
+- fix(deps): update dependency django to v4.2.24 (#4400)
+- fix(deps): update dependency djoser to v2.3.0 [security] (#4397)
+- fix(deps): update dependency @babel/runtime to v7.26.10 [security] (#4396)
+- fix(deps): update dependency requests to v2.32.4 [security] (#4395)
+- fix(deps): update dependency django to v4.2.22 [security] (#4394)
+
 Version 0.234.2 (Released August 08, 2025)
 ---------------
 
