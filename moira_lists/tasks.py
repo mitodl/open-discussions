@@ -12,7 +12,9 @@ log = logging.getLogger()
 
 
 @app.task
-def update_user_moira_lists(user_id, update_memberships=False):
+def update_user_moira_lists(
+    user_id, update_memberships=False
+):  # pylint: disable=unused-argument
     """Update the user's moira lists
 
     Args:
@@ -24,7 +26,7 @@ def update_user_moira_lists(user_id, update_memberships=False):
 
 
 @app.task
-def update_moira_list_users(names, channel_ids=None):
+def update_moira_list_users(names, channel_ids=None):  # pylint: disable=unused-argument
     """Update the users for each moira list
 
     Args:
