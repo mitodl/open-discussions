@@ -1,7 +1,9 @@
 """Tests for permissions"""
 import pytest
 from django.contrib.auth.models import AnonymousUser
-from django.http import Http404
+from django.http import (
+    Http404,
+)  # pylint: disable=unused-import  # pylint: disable=unused-import
 
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
@@ -13,8 +15,8 @@ from open_discussions.permissions import (
     IsStaffPermission,
     ModeratorPermissions,
     ObjectOnlyPermissions,
-    channel_exists,
-    channel_is_mod_editable,
+    channel_exists,  # pylint: disable=unused-import
+    channel_is_mod_editable,  # pylint: disable=unused-import
     is_admin_user,
     is_moderator,
     is_readonly,

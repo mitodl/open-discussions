@@ -151,7 +151,7 @@ def gen_podcast_episode_id(podcast_episode_obj):
 
 
 # pylint: disable=invalid-unary-operand-type
-def _apply_general_query_filters(search, user):
+def _apply_general_query_filters(search, user):  # pylint: disable=unused-argument
     """Applies a series of filters to a Search object so permissions are respected, deleted
     objects are ignored, etc.
 

@@ -1,5 +1,5 @@
 """Tests for profiles.utils"""
-import re
+import re  # pylint: disable=unused-import
 import xml.etree.ElementTree as etree
 from io import BytesIO
 from urllib.parse import parse_qs, urlparse
@@ -11,7 +11,7 @@ from open_discussions.factories import UserFactory
 from open_discussions.utils import generate_filepath
 from profiles.utils import (
     DEFAULT_PROFILE_IMAGE,
-    article_image_uri,
+    article_image_uri,  # pylint: disable=unused-import
     generate_initials,
     generate_svg_avatar,
     image_uri,

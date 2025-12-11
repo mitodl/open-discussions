@@ -1,5 +1,5 @@
 """Utils tests"""
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock  # pylint: disable=unused-import
 
 import pytest
 

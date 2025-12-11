@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 
 @contextmanager
-def record(name, user):
+def record(name, user):  # pylint: disable=unused-argument
     """Record a cassette of some reddit communication (deprecated - no-op).
 
     Args:

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as etree
 
 import pytest
 from django.urls import reverse
-from rest_framework import status
+from rest_framework import status  # pylint: disable=unused-import
 
 from open_discussions import features
 

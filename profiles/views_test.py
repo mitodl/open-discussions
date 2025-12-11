@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
 import json
 from os.path import basename, splitext
-from types import SimpleNamespace
+from types import SimpleNamespace  # pylint: disable=unused-import
 
 import pytest
 from django.contrib.auth.models import User

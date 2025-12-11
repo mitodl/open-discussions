@@ -24,7 +24,9 @@ from open_discussions.utils import chunks
 log = logging.getLogger()
 
 
-def ensure_notification_settings(user, skip_moderator_setting=False):
+def ensure_notification_settings(
+    user, skip_moderator_setting=False
+):  # pylint: disable=unused-argument
     """Populates user with notification settings
 
     Args:
@@ -167,13 +169,17 @@ def send_email_notification_batch(notification_ids):
             log.exception("Error sending notification %s", notification)
 
 
-def send_comment_notifications(post_id, comment_id, new_comment_id):
+def send_comment_notifications(
+    post_id, comment_id, new_comment_id
+):  # pylint: disable=unused-argument
     """Deprecated - comment notifications no longer supported.
     Kept as stub for Phase 3 cleanup.
     """
 
 
-def send_moderator_notifications(post_id, channel_name):
+def send_moderator_notifications(
+    post_id, channel_name
+):  # pylint: disable=unused-argument
     """Sends post notifications to channel moderators (deprecated - no-op)
 
     Args:

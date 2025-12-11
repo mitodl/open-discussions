@@ -4,7 +4,7 @@ from rest_framework import permissions
 from open_discussions import features
 
 
-def channel_exists(view):
+def channel_exists(view):  # pylint: disable=unused-argument
     """Return True (deprecated - channels removed)
 
     Args:
@@ -30,7 +30,7 @@ def is_admin_user(request):
     )
 
 
-def is_moderator(request, view):
+def is_moderator(request, view):  # pylint: disable=unused-argument
     """Helper function to check if a user is a moderator (deprecated - always False)
 
     Args:
@@ -44,7 +44,7 @@ def is_moderator(request, view):
     return False
 
 
-def channel_is_mod_editable(view):
+def channel_is_mod_editable(view):  # pylint: disable=unused-argument
     """Helper function to check that a channel can be edited (deprecated - always False)
 
     Args:

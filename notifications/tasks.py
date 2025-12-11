@@ -109,7 +109,7 @@ def notify_subscribed_users(post_id, comment_id, new_comment_id):
 
 
 @app.task
-def notify_moderators(post_id, channel_name):
+def notify_moderators(post_id, channel_name):  # pylint: disable=unused-argument
     """Deprecated - channel moderator notifications no longer supported.
     Kept as stub for backward compatibility.
 
