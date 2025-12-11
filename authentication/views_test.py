@@ -18,6 +18,7 @@ from open_discussions import features
 from open_discussions.factories import UserFactory, UserSocialAuthFactory
 from open_discussions.test_utils import MockResponse, any_instance_of
 from profiles.models import Profile
+from profiles.utils import image_uri, IMAGE_SMALL
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("indexing_user")]
 lazy = pytest.lazy_fixture
@@ -133,7 +134,7 @@ def login_email_exists(client, email_user):
                 "state": SocialAuthState.STATE_LOGIN_PASSWORD,
                 "extra_data": {
                     "name": email_user.profile.name,
-                    "profile_image_small": email_user.profile.image_small_file.url,
+                    "profile_image_small": image_uri(email_user.profile, IMAGE_SMALL),
                 },
             },
         )
