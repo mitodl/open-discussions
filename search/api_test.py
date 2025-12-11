@@ -109,40 +109,9 @@ def test_execute_search(user, opensearch):
 
     assert execute_search(user=user, query=query) == opensearch.conn.search.return_value
     opensearch.conn.search.assert_called_once_with(
-        body={
-            **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {"terms": {"channel_type": []}},
-                                    {"terms": {"channel_name": []}},
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must": [
-                                                {"term": {"deleted": False}},
+        body=query,
+        index=["testindex_all_default"],
+    )
                                                 {"term": {"removed": False}},
                                             ]
                                         }
@@ -180,64 +149,7 @@ def test_execute_search_anonymous(opensearch):
 
     assert execute_search(user=user, query=query) == opensearch.conn.search.return_value
     opensearch.conn.search.assert_called_once_with(
-        body={
-            **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {"terms": {"channel_type": []}},
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must": [
-                                                {"term": {"deleted": False}},
-                                                {"term": {"removed": False}},
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                    ]
-                }
-            },
-        },
+        body=query,
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
