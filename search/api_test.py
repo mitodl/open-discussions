@@ -325,6 +325,8 @@ def test_execute_learn_search_podcasts(settings, user, opensearch):
     }
 
 
+@pytest.mark.parametrize("is_anonymous", [True, False])
+@pytest.mark.django_db
 def test_find_similar_resources(settings, is_anonymous, opensearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
     resources_to_return = 5
