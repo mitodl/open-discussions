@@ -180,9 +180,10 @@ def test_write_to_file():
 
 
 def test_get_field_names():
-    """Assert that get_field_names returns expected fields"""
+    """Assert that get_field_names returns expected fields (excluding auto-created fields)"""
     # Test with User model instead of removed SpamCheckResult
     user_fields = get_field_names(User)
     assert "username" in user_fields
     assert "email" in user_fields
-    assert "id" in user_fields
+    # id is auto-created so it's not included
+    assert "id" not in user_fields

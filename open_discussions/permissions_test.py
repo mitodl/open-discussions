@@ -51,9 +51,10 @@ def test_is_staff_user(
 @pytest.mark.parametrize("method", ["GET", "HEAD", "OPTIONS", "POST", "PUT"])
 def test_anonymous_readonly(mocker, method):
     """Test that AnonymousAccessReadonlyPermission allows anonymous readonly access"""
-    request, view = mocker.Mock(user=AnonymousUser()), mocker.Mock()
+    request = mocker.Mock()
+    request.user = AnonymousUser()
     request.method = method
-    request.user.is_anonymous = True
+    view = mocker.Mock()
     expected = method in ["GET", "HEAD", "OPTIONS"]
     assert AnonymousAccessReadonlyPermission().has_permission(request, view) is expected
 
