@@ -1,5 +1,4 @@
 """Tests for URLs"""
-import pytest
 from django.urls import reverse
 
 
