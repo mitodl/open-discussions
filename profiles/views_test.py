@@ -80,9 +80,6 @@ def test_create_user(
         UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists()
         is False
     )
-    get_or_create_auth_tokens_stub = mocker.patch(
-        "channels.api.get_or_create_auth_tokens"
-    )
     ensure_notifications_stub = mocker.patch(
         "notifications.api.ensure_notification_settings"
     )
@@ -104,7 +101,6 @@ def test_create_user(
         }
     )
     assert resp.json()["profile"] == payload["profile"]
-    get_or_create_auth_tokens_stub.assert_called_once_with(user)
     ensure_notifications_stub.assert_called_once_with(user, skip_moderator_setting=True)
     assert user.email == email
     assert user.profile.email_optin is email_optin

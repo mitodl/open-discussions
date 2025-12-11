@@ -25,7 +25,6 @@ class NotificationSettingsFactory(DjangoModelFactory):
 
     user = SubFactory(UserFactory)
     notification_type = FuzzyChoice(NOTIFICATION_TYPES)
-    channel = None
 
     via_app = Faker("boolean")
     via_email = Faker("boolean")

@@ -60,13 +60,9 @@ def test_serialize_create_user(db, mocker):
         "placename": "",
     }
 
-    get_or_create_auth_tokens_stub = mocker.patch(
-        "channels.api.get_or_create_auth_tokens"
-    )
     serializer = UserSerializer(data={"email": "test@localhost", "profile": profile})
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
-    get_or_create_auth_tokens_stub.assert_called_once_with(user)
 
     del profile["email_optin"]  # is write-only
     del profile["toc_optin"]  # is write-only

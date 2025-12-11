@@ -1,50 +1,29 @@
 """Tests for permissions"""
 import pytest
 from django.contrib.auth.models import AnonymousUser
-from django.http import (  # pylint: disable=unused-import
-    Http404,
-)  # pylint: disable=unused-import
 
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
-    ContributorPermissions,
-    IsOwnSubscriptionOrAdminPermission,
-    IsStaffModeratorOrReadonlyPermission,
-    IsStaffOrModeratorPermission,
-    IsStaffOrReadonlyPermission,
-    IsStaffPermission,
-    ModeratorPermissions,
     ObjectOnlyPermissions,
     is_admin_user,
-    is_moderator,
     is_readonly,
 )
-
-pytestmark = pytest.mark.usefixtures("mock_channel_exists")
 
 
 @pytest.mark.parametrize(
     "method,result",
-    [("GET", True), ("HEAD", True), ("OPTIONS", True), ("POST", False), ("PUT", False)],
+    [
+        ("GET", True),
+        ("HEAD", True),
+        ("OPTIONS", True),
+        ("POST", False),
+        ("PUT", False),
+    ],
 )
 def test_is_readonly(mocker, method, result):
     """is_readonly should return true for readonly HTTP verbs"""
     request = mocker.Mock(method=method)
     assert is_readonly(request) is result
-
-
-@pytest.mark.parametrize("result", [True, False])
-def test_is_moderator(user, mocker, result):
-    """is_moderator should return True if the user is a moderator for the channel"""
-    request = mocker.Mock(user=user)
-    request.channel_api = mocker.patch("channels.api.Api").return_value
-    request.channel_api.is_moderator.return_value = result
-    channel_name = "abc"
-    view = mocker.Mock(kwargs={"channel_name": channel_name})
-    assert is_moderator(request, view) is result
-    request.channel_api.is_moderator.assert_called_once_with(
-        channel_name, user.username
-    )
 
 
 @pytest.mark.parametrize(
@@ -69,286 +48,25 @@ def test_is_staff_user(
     assert is_admin_user(request) is expected
 
 
-def test_is_staff_permission(mocker, is_staff):
-    """Test that IsStaffPermission checks that the user is a staff user"""
-    request, view = mocker.Mock(), mocker.Mock()
-    is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_admin_user",
-        autospec=True,
-        return_value=is_staff,
-    )
-    assert IsStaffPermission().has_permission(request, view) is is_staff
-    is_staff_user_mock.assert_called_once_with(request)
-
-
-@pytest.mark.parametrize(
-    "is_staff,readonly,expected",
-    [
-        [True, True, True],
-        [True, False, True],
-        [False, True, True],
-        [False, False, False],
-    ],
-)
-def test_is_staff_or_readonly_permission(mocker, is_staff, readonly, expected):
-    """Test that staff users or readonly verbs are allowed"""
-    request, view = mocker.Mock(), mocker.Mock()
-    is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_admin_user",
-        autospec=True,
-        return_value=is_staff,
-    )
-    is_readonly_mock = mocker.patch(
-        "open_discussions.permissions.is_readonly", autospec=True, return_value=readonly
-    )
-    assert IsStaffOrReadonlyPermission().has_permission(request, view) is expected
-    if is_staff_user_mock.called:
-        is_staff_user_mock.assert_called_once_with(request)
-    is_readonly_mock.assert_called_once_with(request)
-
-
-@pytest.mark.parametrize(
-    "is_staff,moderator,expected",
-    [
-        [True, True, True],
-        [True, False, True],
-        [False, True, True],
-        [False, False, False],
-    ],
-)
-def test_is_staff_or_moderator_permission(mocker, is_staff, moderator, expected):
-    """Test that staff users or moderators are allowed"""
-    request, view = mocker.Mock(), mocker.Mock()
-    is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_admin_user",
-        autospec=True,
-        return_value=is_staff,
-    )
-    is_moderator_mock = mocker.patch(
-        "open_discussions.permissions.is_moderator",
-        autospec=True,
-        return_value=moderator,
-    )
-    assert IsStaffOrModeratorPermission().has_permission(request, view) is expected
-    if is_moderator_mock.called:
-        is_moderator_mock.assert_called_once_with(request, view)
-    is_staff_user_mock.assert_called_once_with(request)
-
-
-@pytest.mark.parametrize(
-    "is_staff,moderator,readonly,expected",
-    [
-        [True, True, True, True],
-        [True, False, True, True],
-        [False, True, True, True],
-        [False, False, True, True],
-        [True, True, False, True],
-        [True, False, False, True],
-        [False, True, False, True],
-        [False, False, False, False],
-    ],
-)
-def test_is_staff_moderator_or_readonly_permission(
-    mocker, is_staff, moderator, readonly, expected
-):
-    """Test that staff users or moderators are allowed"""
-    request, view = mocker.Mock(), mocker.Mock()
-    is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_admin_user",
-        autospec=True,
-        return_value=is_staff,
-    )
-    is_moderator_mock = mocker.patch(
-        "open_discussions.permissions.is_moderator",
-        autospec=True,
-        return_value=moderator,
-    )
-    is_readonly_mock = mocker.patch(
-        "open_discussions.permissions.is_readonly", autospec=True, return_value=readonly
-    )
-    assert (
-        IsStaffModeratorOrReadonlyPermission().has_permission(request, view) is expected
-    )
-    is_readonly_mock.assert_called_once_with(request)
-    if is_staff_user_mock.called:
-        is_staff_user_mock.assert_called_once_with(request)
-    if is_moderator_mock.called:
-        is_moderator_mock.assert_called_once_with(request, view)
-
-
-@pytest.mark.parametrize(
-    "logged_in_username,req_body_username,url_kwarg_username,expected",
-    [
-        ["user1", "user1", None, True],
-        ["user1", None, "user1", True],
-        ["user1", "user1", None, True],
-        ["otheruser", "user1", None, False],
-        ["otheruser", None, "user1", False],
-        ["user1", None, None, False],
-    ],
-)
-def test_is_own_subscription_permission(
-    mocker, logged_in_username, req_body_username, url_kwarg_username, expected
-):
-    """Test that IsOwnSubscriptionOrAdminPermission returns True if the user is adding/deleting
-    their own resource
-    """
-    view = mocker.Mock(kwargs={"subscriber_name": url_kwarg_username})
-    request = mocker.Mock(
-        user=mocker.Mock(username=logged_in_username),
-        data={"subscriber_name": req_body_username} if req_body_username else {},
-    )
-    mocker.patch("open_discussions.permissions.is_admin_user", return_value=False)
-    mocker.patch("open_discussions.permissions.is_moderator", return_value=False)
-    mocker.patch("open_discussions.permissions.is_readonly", return_value=False)
-    assert (
-        IsOwnSubscriptionOrAdminPermission().has_permission(request, view) is expected
-    )
-
-
-def test_contributor_permission_self_delete(mocker):
-    """Test that users can delete their own contributor status"""
-    mocker.patch("open_discussions.permissions.is_admin_user", return_value=False)
-    mocker.patch("open_discussions.permissions.is_moderator", return_value=False)
-    username = "user1"
-    request, view = mocker.Mock(), mocker.Mock()
-    request.method = "DELETE"
-    request.user.username = username
-    view.kwargs = {"contributor_name": username}
-    assert ContributorPermissions().has_permission(request, view) is True
-
-
-# This is essentially is_staff or (moderator and (mod_editable or readonly))
-@pytest.mark.parametrize(
-    "is_staff, moderator, mod_editable, readonly, expected",
-    [
-        [True, True, True, True, True],
-        [True, True, True, False, True],
-        [True, True, False, True, True],
-        [True, True, False, False, True],
-        [True, False, True, True, True],
-        [True, False, True, False, True],
-        [True, False, False, True, True],
-        [True, False, False, False, True],
-        [False, True, True, True, True],
-        [False, True, True, False, True],
-        [False, True, False, True, True],
-        [False, True, False, False, False],
-        [False, False, True, True, False],
-        [False, False, True, False, False],
-        [False, False, False, True, False],
-        [False, False, False, False, False],
-    ],
-)  # pylint: disable=too-many-arguments
-def test_contributor_permission(  # pylint:disable=unused-argument,too-many-arguments
-    mocker, is_staff, moderator, mod_editable, readonly, expected
-):
-    """Test who can view and edit via the contributor REST API"""
-    request, view = mocker.Mock(), mocker.Mock()
-    is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_admin_user",
-        autospec=True,
-        return_value=is_staff,
-    )
-    is_moderator_mock = mocker.patch(
-        "open_discussions.permissions.is_moderator",
-        autospec=True,
-        return_value=moderator,
-    )
-    channel_is_mod_editable_mock = mocker.patch(
-        "open_discussions.permissions.channel_is_mod_editable",
-        autospec=True,
-        return_value=mod_editable,
-    )
-    is_readonly_mock = mocker.patch(
-        "open_discussions.permissions.is_readonly", autospec=True, return_value=readonly
-    )
-    assert ContributorPermissions().has_permission(request, view) is expected
-    is_staff_user_mock.assert_called_once_with(request)
-    if is_moderator_mock.called:
-        is_moderator_mock.assert_called_once_with(request, view)
-    if channel_is_mod_editable_mock.called:
-        channel_is_mod_editable_mock.assert_called_once_with(view)
-    if is_readonly_mock.called:
-        is_readonly_mock.assert_called_once_with(request)
-
-
-@pytest.mark.parametrize(
-    "readonly, is_staff, mod_editable, moderator, expected",
-    [
-        [True, True, True, True, True],
-        [True, True, True, False, True],
-        [True, True, False, True, True],
-        [True, True, False, False, True],
-        [True, False, True, True, True],
-        [True, False, True, False, True],
-        [True, False, False, True, True],
-        [True, False, False, False, True],
-        [False, True, True, True, True],
-        [False, True, True, False, True],
-        [False, True, False, True, True],
-        [False, True, False, False, True],
-        [False, False, True, True, True],
-        [False, False, True, False, False],
-        [False, False, False, True, False],
-        [False, False, False, False, False],
-    ],
-)  # pylint: disable=too-many-arguments
-def test_moderator_permission(  # pylint:disable=unused-argument,too-many-arguments
-    mocker, readonly, is_staff, mod_editable, moderator, expected
-):
-    """Test who can view and edit via the moderator REST API"""
-    request, view = mocker.Mock(), mocker.Mock()
-    is_readonly_mock = mocker.patch(
-        "open_discussions.permissions.is_readonly", autospec=True, return_value=readonly
-    )
-    is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_admin_user",
-        autospec=True,
-        return_value=is_staff,
-    )
-    is_moderator_mock = mocker.patch(
-        "open_discussions.permissions.is_moderator",
-        autospec=True,
-        return_value=moderator,
-    )
-    channel_is_mod_editable_mock = mocker.patch(
-        "open_discussions.permissions.channel_is_mod_editable",
-        autospec=True,
-        return_value=mod_editable,
-    )
-    assert ModeratorPermissions().has_permission(request, view) is expected
-    is_readonly_mock.assert_called_once_with(request)
-    if is_staff_user_mock.called:
-        is_staff_user_mock.assert_called_once_with(request)
-    if is_moderator_mock.called:
-        is_moderator_mock.assert_called_once_with(request, view)
-    if channel_is_mod_editable_mock.called:
-        channel_is_mod_editable_mock.assert_called_once_with(view)
-
-
-@pytest.mark.parametrize(
-    "method,result",
-    [("GET", True), ("HEAD", True), ("OPTIONS", True), ("POST", False), ("PUT", False)],
-)
-def test_anonymous_readonly(method, result, mocker):
-    """Test that anonymous users are allowed for readonly verbs"""
-    perm = AnonymousAccessReadonlyPermission()
-    request = mocker.Mock(user=AnonymousUser(), method=method)
-    assert perm.has_permission(request, mocker.Mock()) is result
+@pytest.mark.parametrize("method", ["GET", "HEAD", "OPTIONS", "POST", "PUT"])
+def test_anonymous_readonly(mocker, method):
+    """Test that AnonymousAccessReadonlyPermission allows anonymous readonly access"""
+    request, view = mocker.Mock(user=AnonymousUser()), mocker.Mock()
+    request.method = method
+    request.user.is_anonymous = True
+    expected = method in ["GET", "HEAD", "OPTIONS"]
+    assert AnonymousAccessReadonlyPermission().has_permission(request, view) is expected
 
 
 @pytest.mark.parametrize("method", ["GET", "HEAD", "OPTIONS", "POST", "PUT"])
-def test_not_anonymous(method, mocker):
-    """Authenticated users are always allowed by this permission class"""
-    perm = AnonymousAccessReadonlyPermission()
-    request = mocker.Mock(user=mocker.Mock(is_anonymous=False), method=method)
-    assert perm.has_permission(request, mocker.Mock()) is True
+def test_not_anonymous(mocker, user, method):
+    """Test that AnonymousAccessReadonlyPermission allows all requests for authenticated users"""
+    request, view = mocker.Mock(user=user), mocker.Mock()
+    request.method = method
+    assert AnonymousAccessReadonlyPermission().has_permission(request, view) is True
 
 
-@pytest.mark.django_db
 def test_object_only_permissions(mocker):
-    """Checks that ObjectOnlyPermissions.has_permission() returns True"""
-    perm = ObjectOnlyPermissions()
-    request = mocker.Mock(user=mocker.Mock(is_anonymous=False), method="PUT")
-    assert perm.has_permission(request, mocker.Mock()) is True
+    """Test that ObjectOnlyPermissions ignores model-level permissions"""
+    request, view = mocker.Mock(), mocker.Mock()
+    assert ObjectOnlyPermissions().has_permission(request, view) is True

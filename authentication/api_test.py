@@ -24,10 +24,8 @@ pytestmark = pytest.mark.django_db
         # None,
     ],
 )
-def test_create_user(mocker, profile_data: dict[str, str]):
+def test_create_user(profile_data: dict[str, str]):
     """Tests that a user and associated objects are created"""
-    auth_token_mock = mocker.patch("channels.api.get_or_create_auth_tokens")
-
     email = "email@localhost"
     username = "username"
     user = api.create_user(username, email, profile_data, {"first_name": "Bob"})
@@ -37,8 +35,6 @@ def test_create_user(mocker, profile_data: dict[str, str]):
     assert user.username == username
     assert user.first_name == "Bob"
     assert NotificationSettings.objects.count() == 2
-
-    auth_token_mock.assert_called_once()
 
     if "name" in profile_data:
         assert user.profile.name == profile_data["name"]
@@ -58,7 +54,6 @@ def test_create_user_errors(
 ):
     """Test that we don't end up in a partial state if there are errors"""
     mocker.patch(mock_method, side_effect=Exception("error"))
-    auth_token_mock = mocker.patch("channels.api.get_or_create_auth_tokens")
 
     with pytest.raises(Exception):
         api.create_user(
@@ -69,29 +64,6 @@ def test_create_user_errors(
 
     assert User.objects.all().count() == 0
     assert Profile.objects.count() == 0
-    auth_token_mock.assert_not_called()
-
-
-def test_create_user_token_error(mocker):
-    """Test that an error creating a token fails the user creation"""
-    auth_token_mock = mocker.patch(
-        "channels.api.get_or_create_auth_tokens", side_effect=Exception("error")
-    )
-
-    with pytest.raises(Exception):
-        assert (
-            api.create_user(
-                "username",
-                "email@localhost",
-                {"name": "My Name", "image": "http://localhost/image.jpg"},
-            )
-            is not None
-        )
-
-    assert User.objects.all().count() == 0
-    assert Profile.objects.count() == 0
-    assert NotificationSettings.objects.count() == 0
-    auth_token_mock.assert_called_once()
 
 
 def test_create_or_update_micromasters_social_auth(user):

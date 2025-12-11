@@ -47,7 +47,7 @@ jobs:
         run: sudo apt-get update -y
 
       - name: Apt install
-        run: cat Aptfile | sudo xargs apt-get install
+        run: cat Aptfile | sudo xargs apt-get install -y
 
       - name: Install poetry
         uses: snok/install-poetry@93ada01c735cc8a383ce0ce2ae205a21c415379b # v1

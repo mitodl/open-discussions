@@ -11,30 +11,8 @@ from profiles.models import Profile
 from search import api, serializers
 
 
-def test_serialize_post_for_bulk(mocker):
-    """Test that serialize_post_for_bulk correctly serializes a post/submission object"""
-    post_id = "post1"
-    base_serialized_post = {"serialized": "post"}
-    mocker.patch(
-        "search.serializers.OSPostSerializer.to_representation",
-        return_value=base_serialized_post,
-    )
-    serialized = serializers.serialize_post_for_bulk(mocker.Mock(post_id=post_id))
-    assert serialized == {"_id": f"p_{post_id}", **base_serialized_post}
-
-
-def test_serialize_comment_for_bulk(mocker):
-    """Test that serialize_comment_for_bulk correctly serializes a comment object"""
-    comment_id = "456"
-    base_serialized_comment = {"serialized": "comment"}
-    mocker.patch(
-        "search.serializers.OSCommentSerializer.to_representation",
-        return_value=base_serialized_comment,
-    )
-    serialized = serializers.serialize_comment_for_bulk(
-        mocker.Mock(comment_id=comment_id)
-    )
-    assert serialized == {"_id": f"c_{comment_id}", **base_serialized_comment}
+# Tests for serialize_post_for_bulk and serialize_comment_for_bulk removed
+# - These tested serializers for discussion posts/comments which have been removed
 
 
 @pytest.mark.django_db

@@ -382,31 +382,6 @@ def test_forbid_hijack(mocker, hijacked):
         assert user_actions.forbid_hijack(*args, **kwargs) == {}
 
 
-@pytest.mark.parametrize("has_user", [True, False])
-@pytest.mark.parametrize("is_active", [True, False])
-def test_update_managed_channel_memberships(mocker, has_user, user, is_active):
-    """Test that update_managed_channel_memberships calls the api if the user is authenticated"""
-    user.is_active = is_active
-    user.save()
-
-    mock_strategy = mocker.Mock()
-    mock_backend = mocker.Mock(name="email")
-
-    mock_membership_api = mocker.patch("authentication.pipeline.user.membership_api")
-
-    args = [mock_strategy, mock_backend]
-    kwargs = {"user": user if has_user else None}
-
-    assert user_actions.update_managed_channel_memberships(*args, **kwargs) == {}
-
-    if has_user and is_active:
-        mock_membership_api.update_memberships_for_managed_channels.assert_called_once_with(
-            user_ids=[user.id]
-        )
-    else:
-        mock_membership_api.update_memberships_for_managed_channels.assert_not_called()
-
-
 @pytest.mark.parametrize("moira_enabled", [True, False])
 @pytest.mark.parametrize("has_user", [True, False])
 @pytest.mark.parametrize("is_active", [True, False])
