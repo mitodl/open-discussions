@@ -10,7 +10,7 @@ import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../components/ProfileImage"
 import ProfileContributionFeed from "../components/ProfileContributionFeed"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
-import { SocialSiteLogoLink, SiteLogoLink } from "../components/SiteLogoLink"
+import { SocialSiteLogoLink } from "../components/SiteLogoLink"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -69,20 +69,15 @@ class ProfilePage extends React.Component<Props> {
     }
 
     // $FlowFixMe: profile.user_websites cannot be undefined here
+    // Only render social sites, not personal websites (www links) to reduce spam
     const socialSites = profile.user_websites
       .filter(site => site.site_type !== PERSONAL_SITE_TYPE)
       .map((site, i) => (
         <SocialSiteLogoLink site={site.site_type} url={site.url} key={i} />
       ))
-    // $FlowFixMe: profile.user_websites cannot be undefined here
-    const personalSite = profile.user_websites
-      .filter(site => site.site_type === PERSONAL_SITE_TYPE)
-      .map((site, i) => <SiteLogoLink url={site.url} key={i} />)
 
-    const sites = socialSites.concat([personalSite]).filter(site => site)
-
-    if (sites.length === 0) return null
-    return <div className="card-site-links">{sites}</div>
+    if (socialSites.length === 0) return null
+    return <div className="card-site-links">{socialSites}</div>
   }
 
   render() {
