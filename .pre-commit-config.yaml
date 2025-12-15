@@ -4,4 +4,4 @@ repos:
     hooks:
     -   id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
-        exclude: .*_test.*|yarn\.lock|cassettes/.*|test_json/.*
+        exclude: .*_test.*|yarn\.lock|cassettes/.*|test_json/.*|poetry.lock
