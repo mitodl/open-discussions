@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.235.0
+Version 0.235.0 (Released December 15, 2025)
 ---------------
 
 - version: Loosen Python version constraint
