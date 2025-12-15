@@ -29,6 +29,26 @@ class Migration(migrations.Migration):
             sql="ALTER TABLE notifications_notificationsettings DROP COLUMN IF EXISTS channel_id CASCADE;",
             reverse_sql=migrations.RunSQL.noop,
         ),
+        # Remove duplicate rows before adding unique constraint
+        # Keep the oldest record for each (user_id, notification_type) combination
+        migrations.RunSQL(
+            sql="""
+                DELETE FROM notifications_notificationsettings
+                WHERE id IN (
+                    SELECT id
+                    FROM (
+                        SELECT id,
+                               ROW_NUMBER() OVER (
+                                   PARTITION BY user_id, notification_type
+                                   ORDER BY created_on ASC, id ASC
+                               ) AS rn
+                        FROM notifications_notificationsettings
+                    ) t
+                    WHERE t.rn > 1
+                );
+            """,
+            reverse_sql=migrations.RunSQL.noop,
+        ),
         # Re-add the unique constraint without channel
         migrations.AddConstraint(
             model_name="notificationsettings",
