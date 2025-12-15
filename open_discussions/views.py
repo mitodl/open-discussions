@@ -87,6 +87,7 @@ def _render_app(request, initial_state=None):  # pylint:disable=unused-argument
         "profile_ui_enabled": features.is_enabled(features.PROFILE_UI),
         "allow_saml_auth": features.is_enabled(features.SAML_AUTH),
         "allow_related_posts_ui": features.is_enabled(features.RELATED_POSTS_UI),
+        "embedlyKey": settings.EMBEDLY_KEY,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.OPENSEARCH_DEFAULT_PAGE_SIZE,
         "search_min_length": settings.OPENSEARCH_MIN_QUERY_SIZE,

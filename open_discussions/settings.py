@@ -119,6 +119,7 @@ INSTALLED_APPS = (
     "profiles",
     "mail",
     "notifications",
+    "embedly",
     "search",
     "widgets",
     "course_catalog",
