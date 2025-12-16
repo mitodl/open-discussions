@@ -104,7 +104,7 @@ export type FacetResult = {
   buckets:    Array<FacetBucket>
 }
 
-export type Result = PostResult | CommentResult | ProfileResult | LearningResourceResult
+export type Result = ProfileResult | LearningResourceResult
 
 export type SearchInputs = {
   text?:            string,

@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-from course_catalog.constants import OfferedBy, PlatformType
+from course_catalog.constants import OfferedBy
 
 
 def depopulate_bootcamps_from_courses(apps, schema_editor):

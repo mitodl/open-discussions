@@ -1,7 +1,7 @@
 """Tests for common video extractors"""
 import pytest
 
-from course_catalog.etl.video import extract_videos_topics, extract_topics
+from course_catalog.etl.video import extract_topics, extract_videos_topics
 from course_catalog.factories import VideoFactory
 
 pytestmark = pytest.mark.django_db

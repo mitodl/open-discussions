@@ -1,5 +1,4 @@
-"""
-Django settings specific to DRF Spectacular
+"""Django settings specific to DRF Spectacular
 to offload from the main settings.py
 """
 

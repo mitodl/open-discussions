@@ -1,13 +1,13 @@
 """Tests for EmailNotifier"""
 # pylint: disable=redefined-outer-name
-from django.core.mail import EmailMessage
 import pytest
+from django.core.mail import EmailMessage
 
 from notifications.factories import (
     EmailNotificationFactory,
     NotificationSettingsFactory,
 )
-from notifications.models import EmailNotification, FREQUENCY_NEVER
+from notifications.models import FREQUENCY_NEVER, EmailNotification
 from notifications.notifiers import email
 from open_discussions import features
 from open_discussions.test_utils import any_instance_of

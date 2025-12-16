@@ -6,9 +6,7 @@ from course_catalog.api import get_course_availability
 
 
 def populate_availability(apps, schema_editor):
-    """
-    Back-fills availability values for Courses
-    """
+    """Back-fills availability values for Courses"""
     Course = apps.get_model("course_catalog", "Course")
     for course in Course.objects.iterator():
         course.availability = get_course_availability(course)

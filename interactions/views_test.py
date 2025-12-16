@@ -1,7 +1,7 @@
 """interactions views tests"""
+import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
-import pytest
 from rest_framework import status
 
 from course_catalog.factories import (
@@ -10,7 +10,6 @@ from course_catalog.factories import (
     UserListFactory,
     VideoFactory,
 )
-
 from interactions.factories import ContentTypeInteractionFactory
 from interactions.models import ContentTypeInteraction
 from interactions.serializers import PopularContentSerializer

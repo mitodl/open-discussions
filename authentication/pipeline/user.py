@@ -1,22 +1,21 @@
 """Auth pipline functions for email authentication"""
 import ulid
+from django.conf import settings
+from django.db import transaction
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
 from social_core.exceptions import AuthException
 from social_core.pipeline.partial import partial
-from django.conf import settings
-from django.db import transaction
 
 from authentication.backends.micromasters import MicroMastersAuth
 from authentication.exceptions import (
     InvalidPasswordException,
-    RequirePasswordException,
     RequirePasswordAndProfileException,
+    RequirePasswordException,
     RequireProviderException,
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
-from channels import membership_api
 from moira_lists.tasks import update_user_moira_lists
 from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
@@ -29,13 +28,13 @@ from profiles.utils import update_full_name
 def validate_email_auth_request(
     strategy, backend, user=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    Validates an auth request for email
+    """Validates an auth request for email
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
+
     """
     if backend.name != EmailAuth.name:
         return {}
@@ -50,13 +49,13 @@ def validate_email_auth_request(
 def get_username(
     strategy, backend, user=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    Gets the username for a user
+    """Gets the username for a user
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
+
     """
     username = None
 
@@ -72,8 +71,7 @@ def get_username(
 def require_password_and_profile_via_email(
     strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    Sets a new user's password and profile
+    """Sets a new user's password and profile
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
@@ -84,6 +82,7 @@ def require_password_and_profile_via_email(
 
     Raises:
         RequirePasswordAndProfileException: if the user hasn't set password or name
+
     """
     if backend.name != EmailAuth.name or flow != SocialAuthState.FLOW_REGISTER:
         return {}
@@ -109,8 +108,7 @@ def require_password_and_profile_via_email(
 def require_profile_update_user_via_saml(
     strategy, backend, user=None, is_new=False, *args, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    Sets a new user's password and profile, and updates the user first and last names.
+    """Sets a new user's password and profile, and updates the user first and last names.
     Touchstone only returns DisplayName, which is the full name, and that is what the
     user first_name is initially set to.
 
@@ -119,6 +117,7 @@ def require_profile_update_user_via_saml(
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
         is_new (bool): True if the user just got created
+
     """
     if backend.name != SAMLAuth.name or not is_new:
         return {}
@@ -144,8 +143,7 @@ def require_profile_update_user_via_saml(
 def validate_password(
     strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    Validates a user's password for login
+    """Validates a user's password for login
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
@@ -156,6 +154,7 @@ def validate_password(
 
     Raises:
         RequirePasswordException: if the user password is invalid
+
     """
     if backend.name != EmailAuth.name or flow != SocialAuthState.FLOW_LOGIN:
         return {}
@@ -181,14 +180,14 @@ def validate_password(
 def require_touchstone_login(
     strategy, backend, flow=None, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    If the user is attempting to log in via email and has authenticated via Touchstone/SAML, require
+    """If the user is attempting to log in via email and has authenticated via Touchstone/SAML, require
     them to log in that way.
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         flow (str): the type of flow (login or register)
+
     """
     if (
         backend.name != EmailAuth.name
@@ -204,7 +203,7 @@ def require_touchstone_login(
 
     user_storage = strategy.storage.user
     saml_auth = user_storage.get_social_auth(
-        SAMLAuth.name, "{}:{}".format(settings.SOCIAL_AUTH_DEFAULT_IDP_KEY, email)
+        SAMLAuth.name, f"{settings.SOCIAL_AUTH_DEFAULT_IDP_KEY}:{email}"
     )
     if saml_auth:
         raise RequireProviderException(backend, saml_auth)
@@ -214,14 +213,14 @@ def require_touchstone_login(
 def require_micromasters_provider(
     strategy, backend, user=None, flow=None, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    If the user exists and only has a micromasters auth, require them to login that way
+    """If the user exists and only has a micromasters auth, require them to login that way
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
         flow (str): the type of flow (login or register)
+
     """
     # only do this check if the user is attempting an email login
     if (
@@ -245,12 +244,12 @@ def require_micromasters_provider(
 
 
 def forbid_hijack(strategy, backend, **kwargs):  # pylint: disable=unused-argument
-    """
-    Forbid an admin user from trying to login/register while hijacking another user
+    """Forbid an admin user from trying to login/register while hijacking another user
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+
     """
     # As first step in pipeline, stop a hijacking admin from going any further
     if strategy.session_get("is_hijacked_user"):
@@ -261,25 +260,21 @@ def forbid_hijack(strategy, backend, **kwargs):  # pylint: disable=unused-argume
 def update_managed_channel_memberships(
     strategy, backend, user=None, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    Update a user's managed channel memberships
+    """Update a user's managed channel memberships (deprecated - no-op)
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
-    """
-    if user and user.is_active:
-        membership_api.update_memberships_for_managed_channels(user_ids=[user.id])
 
+    """
     return {}
 
 
 def update_moira_lists(
     strategy, backend, user=None, **kwargs
 ):  # pylint: disable=unused-argument
-    """
-    Update a user's moira lists
+    """Update a user's moira lists
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate

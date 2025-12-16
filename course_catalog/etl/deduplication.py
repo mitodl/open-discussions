@@ -1,6 +1,6 @@
 """Functions to combine duplicate courses"""
-import yaml
 import requests
+import yaml
 from django.conf import settings
 from django.db.models import Count
 
@@ -9,15 +9,14 @@ from course_catalog.models import Course
 
 
 def get_most_relevant_run(runs):
-    """
-    Helper function to determine the most relevant course run.
+    """Helper function to determine the most relevant course run.
 
     Args:
         runs (QuerySet): a set of LearningResourseRun objects
     Returns:
         A LearningResourseRun object
-    """
 
+    """
     # if there is a current run in the set pick it
     most_relevant_run = next(
         (run for run in runs if run.availability == AvailabilityType.current.value),
@@ -42,14 +41,13 @@ def get_most_relevant_run(runs):
 
         if not most_relevant_run:
             # get latest past run by start date
-            most_relevant_run = next((run for run in runs.reverse()))
+            most_relevant_run = next(run for run in runs.reverse())
 
     return most_relevant_run
 
 
 def generate_duplicates_yaml():
     """Generate updated list of mitx duplicates"""
-
     platform = PlatformType.mitx.name
     duplicates_url = settings.DUPLICATE_COURSES_URL
 

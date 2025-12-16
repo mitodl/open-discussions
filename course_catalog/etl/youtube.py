@@ -1,27 +1,26 @@
 """video catalog ETL"""
 import logging
+import time
+from datetime import timedelta
 from html import unescape
 from xml.etree import ElementTree
-from datetime import timedelta
-import time
-from django.conf import settings
 
-from googleapiclient.discovery import build
-import googleapiclient.errors
-import yaml
-import pytube
 import github
+import googleapiclient.errors
+import pytube
+import yaml
+from django.conf import settings
+from googleapiclient.discovery import build
 
 from course_catalog.constants import PlatformType
 from course_catalog.etl.exceptions import (
-    ExtractVideoException,
     ExtractPlaylistException,
     ExtractPlaylistItemException,
+    ExtractVideoException,
 )
 from course_catalog.models import Video
 from open_discussions.utils import now_in_utc
 from search.search_index_helpers import upsert_video
-
 
 CONFIG_FILE_REPO = "mitodl/open-video-data"
 CONFIG_FILE_FOLDER = "youtube"
@@ -33,13 +32,12 @@ log = logging.getLogger()
 
 
 def get_youtube_client():
-    """
-    Function to generate a Google api client
+    """Function to generate a Google api client
 
     Returns:
         Google Api client object
-    """
 
+    """
     developer_key = settings.YOUTUBE_DEVELOPER_KEY
     return build(
         YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=developer_key
@@ -47,8 +45,7 @@ def get_youtube_client():
 
 
 def extract_videos(youtube_client, video_ids):
-    """
-    Function which returns a generator that loops through a list of video ids and returns video data
+    """Function which returns a generator that loops through a list of video ids and returns video data
 
     Args:
         youtube_client (object): Youtube api client
@@ -56,6 +53,7 @@ def extract_videos(youtube_client, video_ids):
 
     Returns:
         A generator that yields video data
+
     """
     video_ids = list(video_ids)
     try:
@@ -75,8 +73,7 @@ def extract_videos(youtube_client, video_ids):
 
 
 def extract_playlist_items(youtube_client, playlist_id):
-    """
-    Extract a playlist's items
+    """Extract a playlist's items
 
     Args:
         youtube_client (object): Youtube api client
@@ -84,8 +81,8 @@ def extract_playlist_items(youtube_client, playlist_id):
 
     Returns:
         A generator that yields video data
-    """
 
+    """
     try:
         request = youtube_client.playlistItems().list(
             part="contentDetails", maxResults=50, playlistId=playlist_id
@@ -114,8 +111,7 @@ def extract_playlist_items(youtube_client, playlist_id):
 
 
 def _extract_playlists(youtube_client, request, playlist_configs):
-    """
-    Extract a list of playlists
+    """Extract a list of playlists
 
     Args:
         youtube_client (object): Youtube api client
@@ -123,6 +119,7 @@ def _extract_playlists(youtube_client, request, playlist_configs):
 
     Returns:
         A generator that yields playlist data
+
     """
     try:
         while request is not None:
@@ -158,8 +155,7 @@ def _extract_playlists(youtube_client, request, playlist_configs):
 
 
 def extract_playlists(youtube_client, playlist_configs, channel_id, upload_playlist_id):
-    """
-    Extract a list of playlists for a channel
+    """Extract a list of playlists for a channel
     Args:
         youtube_client (object): Youtube api client
         playlist_configs (list of dict): list of playlist configurations
@@ -168,7 +164,6 @@ def extract_playlists(youtube_client, playlist_configs, channel_id, upload_playl
     Returns:
         A generator that yields playlist data
     """
-
     playlist_configs_by_id = {
         playlist_config["id"]: playlist_config for playlist_config in playlist_configs
     }
@@ -204,8 +199,7 @@ def extract_playlists(youtube_client, playlist_configs, channel_id, upload_playl
 
 
 def extract_channels(youtube_client, channels_config):
-    """
-    Extract a list of channels
+    """Extract a list of channels
 
     Args:
         youtube_client (object): Youtube api client
@@ -213,6 +207,7 @@ def extract_channels(youtube_client, channels_config):
 
     Returns:
         A generator that yields channel data
+
     """
     channel_configs_by_ids = {item["channel_id"]: item for item in channels_config}
     channel_ids = set(channel_configs_by_ids.keys())
@@ -254,8 +249,7 @@ def extract_channels(youtube_client, channels_config):
 
 
 def get_captions_for_video(video):
-    """
-    Function which fetches and returns xml captions for a video object
+    """Function which fetches and returns xml captions for a video object
 
     Args:
         video (course_catalog.models.Video)
@@ -277,8 +271,7 @@ def get_captions_for_video(video):
 
 
 def parse_video_captions(xml_captions):
-    """
-    Function which parses xml captions and returns a string with just the transcript
+    """Function which parses xml captions and returns a string with just the transcript
 
     Args:
         xml_captions (str): Caption as xml with text and timestamps
@@ -287,7 +280,6 @@ def parse_video_captions(xml_captions):
         str: transcript with timestamps removed
 
     """
-
     if not xml_captions:
         return ""
 
@@ -305,13 +297,12 @@ def parse_video_captions(xml_captions):
 
 
 def github_youtube_config_files():
-    """
-    Function that returns a list of pyGithub files with youtube config channel data
+    """Function that returns a list of pyGithub files with youtube config channel data
 
     Returns:
         A list of pyGithub contentFile objects
-    """
 
+    """
     if settings.GITHUB_ACCESS_TOKEN:
         github_client = github.Github(settings.GITHUB_ACCESS_TOKEN)
     else:
@@ -323,8 +314,7 @@ def github_youtube_config_files():
 
 
 def validate_channel_config(channel_config):
-    """
-    Validates a channel config
+    """Validates a channel config
 
     Args:
         channel_config (dict):
@@ -333,6 +323,7 @@ def validate_channel_config(channel_config):
     Returns:
         list of str:
             list of errors or an empty list if no errors
+
     """
     errors = []
 
@@ -356,8 +347,7 @@ def validate_channel_config(channel_config):
 
 
 def get_youtube_channel_configs(*, channel_ids=None):
-    """
-    Fetch youtube channel configs from github
+    """Fetch youtube channel configs from github
 
     Args:
         channel_ids (list of str):
@@ -366,6 +356,7 @@ def get_youtube_channel_configs(*, channel_ids=None):
     Returns:
         list of dict:
             a list of configuration objects
+
     """
     channel_configs = []
 
@@ -391,14 +382,14 @@ def get_youtube_channel_configs(*, channel_ids=None):
 
 
 def extract(*, channel_ids=None):
-    """
-    Function which returns video data for all videos in our watched playlists
+    """Function which returns video data for all videos in our watched playlists
 
     Args:
         channel_ids (list of str or None): if a list the extraction is limited to those channels
 
     Returns:
         A generator that yields tuples with offered_by and video data
+
     """
     if not settings.YOUTUBE_DEVELOPER_KEY:
         log.error("Missing YOUTUBE_DEVELOPER_KEY")
@@ -411,8 +402,7 @@ def extract(*, channel_ids=None):
 
 
 def transform_video(video_data, offered_by):
-    """
-    Transforms raw video data into normalized data structure for single video
+    """Transforms raw video data into normalized data structure for single video
 
     Args:
         video_data (dict): the raw video data from the youtube api
@@ -420,6 +410,7 @@ def transform_video(video_data, offered_by):
 
     Returns:
         dict: normalized video data
+
     """
     return {
         "video_id": video_data["id"],
@@ -440,8 +431,7 @@ def transform_video(video_data, offered_by):
 def transform_playlist(
     playlist_data, videos, offered_by, has_user_list, user_list_title
 ):
-    """
-    Transform a playlist into our normalized data
+    """Transform a playlist into our normalized data
 
     Args:
         playlist_data (tuple): the extracted playlist data
@@ -452,6 +442,7 @@ def transform_playlist(
     Returns:
         dict:
             normalized playlist data
+
     """
     return {
         "platform": PlatformType.youtube.value,
@@ -468,14 +459,14 @@ def transform_playlist(
 
 
 def transform(extracted_channels):
-    """
-    Transforms raw video data into normalized data structure
+    """Transforms raw video data into normalized data structure
 
     Args:
         extracted_channels (iterable of tuple): the youtube channels that were fetched
 
     Returns:
         generator that yields normalized video data
+
     """
     # NOTE: this generator has nested generators (channels -> playlists -> videos)
     # this is by design so that when the loaders run an exception raised in an
@@ -500,8 +491,7 @@ def transform(extracted_channels):
 def get_youtube_videos_for_transcripts_job(
     *, created_after=None, created_minutes=None, overwrite=False
 ):
-    """
-    course_catalog.Video object filtered to tasks.get_youtube_transcripts job params
+    """course_catalog.Video object filtered to tasks.get_youtube_transcripts job params
 
     Args:
         created_after (date or None):
@@ -511,10 +501,10 @@ def get_youtube_videos_for_transcripts_job(
         overwrite (bool):
             if true include videos that already have transcripts
 
-    Returns
+    Returns:
         Django filtered course_catalog.videos object
-    """
 
+    """
     videos = Video.objects.filter(published=True)
 
     if not overwrite:
@@ -529,13 +519,12 @@ def get_youtube_videos_for_transcripts_job(
 
 
 def get_youtube_transcripts(videos):
-    """
-    Fetch transcripts for Youtube videos
+    """Fetch transcripts for Youtube videos
 
     Args:
         vidoes - collection of course_catalog.Video objects
-    """
 
+    """
     # The call to download the transcript occasionally fails. We'll retry once after the first failure.
     # If 15 consecutive  videos fail to load with pytube.exceptions.VideoUnavailable error
     # we will assume we are being rate limited and stop the job early

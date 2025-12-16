@@ -1,14 +1,13 @@
 import json
 from math import ceil
 
-from django.contrib.auth import get_user_model
-from django.core.management import call_command
 import pytest
 import responses
+from django.contrib.auth import get_user_model
+from django.core.management import call_command
 
 from keycloak_user_export.models import UserExportToKeycloak
 from open_discussions.factories import UserFactory
-
 
 pytestmark = [pytest.mark.usefixtures("mocked_responses"), pytest.mark.django_db]
 

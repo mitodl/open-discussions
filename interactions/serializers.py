@@ -30,7 +30,6 @@ class ContentTypeInteractionSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         """Validate the resource exists"""
-
         content_type = attrs["content_type"]
         content_id = attrs["content_id"]
 

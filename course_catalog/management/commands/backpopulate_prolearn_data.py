@@ -2,10 +2,10 @@
 from django.core.management import BaseCommand
 
 from course_catalog.etl.prolearn import PROLEARN_DEPARTMENT_MAPPING
-from course_catalog.models import Course, Program
+from course_catalog.models import Course
 from course_catalog.tasks import get_prolearn_data
 from open_discussions.utils import now_in_utc
-from search.search_index_helpers import deindex_course, deindex_program
+from search.search_index_helpers import deindex_course
 
 
 class Command(BaseCommand):
@@ -43,7 +43,5 @@ class Command(BaseCommand):
             task.get()
             total_seconds = (now_in_utc() - start).total_seconds()
             self.stdout.write(
-                "Population of prolearn data finished, took {} seconds".format(
-                    total_seconds
-                )
+                f"Population of prolearn data finished, took {total_seconds} seconds"
             )

@@ -15,13 +15,12 @@ MoiraUser = namedtuple("MoiraUser", "username type")
 
 
 def get_moira_client():
-    """
-    Gets a moira client.
+    """Gets a moira client.
 
     Returns:
         Moira: A moira client
-    """
 
+    """
     _check_files_exist(
         [settings.MIT_WS_CERTIFICATE_FILE, settings.MIT_WS_PRIVATE_KEY_FILE]
     )
@@ -38,14 +37,13 @@ def _check_files_exist(paths):
     errors = []
     for path in paths:
         if not os.path.isfile(path):
-            errors.append("File missing: expected path '{}'".format(path))
+            errors.append(f"File missing: expected path '{path}'")
     if errors:
         raise RuntimeError("\n".join(errors))
 
 
 def get_moira_user(user):
-    """
-    Return the most likely username & type (USER, STRING) for a user in moira lists based on email.
+    """Return the most likely username & type (USER, STRING) for a user in moira lists based on email.
     If the email ends with 'mit.edu', assume kerberos id = email prefix
     Otherwise use the entire email address as the username.
 
@@ -54,6 +52,7 @@ def get_moira_user(user):
 
     Returns:
         MoiraUser: A namedtuple containing username and type
+
     """
     if re.search(r"(@|\.)mit.edu$", user.email):
         return MoiraUser(user.email.split("@")[0], "USER")
@@ -61,14 +60,14 @@ def get_moira_user(user):
 
 
 def query_moira_lists(user):
-    """
-    Get a set of all moira lists (including nested lists) a user has access to, by querying the Moira service.
+    """Get a set of all moira lists (including nested lists) a user has access to, by querying the Moira service.
 
     Args:
         user (django.contrib.auth.User): the Django user.
 
     Returns:
         list_names(list of str): A list of names of moira lists which contain the user as a member.
+
     """
     moira_user = get_moira_user(user)
     moira = get_moira_client()
@@ -90,8 +89,7 @@ def query_moira_lists(user):
 
 
 def user_moira_lists(user):
-    """
-    Get a list of all the moira lists a user has access to
+    """Get a list of all the moira lists a user has access to
 
     Args:
         user (django.contrib.auth.User): the Django user.
@@ -99,6 +97,7 @@ def user_moira_lists(user):
     Returns:
         list_names(set): An set containing all known lists the user belongs to,
             including ancestors of nested lists.
+
     """
     if user.is_anonymous:
         return []
@@ -107,8 +106,7 @@ def user_moira_lists(user):
 
 
 def moira_user_emails(member_list):
-    """
-    Transform a list of moira list members to emails.
+    """Transform a list of moira list members to emails.
     Assumes kerberos id => <kerberos_id>@mit.edu
 
     Args:
@@ -116,6 +114,7 @@ def moira_user_emails(member_list):
 
     Returns:
         list of str: Member emails in list
+
     """
     return list(
         map(
@@ -127,11 +126,11 @@ def moira_user_emails(member_list):
 
 @transaction.atomic
 def update_user_moira_lists(user):
-    """
-    Add moira lists the user is a member of, remove any expired lists
+    """Add moira lists the user is a member of, remove any expired lists
 
     Args:
         user (User): user to update moira lists for
+
     """
     moira_lists = query_moira_lists(user)
 
@@ -143,8 +142,7 @@ def update_user_moira_lists(user):
 
 
 def get_list_members(moira_name):
-    """
-    Get all the members of a moira list
+    """Get all the members of a moira list
 
     Args:
         moira_name (str): Moira list name
@@ -161,11 +159,11 @@ def get_list_members(moira_name):
 
 @transaction.atomic
 def update_moira_list_users(moira_list):
-    """
-    Update the users in a moira list
+    """Update the users in a moira list
 
     Args:
         moira_list (MoiraList): the moira list
+
     """
     users = User.objects.filter(
         email__in=moira_user_emails(get_list_members(moira_list.name))
@@ -174,14 +172,14 @@ def update_moira_list_users(moira_list):
 
 
 def is_public_list_editor(user):
-    """
-    Determine if a user can author public user lists & paths
+    """Determine if a user can author public user lists & paths
 
     Args:
         user (User): a user
 
     Returns:
         boolean: True or False
+
     """
     return user and (
         user.is_superuser

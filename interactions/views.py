@@ -1,6 +1,5 @@
 """Interactions views"""
 from django.db.models import Count
-
 from rest_framework import mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -12,9 +11,7 @@ from interactions.serializers import (
 
 
 class DefaultPagination(LimitOffsetPagination):
-    """
-    Pagination class for interaction viewsets which gets default_limit and max_limit from settings
-    """
+    """Pagination class for interaction viewsets which gets default_limit and max_limit from settings"""
 
     default_limit = 10
     max_limit = 100

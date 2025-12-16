@@ -49,7 +49,7 @@ def mock_ocw_learning_bucket(
         aws_secret_access_key=ocw_aws_settings.AWS_SECRET_ACCESS_KEY,
     )
     bucket = s3.create_bucket(Bucket=ocw_aws_settings.OCW_LEARNING_COURSE_BUCKET_NAME)
-    yield SimpleNamespace(s3=s3, bucket=bucket)
+    return SimpleNamespace(s3=s3, bucket=bucket)
 
 
 @pytest.fixture(autouse=True)
@@ -90,7 +90,7 @@ def mock_xpro_learning_bucket(
         aws_secret_access_key=xpro_aws_settings.AWS_SECRET_ACCESS_KEY,
     )
     bucket = s3.create_bucket(Bucket=xpro_aws_settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
-    yield SimpleNamespace(s3=s3, bucket=bucket)
+    return SimpleNamespace(s3=s3, bucket=bucket)
 
 
 @pytest.fixture
@@ -106,7 +106,7 @@ def mock_mitxonline_learning_bucket(
     bucket = s3.create_bucket(
         Bucket=mitxonline_aws_settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME
     )
-    yield SimpleNamespace(s3=s3, bucket=bucket)
+    return SimpleNamespace(s3=s3, bucket=bucket)
 
 
 @pytest.fixture
@@ -120,4 +120,4 @@ def mock_mitx_learning_bucket(
         aws_secret_access_key=mitx_aws_settings.AWS_SECRET_ACCESS_KEY,
     )
     bucket = s3.create_bucket(Bucket=mitx_aws_settings.EDX_LEARNING_COURSE_BUCKET_NAME)
-    yield SimpleNamespace(s3=s3, bucket=bucket)
+    return SimpleNamespace(s3=s3, bucket=bucket)

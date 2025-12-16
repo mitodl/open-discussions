@@ -3,23 +3,22 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
-from social_django.views import _do_login as login
-from social_core.backends.email import EmailAuth
-from social_core.exceptions import InvalidEmail, AuthException
-from social_core.utils import partial_pipeline_data, sanitize_redirect
 from rest_framework import serializers
+from social_core.backends.email import EmailAuth
+from social_core.exceptions import AuthException, InvalidEmail
+from social_core.utils import partial_pipeline_data, sanitize_redirect
+from social_django.views import _do_login as login
 
 from authentication.exceptions import (
     InvalidPasswordException,
-    RequirePasswordException,
     RequirePasswordAndProfileException,
+    RequirePasswordException,
     RequireProviderException,
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
 from profiles.models import Profile
 from profiles.serializers import ProfileSerializer
-
 
 PARTIAL_PIPELINE_TOKEN_KEY = "partial_pipeline_token"
 
@@ -109,7 +108,7 @@ class SocialAuthSerializer(serializers.Serializer):
             return SocialAuthState(
                 SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url
             )
-        elif user:
+        if user:
             if user.is_active:
                 social_user = user.social_user
 
@@ -122,14 +121,13 @@ class SocialAuthSerializer(serializers.Serializer):
                 return SocialAuthState(
                     SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url
                 )
-            else:
-                return SocialAuthState(SocialAuthState.STATE_INACTIVE)
-        else:  # pragma: no cover
-            # this follows similar code in PSA itself, but wasn't reachable through normal testing
-            log.error("Unexpected authentication result")
-            return SocialAuthState(
-                SocialAuthState.STATE_ERROR, errors=["Unexpected authentication result"]
-            )
+            return SocialAuthState(SocialAuthState.STATE_INACTIVE)
+        # pragma: no cover
+        # this follows similar code in PSA itself, but wasn't reachable through normal testing
+        log.error("Unexpected authentication result")
+        return SocialAuthState(
+            SocialAuthState.STATE_ERROR, errors=["Unexpected authentication result"]
+        )
 
     def save(self, **kwargs):
         """'Save' the auth request"""

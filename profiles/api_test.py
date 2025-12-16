@@ -1,24 +1,18 @@
 """Profile API tests"""
 import pytest
 
-from channels.api import sync_channel_subscription_model, add_user_role
-from channels.constants import ROLE_CONTRIBUTORS, ROLE_MODERATORS
-from channels.factories.models import ChannelFactory
-from channels.models import ChannelGroupRole
 from open_discussions.factories import UserFactory
 from profiles import api
 from profiles.api import (
-    get_channels,
-    get_channel_join_dates,
-    get_site_type_from_url,
     after_profile_created_or_updated,
+    get_site_type_from_url,
 )
 from profiles.models import (
-    Profile,
     FACEBOOK_DOMAIN,
-    TWITTER_DOMAIN,
     LINKEDIN_DOMAIN,
     PERSONAL_SITE_TYPE,
+    TWITTER_DOMAIN,
+    Profile,
 )
 
 pytestmark = pytest.mark.django_db
@@ -57,7 +51,6 @@ def test_after_profile_created_or_updated(mocker, user):
     after_profile_created_or_updated(user.profile)
 
     mock_search_tasks.upsert_profile.assert_not_called()
-    mock_search_tasks.update_author_posts_comments.assert_not_called()
 
     mock_transaction.on_commit.assert_called_once()
 
@@ -66,38 +59,6 @@ def test_after_profile_created_or_updated(mocker, user):
     on_commit()
 
     mock_search_tasks.upsert_profile.assert_called_once_with(user.profile.id)
-    mock_search_tasks.update_author_posts_comments.assert_called_once_with(
-        user.profile.id
-    )
-
-
-def test_get_channels(user):
-    """
-    Test that get_channels returns the correct list of channel names for a user
-    """
-    channels = ChannelFactory.create_batch(4)
-    sync_channel_subscription_model(channels[0], user)
-    add_user_role(channels[1], ROLE_CONTRIBUTORS, user)
-    add_user_role(channels[2], ROLE_MODERATORS, user)
-    assert get_channels(user) == {channel.name for channel in channels[:3]}
-
-
-def test_get_channel_join_dates(user):
-    """
-    Test out the get_channel_join_dates function
-    """
-    channels = ChannelFactory.create_batch(4)
-    sync_channel_subscription_model(channels[0], user)
-    sync_channel_subscription_model(channels[1], user)
-    add_user_role(channels[2], "moderators", user)
-    add_user_role(channels[3], "contributors", user)
-    assert sorted(get_channel_join_dates(user)) == sorted(
-        [
-            (obj.channel.name, obj.created_on)
-            for obj in list(user.channelsubscription_set.all())
-            + list(ChannelGroupRole.objects.filter(group__in=user.groups.all()))
-        ]
-    )
 
 
 @pytest.mark.parametrize(

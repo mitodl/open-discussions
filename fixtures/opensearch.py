@@ -14,4 +14,4 @@ def opensearch(mocker, settings):
         "opensearch_dsl.search.get_connection", autospec=True
     )
     configure_connections()
-    yield SimpleNamespace(conn=mock_get_connection.return_value)
+    return SimpleNamespace(conn=mock_get_connection.return_value)

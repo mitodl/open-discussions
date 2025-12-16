@@ -65,8 +65,7 @@ def load_drf_strategy(request=None):
 
 
 def jwt_get_username_from_payload_handler(payload):
-    """
-    Get the username from the payload
+    """Get the username from the payload
 
     To do this in concert with PSA, we lookup the username of the user that corresponds to the matching provider
 
@@ -75,6 +74,7 @@ def jwt_get_username_from_payload_handler(payload):
 
     Returns:
         str: the username associated with this JWT
+
     """
     username = payload.get("username")
 

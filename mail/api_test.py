@@ -1,13 +1,14 @@
 """API tests"""
 from email.utils import formataddr
+
 import pytest
 
 from mail.api import (
     context_for_user,
-    safe_format_recipients,
-    render_email_templates,
-    send_messages,
     messages_for_recipients,
+    render_email_templates,
+    safe_format_recipients,
+    send_messages,
 )
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import any_instance_of
@@ -74,7 +75,6 @@ def test_render_email_templates(user):
 
 def test_messages_for_recipients():
     """Tests that messages_for_recipients works as expected"""
-
     users = UserFactory.create_batch(5)
 
     messages = list(
@@ -96,7 +96,7 @@ def test_messages_for_recipients():
 
     for user, msg in zip(users, messages):
         assert user.email in str(msg.to[0])
-        assert msg.subject == "Welcome {}".format(user.profile.name)
+        assert msg.subject == f"Welcome {user.profile.name}"
 
 
 def test_send_message(mailoutbox):
