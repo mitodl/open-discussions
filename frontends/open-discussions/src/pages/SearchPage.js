@@ -22,13 +22,12 @@ import { validateSearchQuery } from "../lib/validation"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
-import type { Channel, CommentInTree, Post } from "../flow/discussionTypes"
+import type { Channel } from "../flow/discussionTypes"
 import type {
   SearchInputs,
   SearchParams,
-  PostResult,
-  CommentResult,
-  ProfileResult
+  ProfileResult,
+  LearningResourceResult
 } from "../flow/searchTypes"
 
 type Props = {
@@ -46,19 +45,17 @@ type Props = {
   notAuthorized: boolean,
   notFound: boolean,
   runSearch: (params: SearchParams) => Promise<*>,
-  results: Array<PostResult | CommentResult | ProfileResult>,
+  results: Array<ProfileResult | LearningResourceResult>,
   searchLoaded: boolean,
   searchProcessing: boolean,
   suggest: Array<string>,
   total: number,
-  clearSearch: () => void,
-  upvotedPosts: Map<string, Post>
+  clearSearch: () => void
 }
 
 type State = {
   text: string,
   from: number,
-  votedComments: Map<string, CommentInTree>,
   error: ?string
 }
 
@@ -66,10 +63,9 @@ export class SearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      text:          qs.parse(props.location.search).q,
-      from:          0,
-      votedComments: new Map(),
-      error:         null
+      text:  qs.parse(props.location.search).q,
+      from:  0,
+      error: null
     }
   }
 
@@ -85,16 +81,6 @@ export class SearchPage extends React.Component<Props, State> {
   componentWillUnmount() {
     const { clearSearch } = this.props
     clearSearch()
-  }
-
-  downvote = async (comment: CommentInTree) => {
-    const { dispatch } = this.props
-    const updatedComment = await dispatch(
-      actions.comments.patch(comment.id, {
-        downvoted: !comment.downvoted
-      })
-    )
-    this.updateVotedComments(updatedComment)
   }
 
   loadMore = async () => {
@@ -166,15 +152,9 @@ export class SearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const {
-      results,
-      searchProcessing,
-      initialLoad,
-      suggest,
-      total,
-      upvotedPosts
-    } = this.props
-    const { from, votedComments } = this.state
+    const { results, searchProcessing, initialLoad, suggest, total } =
+      this.props
+    const { from } = this.state
 
     if (searchProcessing && initialLoad) {
       return <PostLoading />
@@ -214,24 +194,7 @@ export class SearchPage extends React.Component<Props, State> {
           </div>
         ) : null}
         {results.length ? (
-          results.map((result, i) => (
-            <SearchResult
-              key={i}
-              result={result}
-              upvotedPost={
-                result.object_type === "post"
-                  ? upvotedPosts.get(result.post_id)
-                  : null
-              }
-              votedComment={
-                result.object_type === "comment"
-                  ? votedComments.get(result.comment_id) || null
-                  : null
-              }
-              commentDownvote={this.downvote}
-              commentUpvote={this.upvote}
-            />
-          ))
+          results.map((result, i) => <SearchResult key={i} result={result} />)
         ) : (
           <div className="empty-list-msg">There are no results to display.</div>
         )}
@@ -248,23 +211,6 @@ export class SearchPage extends React.Component<Props, State> {
   useSuggestion = async (text: string) => {
     await this.setState({ text })
     this.runSearch()
-  }
-
-  upvote = async (comment: CommentInTree) => {
-    const { dispatch } = this.props
-    const updatedComment = await dispatch(
-      actions.comments.patch(comment.id, {
-        upvoted: !comment.upvoted
-      })
-    )
-    this.updateVotedComments(updatedComment)
-  }
-
-  updateVotedComments = (comment: CommentInTree) => {
-    const { votedComments } = this.state
-    const upvotedCommentMap = new Map(votedComments)
-    upvotedCommentMap.set(comment.id, comment)
-    this.setState({ votedComments: upvotedCommentMap })
   }
 
   render() {
@@ -303,39 +249,26 @@ export class SearchPage extends React.Component<Props, State> {
 
 const mapStateToProps = (state, ownProps) => {
   const { channelName } = ownProps
-  const { channels, search, posts } = state
-  const channel = channels.data.get(channelName)
-  const channelLoaded = channels.loaded
+  const { search } = state
   const searchLoaded = search.loaded
   const searchProcessing = search.processing
-  const loaded = (channels.error ? true : !!channel) && searchLoaded
-  const channelProcessing = channels.processing
-  const notFound = loaded
-    ? channels.error && channels.error.errorStatusCode === 404
-    : false
-  const notAuthorized = loaded
-    ? channels.error && channels.error.errorStatusCode === 403
-    : false
   const { results, total, suggest, initialLoad } = search.data
-  const upvotedPosts = posts.data
 
   return {
     results,
     total,
     initialLoad,
-    channel,
-    channelLoaded,
-    channelProcessing,
+    channel:           null,
+    channelLoaded:     true,
+    channelProcessing: false,
     channelName,
-    // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
-    // whenever the user makes a new search
-    loaded: channelName ? channelLoaded : true,
-    notFound,
-    notAuthorized,
+    // loaded is used in withLoading - always true for search page now that channels are removed
+    loaded:            true,
+    notFound:          false,
+    notAuthorized:     false,
     searchLoaded,
     searchProcessing,
-    suggest,
-    upvotedPosts
+    suggest
   }
 }
 
