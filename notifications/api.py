@@ -25,7 +25,7 @@ from notifications.models import (
     FREQUENCY_WEEKLY,
     FREQUENCY_NEVER,
 )
-from notifications.notifiers import comments, frontpage, moderator_posts
+from notifications.notifiers import frontpage, moderator_posts
 from notifications import tasks
 from open_discussions.utils import chunks
 
@@ -141,10 +141,11 @@ def _get_notifier_for_notification(notification):
 
     if notification.notification_type == NOTIFICATION_TYPE_FRONTPAGE:
         return frontpage.FrontpageDigestNotifier(notification_settings)
-    elif notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
-        return comments.CommentNotifier(notification_settings)
     elif notification.notification_type == NOTIFICATION_TYPE_MODERATOR:
         return moderator_posts.ModeratorPostsNotifier(notification_settings)
+    elif notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
+        # Comment notifications no longer supported - discussions removed
+        return None
     else:
         raise UnsupportedNotificationTypeError(
             "Notification type '{}' is unsupported".format(
@@ -203,32 +204,10 @@ def send_email_notification_batch(notification_ids):
 
 def send_comment_notifications(post_id, comment_id, new_comment_id):
     """
-    Sends notifications for a reply to a given post notification
-
-    Args:
-        post_id (str): base36 post id
-        comment_id (str): base36 comment id
-        new_comment_id (str): base36 comment id of the new comment
+    Deprecated - comment notifications no longer supported.
+    Kept as stub for Phase 3 cleanup.
     """
-    for subscription in (
-        Subscription.objects.filter(post_id=post_id)
-        .filter(Q(comment_id=comment_id) | Q(comment_id=None))
-        .distinct("user")
-        .iterator()
-    ):
-        try:
-            notification_settings = NotificationSettings.objects.get(
-                user_id=subscription.user_id,
-                notification_type=NOTIFICATION_TYPE_COMMENTS,
-            )
-        except NotificationSettings.DoesNotExist:
-            log.exception(
-                "NotificationSettings didn't exist for subscription %s", subscription.id
-            )
-            continue
-
-        notifier = comments.CommentNotifier(notification_settings)
-        notifier.create_comment_event(subscription, new_comment_id)
+    pass
 
 
 def send_moderator_notifications(post_id, channel_name):

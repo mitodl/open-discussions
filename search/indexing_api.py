@@ -42,15 +42,12 @@ from search.constants import (
 )
 from search.exceptions import ReindexException
 from search.serializers import (
-    OSPostSerializer,
-    serialize_bulk_comments,
     serialize_bulk_courses,
     serialize_bulk_courses_for_deletion,
     serialize_bulk_podcast_episodes,
     serialize_bulk_podcast_episodes_for_deletion,
     serialize_bulk_podcasts,
     serialize_bulk_podcasts_for_deletion,
-    serialize_bulk_posts,
     serialize_bulk_profiles,
     serialize_bulk_profiles_for_deletion,
     serialize_bulk_programs,
@@ -289,19 +286,6 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
             }
         },
         object_type,
-    )
-
-
-def update_post(doc_id, post):
-    """
-    Serializes a Post object and updates it in the index
-
-    Args:
-        doc_id (str): The ES document id
-        post (channels.models.Post): A Post object
-    """
-    return update_document_with_partial(
-        doc_id, OSPostSerializer(instance=post).data, POST_TYPE
     )
 
 
