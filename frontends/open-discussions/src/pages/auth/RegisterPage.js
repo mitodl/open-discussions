@@ -42,24 +42,38 @@ export const RegisterPage = ({
   formError,
   match,
   next
-}: RegisterPageProps) => (
-  <div className="auth-page register-page">
-    <div className="main-content">
-      <Card className="register-card">
-        <h3>Join MIT OPEN for free</h3>
-        <MetaTags canonicalLink={match?.url}>
-          <title>{formatTitle("Register")}</title>
-        </MetaTags>
-        {renderForm({ formError, submitLabel: "Sign Up" })}
-        <ExternalLogins next={next} />
-        <div className="alternate-auth-link">
-          Already have an account?{" "}
-          <Link to={`${LOGIN_URL}?${qs.stringify({ next })}`}>Log in</Link>
-        </div>
-      </Card>
+}: RegisterPageProps) => {
+  const isLoginDisabled = SETTINGS.FEATURES && SETTINGS.FEATURES.DISABLE_USER_LOGIN
+
+  return (
+    <div className="auth-page register-page">
+      <div className="main-content">
+        <Card className="register-card">
+          <h3>Join MIT OPEN for free</h3>
+          <MetaTags canonicalLink={match?.url}>
+            <title>{formatTitle("Register")}</title>
+          </MetaTags>
+          {isLoginDisabled ? (
+            <div className="login-disabled-message">
+              <p>
+                Login is currently disabled. The site is now read-only.
+              </p>
+            </div>
+          ) : (
+            <>
+              {renderForm({ formError, submitLabel: "Sign Up" })}
+              <ExternalLogins next={next} />
+              <div className="alternate-auth-link">
+                Already have an account?{" "}
+                <Link to={`${LOGIN_URL}?${qs.stringify({ next })}`}>Log in</Link>
+              </div>
+            </>
+          )}
+        </Card>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 const newEmailForm = () => ({ email: "" })
 

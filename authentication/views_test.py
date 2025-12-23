@@ -875,3 +875,34 @@ def test_post_user_details_for_keycloak(mocker, client, user, admin_user):
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
     response = client.post(url, data={"password": "correct_password"})
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.parametrize(
+    "url_name",
+    [
+        "psa-login-email",
+        "psa-login-password",
+        "psa-register-email",
+        "psa-register-confirm",
+        "psa-register-details",
+    ],
+)
+def test_login_disabled_returns_403(client, settings, url_name):
+    """Test that login endpoints return 403 when DISABLE_USER_LOGIN feature is enabled"""
+    settings.FEATURES[features.DISABLE_USER_LOGIN] = True
+    response = client.post(reverse(url_name), {})
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()["detail"] == (
+        "Login is currently disabled. The site is now read-only."
+    )
+
+
+def test_login_not_disabled_by_default(client):
+    """Test that login endpoints work normally when DISABLE_USER_LOGIN is not set"""
+    # This should not return 403, just the normal auth flow error
+    response = client.post(
+        reverse("psa-login-email"),
+        {"flow": SocialAuthState.FLOW_LOGIN, "email": "test@example.com"},
+    )
+    # Should not be 403 - the feature flag is off by default
+    assert response.status_code != status.HTTP_403_FORBIDDEN
