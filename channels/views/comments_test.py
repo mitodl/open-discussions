@@ -31,12 +31,6 @@ def mock_spam_check(mocker):
     return mocker.patch("channels.task_helpers.check_comment_for_spam")
 
 
-@pytest.fixture(autouse=True)
-def mock_notify_subscribed_users(mocker):
-    """Returns a mocked version of notify_subscribed_users"""
-    return mocker.patch("notifications.tasks.notify_subscribed_users").delay
-
-
 @pytest.mark.parametrize("missing_user", [True, False])
 def test_list_comments(
     cassette_exists, user_client, user, reddit_factories, public_channel, missing_user

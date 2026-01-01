@@ -7,7 +7,6 @@ from social_core.utils import get_strategy
 
 from authentication.backends.micromasters import MicroMastersAuth
 from channels import api as channels_api
-from notifications import api as notifications_api
 from profiles import api as profile_api
 
 User = get_user_model()
@@ -38,9 +37,6 @@ def create_user(username, email, profile_data=None, user_extra=None):
         user, _ = User.objects.get_or_create(email=email, defaults=defaults)
 
         profile_api.ensure_profile(user, profile_data=profile_data)
-        notifications_api.ensure_notification_settings(
-            user, skip_moderator_setting=True
-        )
 
         # this could fail if the reddit backend is down
         # so if it fails we want to rollback this entire transaction

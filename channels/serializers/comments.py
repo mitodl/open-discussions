@@ -191,12 +191,6 @@ class CommentSerializer(BaseCommentSerializer):
 
         changed = api.apply_comment_vote(comment, validated_data)
 
-        from notifications.tasks import notify_subscribed_users
-
-        notify_subscribed_users.delay(
-            post_id, validated_data.get("comment_id", None), comment.id
-        )
-
         if not api.is_moderator(comment.subreddit.display_name, comment.author.name):
             task_helpers.check_comment_for_spam(self.context["request"], comment.id)
 

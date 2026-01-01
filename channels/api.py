@@ -78,11 +78,6 @@ from channels.utils import (
     num_items_not_none,
 )
 
-from notifications.models import (
-    NotificationSettings,
-    NOTIFICATION_TYPE_MODERATOR,
-    FREQUENCY_IMMEDIATE,
-)
 from open_discussions.utils import now_in_utc
 from search import search_index_helpers
 from search.search_index_helpers import reddit_object_persist
@@ -1517,12 +1512,6 @@ class Api:
             try:
                 proxied_channel.moderator.add(user)
                 Api(user).accept_invite(channel_name)
-                NotificationSettings.objects.get_or_create(
-                    user=user,
-                    notification_type=NOTIFICATION_TYPE_MODERATOR,
-                    channel=self_channel,
-                    defaults={"trigger_frequency": FREQUENCY_IMMEDIATE},
-                )
 
             except APIException as ex:
                 if ex.error_type != "ALREADY_MODERATOR":
@@ -1557,11 +1546,6 @@ class Api:
         with transaction.atomic():
             remove_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
             proxied_channel.moderator.remove(user)
-            NotificationSettings.objects.filter(
-                user=user,
-                channel=self_channel,
-                notification_type=NOTIFICATION_TYPE_MODERATOR,
-            ).delete()
 
         search_index_helpers.upsert_profile(user.profile.id)
 

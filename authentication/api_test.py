@@ -6,7 +6,6 @@ from social_django.models import UserSocialAuth
 
 from authentication import api
 from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
-from notifications.models import NotificationSettings
 from profiles.models import Profile
 from open_discussions.test_utils import any_instance_of
 
@@ -35,7 +34,6 @@ def test_create_user(mocker, profile_data: dict[str, str]):
     assert user.email == email
     assert user.username == username
     assert user.first_name == "Bob"
-    assert NotificationSettings.objects.count() == 2
 
     auth_token_mock.assert_called_once()
 
@@ -47,12 +45,12 @@ def test_create_user(mocker, profile_data: dict[str, str]):
 
 @pytest.mark.parametrize(
     "mock_method",
-    ["profiles.api.ensure_profile", "notifications.api.ensure_notification_settings"],
+    ["profiles.api.ensure_profile"],
 )
 def test_create_user_errors(
     mocker,
     mock_method: Literal[
-        "profiles.api.ensure_profile", "notifications.api.ensure_notification_settings"
+        "profiles.api.ensure_profile"
     ],
 ):
     """Test that we don't end up in a partial state if there are errors"""

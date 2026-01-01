@@ -122,7 +122,6 @@ INSTALLED_APPS = (
     "channels_fields",  # TODO: Remove in Phase 3
     "profiles",
     "mail",
-    "notifications",
     "search",
     "widgets",
     "course_catalog",
