@@ -48,8 +48,6 @@ from channels.utils import DEFAULT_LISTING_PARAMS, ListingParams
 from channels.test_utils import assert_properties_eq
 from search import search_index_helpers
 from open_discussions.factories import UserFactory
-from notifications.models import NotificationSettings, NOTIFICATION_TYPE_MODERATOR
-from notifications.factories import NotificationSettingsFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -1189,10 +1187,6 @@ def test_add_moderator(mock_client, mock_upsert_profile):
     )
     mock_upsert_profile.assert_called_with(moderator.profile.id)
 
-    notification_setting = NotificationSettings.objects.last()
-    assert notification_setting.user == moderator
-    assert notification_setting.notification_type == NOTIFICATION_TYPE_MODERATOR
-
 
 def test_add_moderator_no_user(mock_client):
     """Test add moderator where user does not exist"""
@@ -1211,9 +1205,6 @@ def test_remove_moderator(mock_client, mock_upsert_profile):
     client = api.Api(UserFactory.create())
     moderator = UserFactory.create()
     channel = Channel.objects.get(name="channel")
-    NotificationSettingsFactory.create(
-        channel=channel, notification_type=NOTIFICATION_TYPE_MODERATOR, user=moderator
-    )
     client.remove_moderator(moderator.username, "channel")
     mock_client.subreddit.return_value.moderator.remove.assert_called_once_with(
         moderator
@@ -1225,7 +1216,6 @@ def test_remove_moderator(mock_client, mock_upsert_profile):
         not in moderator.groups.all()
     )
     mock_upsert_profile.assert_called_with(moderator.profile.id)
-    assert NotificationSettings.objects.count() == 0
 
 
 def test_list_moderator(mock_client):

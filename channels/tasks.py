@@ -40,7 +40,6 @@ from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
 from search import search_index_helpers
-from notifications.tasks import notify_moderators
 
 User = get_user_model()
 log = logging.getLogger()
@@ -497,8 +496,6 @@ def check_post_for_spam(*, user_ip, user_agent, post_id):
 
     if is_spam:
         admin_api.remove_post(post.post_id)
-    else:
-        notify_moderators.delay(post.post_id, post.channel.name)
 
 
 @app.task(acks_late=True)

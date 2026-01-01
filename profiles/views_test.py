@@ -109,9 +109,6 @@ def test_create_user(
     get_or_create_auth_tokens_stub = mocker.patch(
         "channels.api.get_or_create_auth_tokens"
     )
-    ensure_notifications_stub = mocker.patch(
-        "notifications.api.ensure_notification_settings"
-    )
 
     resp = staff_client.post(url, data=payload)
     user = User.objects.get(username=resp.json()["username"])
@@ -131,7 +128,6 @@ def test_create_user(
     )
     assert resp.json()["profile"] == payload["profile"]
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
-    ensure_notifications_stub.assert_called_once_with(user, skip_moderator_setting=True)
     assert user.email == email
     assert user.profile.email_optin is email_optin
     assert user.profile.toc_optin is toc_optin
