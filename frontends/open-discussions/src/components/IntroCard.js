@@ -1,11 +1,9 @@
 // @flow
 import React from "react"
-import { Link } from "react-router-dom"
 
 import Card from "./Card"
 
-import { userIsAnonymous } from "../lib/util"
-import { newPostURL, MIT_LOGO_URL } from "../lib/url"
+import { MIT_LOGO_URL } from "../lib/url"
 
 export default function IntroCard() {
   return (

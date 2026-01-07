@@ -6,7 +6,6 @@ import { shallow } from "enzyme"
 
 import IntroCard from "./IntroCard"
 
-import { newPostURL } from "../lib/url"
 import * as utilLib from "../lib/util"
 
 describe("IntroCard", () => {
