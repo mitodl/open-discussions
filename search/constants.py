@@ -3,9 +3,6 @@ from opensearchpy.exceptions import ConnectionError as ESConnectionError
 from urllib3.exceptions import TimeoutError as UrlTimeoutError
 
 # Local definitions for removed discussion types
-POST_TYPE = "post"
-COMMENT_TYPE = "comment"
-
 ALIAS_ALL_INDICES = "all"
 PROFILE_TYPE = "profile"
 COURSE_TYPE = "course"
