@@ -4,13 +4,10 @@ import sinon from "sinon"
 import { assert } from "chai"
 import qs from "query-string"
 
-import App from "./App"
-
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
-import { channelURL, SETTINGS_URL } from "../lib/url"
+import { channelURL } from "../lib/url"
 import * as authUtils from "../lib/auth"
-import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
 import { makeChannelPostList } from "../factories/posts"
 import { shouldIf, shouldIfGt0, mockCourseAPIMethods } from "../lib/test_utils"
 import * as embedLib from "../lib/embed"
@@ -23,9 +20,6 @@ describe("App", () => {
   beforeEach(() => {
     postList = makeChannelPostList()
     helper = new IntegrationTestHelper()
-    helper.getSettingsStub.returns(
-      Promise.resolve([makeFrontpageSetting(), makeCommentSetting()])
-    )
     helper.getFrontpageStub.returns(Promise.resolve({ posts: postList }))
     helper.getProfileStub.returns(Promise.resolve(""))
     helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
@@ -84,29 +78,6 @@ describe("App", () => {
         await renderComponent(channelURL("channel1"), [])
         sinon.assert.called(isAnonStub)
       })
-    })
-  })
-
-  //
-  ;[SETTINGS_URL, `${SETTINGS_URL}tokenbasedauthtokentoken`].forEach(url => {
-    it(`loads requirements after navigating away from settings url ${url}`, async () => {
-      const [wrapper] = await renderComponent(url, [
-        actions.settings.get.requestType,
-        actions.settings.get.successType
-      ])
-
-      await helper.listenForActions(
-        [
-          actions.profiles.get.requestType,
-          actions.profiles.get.successType,
-          actions.livestream.get.requestType,
-          actions.livestream.get.successType
-        ],
-        () => {
-          const { history } = wrapper.find(App).props()
-          history.push({ pathname: "/" })
-        }
-      )
     })
   })
 

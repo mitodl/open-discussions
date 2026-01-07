@@ -1,7 +1,6 @@
 // @flow
 import { frontPageEndpoint } from "../reducers/frontpage"
 import { reportsEndpoint } from "../reducers/reports"
-import { settingsEndpoint } from "../reducers/settings"
 import { accountSettingsEndpoint } from "../reducers/account_settings"
 import { embedlyEndpoint } from "../reducers/embedly"
 import { profilesEndpoint } from "../reducers/profiles"
@@ -20,7 +19,6 @@ import type { Dispatch } from "redux"
 export const endpoints = [
   frontPageEndpoint,
   reportsEndpoint,
-  settingsEndpoint,
   accountSettingsEndpoint,
   embedlyEndpoint,
   profilesEndpoint,

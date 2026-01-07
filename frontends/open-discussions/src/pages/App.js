@@ -15,7 +15,6 @@ import PrivacyPolicyPage from "./policies/PrivacyPolicyPage"
 import TermsOfServicePage from "./policies/TermsOfServicePage"
 import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./auth/AuthRequiredPage"
-import SettingsPage from "./SettingsPage"
 import AccountSettingsPage from "./AccountSettingsPage"
 import PasswordChangePage from "./PasswordChangePage"
 import ProfilePage from "./ProfilePage"
@@ -235,11 +234,6 @@ class App extends React.Component<Props> {
           <Switch>
             <Route
               exact
-              path={`${match.url}settings/notifications`}
-              component={SettingsPage}
-            />
-            <Route
-              exact
               path={`${match.url}settings/account`}
               component={AccountSettingsPage}
             />
@@ -247,11 +241,6 @@ class App extends React.Component<Props> {
               exact
               path={`${match.url}settings/password`}
               component={PasswordChangePage}
-            />
-            <Route
-              exact
-              path={`${match.url}settings/:token?`}
-              component={SettingsPage}
             />
           </Switch>
           <Route
