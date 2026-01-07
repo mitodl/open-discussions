@@ -21,13 +21,6 @@ export default function IntroCard() {
             MIT.
           </p>
         </div>
-        <div className="action-col">
-          {userIsAnonymous() ? null : (
-            <Link className="link-button" to={newPostURL()}>
-              "Create a post"
-            </Link>
-          )}
-        </div>
       </div>
     </Card>
   )

@@ -23,14 +23,6 @@ describe("IntroCard", () => {
   })
 
   //
-  it(`should return the the create a post link when anon == false`, () => {
-    const url = newPostURL()
-    const text = '"Create a post"'
-    isAnonStub.returns(false)
-    const link = render().find(".link-button")
-    assert.equal(link.prop("to"), url)
-    assert.equal(link.text(), text)
-  })
   it(`should not return a link when anon == true`, () => {
     isAnonStub.returns(true)
     const link = render().find(".link-button")
