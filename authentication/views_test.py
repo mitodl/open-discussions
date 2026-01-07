@@ -561,7 +561,6 @@ def register_profile_details(client):
     return run_step
 
 
-@pytest.mark.betamax
 @pytest.mark.usefixture("mock_email_send")
 @pytest.mark.parametrize(
     "steps",
