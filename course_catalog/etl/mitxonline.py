@@ -2,16 +2,15 @@
 import copy
 import logging
 import re
-from datetime import datetime
-from dateutil.parser import parse
 from urllib.parse import urljoin
 
 import pytz
 import requests
+from dateutil.parser import parse
 from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.etl.utils import transform_topics, extract_valid_department_from_id
+from course_catalog.etl.utils import extract_valid_department_from_id, transform_topics
 
 log = logging.getLogger(__name__)
 
@@ -22,21 +21,20 @@ OFFERED_BY = [{"name": OfferedBy.mitx.value}]
 
 
 def _parse_datetime(value):
-    """
-    Parses an MITx Online datetime string
+    """Parses an MITx Online datetime string
 
     Args:
         value(str): the datetime in string format
 
     Returns:
         datetime: the parsed datetime
+
     """
     return parse(value).replace(tzinfo=pytz.utc) if value else None
 
 
 def parse_page_attribute(mitx_json, attribute, is_url=False, is_list=False):
-    """
-    Extracts an MITX Online page attribute
+    """Extracts an MITX Online page attribute
 
     Args:
         mitx_json(dict): the course/run/program JSON object containing the page element
@@ -46,6 +44,7 @@ def parse_page_attribute(mitx_json, attribute, is_url=False, is_list=False):
 
     Returns:
         str or list or None: The attribute value
+
     """
     default_value = [] if is_list else None
     page = mitx_json.get("page", {}) or {}
@@ -72,14 +71,14 @@ def extract_courses():
 
 
 def _transform_run(course_run):
-    """
-    Transforms a course run into our normalized data structure
+    """Transforms a course run into our normalized data structure
 
     Args:
         course_run (dict): course run data
 
     Returns:
         dict: normalized course run data
+
     """
     return {
         "title": course_run["title"],
@@ -113,14 +112,14 @@ def _transform_run(course_run):
 
 
 def _transform_course(course):
-    """
-    Transforms a course into our normalized data structure
+    """Transforms a course into our normalized data structure
 
     Args:
         course (dict): course data
 
     Returns:
         dict: normalized course data
+
     """
     return {
         "course_id": course["readable_id"],
@@ -140,14 +139,14 @@ def _transform_course(course):
 
 
 def transform_courses(courses):
-    """
-    Transforms a list of courses into our normalized data structure
+    """Transforms a list of courses into our normalized data structure
 
     Args:
         courses (list of dict): courses data
 
     Returns:
         list of dict: normalized courses data
+
     """
     return [
         _transform_course(course)

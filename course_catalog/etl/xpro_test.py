@@ -19,14 +19,14 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def mock_xpro_programs_data():
     """Mock xpro data"""
-    with open("./test_json/xpro_programs.json", "r") as f:
+    with open("./test_json/xpro_programs.json") as f:
         return json.loads(f.read())
 
 
 @pytest.fixture
 def mock_xpro_courses_data():
     """Mock xpro data"""
-    with open("./test_json/xpro_courses.json", "r") as f:
+    with open("./test_json/xpro_courses.json") as f:
         return json.loads(f.read())
 
 
@@ -39,7 +39,7 @@ def mocked_xpro_programs_responses(mocked_responses, settings, mock_xpro_program
         settings.XPRO_CATALOG_API_URL,
         json=mock_xpro_programs_data,
     )
-    yield mocked_responses
+    return mocked_responses
 
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def mocked_xpro_courses_responses(mocked_responses, settings, mock_xpro_courses_
     mocked_responses.add(
         mocked_responses.GET, settings.XPRO_COURSES_API_URL, json=mock_xpro_courses_data
     )
-    yield mocked_responses
+    return mocked_responses
 
 
 @pytest.mark.usefixtures("mocked_xpro_programs_responses")

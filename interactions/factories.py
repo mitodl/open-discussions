@@ -1,6 +1,6 @@
 """Interactions factories"""
-from django.contrib.contenttypes.models import ContentType
 import factory
+from django.contrib.contenttypes.models import ContentType
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 

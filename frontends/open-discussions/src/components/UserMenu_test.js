@@ -9,7 +9,7 @@ import { Link } from "react-router-dom"
 import UserMenu, { LoggedInMenu, LoggedOutMenu } from "./UserMenu"
 import { DropDownArrow, DropUpArrow } from "./Arrow"
 
-import { profileURL, SETTINGS_URL, LOGIN_URL } from "../lib/url"
+import { profileURL, LOGIN_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
 import { defaultProfileImageUrl } from "../lib/util"
 import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
@@ -119,13 +119,6 @@ describe("UserMenu", () => {
       assert.equal(firstLinkProps.children, "Log In")
     })
 
-    it("should include settings link if non-null profile is provided", () => {
-      const wrapper = shallow(<LoggedInMenu {...menuProps} />)
-      const { to, children } = wrapper.find(Link).props()
-      assert.equal(to, SETTINGS_URL)
-      assert.equal(children, "Settings")
-    })
-
     it("should include a logout link, if feature is enabled", () => {
       const wrapper = shallow(<LoggedInMenu {...menuProps} />)
       const { href, children } = wrapper.find("a").props()
@@ -143,10 +136,10 @@ describe("UserMenu", () => {
         SETTINGS.profile_ui_enabled = uiEnabled
         SETTINGS.username = profile.username
         const wrapper = shallow(<LoggedInMenu {...menuProps} />)
-        assert.equal(wrapper.find("Link").at(1).exists(), uiEnabled)
+        assert.equal(wrapper.find("Link").at(0).exists(), uiEnabled)
         if (uiEnabled) {
           assert.equal(
-            wrapper.find("Link").at(1).props().to,
+            wrapper.find("Link").at(0).props().to,
             profileURL(profile.username)
           )
         }

@@ -23,14 +23,14 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def mock_mitxonline_programs_data():
     """Mock mitxonline data"""
-    with open("./test_json/mitxonline_programs.json", "r") as f:
+    with open("./test_json/mitxonline_programs.json") as f:
         return json.loads(f.read())
 
 
 @pytest.fixture
 def mock_mitxonline_courses_data():
     """Mock mitxonline data"""
-    with open("./test_json/mitxonline_courses.json", "r") as f:
+    with open("./test_json/mitxonline_courses.json") as f:
         return json.loads(f.read())
 
 
@@ -45,7 +45,7 @@ def mocked_mitxonline_programs_responses(
         settings.MITX_ONLINE_PROGRAMS_API_URL,
         json=mock_mitxonline_programs_data,
     )
-    yield mocked_responses
+    return mocked_responses
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ def mocked_mitxonline_courses_responses(
         settings.MITX_ONLINE_COURSES_API_URL,
         json=mock_mitxonline_courses_data,
     )
-    yield mocked_responses
+    return mocked_responses
 
 
 @pytest.mark.usefixtures("mocked_mitxonline_programs_responses")

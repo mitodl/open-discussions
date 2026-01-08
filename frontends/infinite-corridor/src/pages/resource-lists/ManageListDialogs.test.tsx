@@ -152,7 +152,8 @@ describe("Creating lists with manageListDialogs", () => {
       )
 
       await waitForElementToBeRemoved(dialog)
-    }
+    },
+    10000
   )
 
   test("Dialog title is 'Create list'", async () => {

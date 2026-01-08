@@ -1,4 +1,4 @@
-""" Admin for channels """
+"""Admin for channels"""
 from django.contrib import admin
 
 from moira_lists.models import MoiraList

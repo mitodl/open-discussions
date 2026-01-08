@@ -1,9 +1,9 @@
 """URL widget"""
+from widgets.serializers.react_fields import ReactCharField, ReactURLField
 from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
 )
-from widgets.serializers.react_fields import ReactURLField, ReactCharField
 
 
 class URLWidgetConfigSerializer(WidgetConfigSerializer):

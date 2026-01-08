@@ -18,7 +18,7 @@ from open_discussions.factories import UserFactory
 # pylint:disable=redefined-outer-name, use-maxsplit-arg
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_user_list_index(mocker):
     """Mocks index updating functions for user lists"""
     return SimpleNamespace(

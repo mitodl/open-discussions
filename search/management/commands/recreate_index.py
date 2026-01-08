@@ -2,8 +2,8 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from open_discussions.utils import now_in_utc
-from search.tasks import start_recreate_index
 from search.constants import VALID_OBJECT_TYPES
+from search.tasks import start_recreate_index
 
 
 class Command(BaseCommand):
@@ -30,9 +30,7 @@ class Command(BaseCommand):
         if options["all"]:
             task = start_recreate_index.delay(list(VALID_OBJECT_TYPES))
             self.stdout.write(
-                "Started celery task {task} to index content for all indexes".format(
-                    task=task
-                )
+                f"Started celery task {task} to index content for all indexes"
             )
         else:
             indexes_to_update = list(
@@ -48,9 +46,7 @@ class Command(BaseCommand):
 
             task = start_recreate_index.delay(indexes_to_update)
             self.stdout.write(
-                "Started celery task {task} to index content for the following indexes: {indexes}".format(
-                    task=task, indexes=indexes_to_update
-                )
+                f"Started celery task {task} to index content for the following indexes: {indexes_to_update}"
             )
 
         self.stdout.write("Waiting on task...")
@@ -60,6 +56,4 @@ class Command(BaseCommand):
             raise CommandError(f"Recreate index errored: {error}")
 
         total_seconds = (now_in_utc() - start).total_seconds()
-        self.stdout.write(
-            "Recreate index finished, took {} seconds".format(total_seconds)
-        )
+        self.stdout.write(f"Recreate index finished, took {total_seconds} seconds")

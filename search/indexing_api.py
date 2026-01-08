@@ -1,5 +1,4 @@
-"""
-Functions and constants for OpenSearch indexing
+"""Functions and constants for OpenSearch indexing
 """
 import json
 import logging
@@ -24,13 +23,11 @@ from search.connection import (
 )
 from search.constants import (
     ALIAS_ALL_INDICES,
-    COMMENT_TYPE,
     COURSE_TYPE,
     GLOBAL_DOC_TYPE,
     MAPPING,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
-    POST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
     SCRIPTING_LANG,
@@ -42,15 +39,12 @@ from search.constants import (
 )
 from search.exceptions import ReindexException
 from search.serializers import (
-    OSPostSerializer,
-    serialize_bulk_comments,
     serialize_bulk_courses,
     serialize_bulk_courses_for_deletion,
     serialize_bulk_podcast_episodes,
     serialize_bulk_podcast_episodes_for_deletion,
     serialize_bulk_podcasts,
     serialize_bulk_podcasts_for_deletion,
-    serialize_bulk_posts,
     serialize_bulk_profiles,
     serialize_bulk_profiles_for_deletion,
     serialize_bulk_programs,
@@ -70,13 +64,13 @@ User = get_user_model()
 
 
 def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=None):
-    """
-    Wipe and recreate index and mapping. No indexing is done.
+    """Wipe and recreate index and mapping. No indexing is done.
 
     Args:
         index_name (str): The name of the index to clear
         skip_mapping (bool): If true, don't set any mapping
         object_type(str): The type of document (post, comment)
+
     """
     if object_type not in VALID_OBJECT_TYPES:
         raise ValueError(
@@ -127,12 +121,12 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
 
 
 def create_document(doc_id, data):
-    """
-    Makes a request to OS to create a new document
+    """Makes a request to OS to create a new document
 
     Args:
         doc_id (str): The ES document id
         data (dict): Full ES document data
+
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[data["object_type"]]):
@@ -140,13 +134,13 @@ def create_document(doc_id, data):
 
 
 def deindex_document(doc_id, object_type, **kwargs):
-    """
-    Makes a request to ES to delete a document
+    """Makes a request to ES to delete a document
 
     Args:
         doc_id (str): The ES document id
         object_type (str): The object type
         kwargs (dict): optional parameters for the request
+
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[object_type]):
@@ -159,20 +153,20 @@ def deindex_document(doc_id, object_type, **kwargs):
 
 
 def update_field_values_by_query(query, field_dict, object_types=None):
-    """
-    Makes a request to ES to use the update_by_query API to update one or more field
+    """Makes a request to ES to use the update_by_query API to update one or more field
     values for all documents that match the given query.
 
     Args:
         query (dict): A dict representing an ES query
         field_dict (dict): dictionary of fields with values to update
         object_types (list of str): The object types to query (post, comment, etc)
+
     """
     sources = []
     params = {}
     for (field_name, field_value) in field_dict.items():
-        new_param = "new_value_{}".format(field_name)
-        sources.append("ctx._source['{}'] = params.{}".format(field_name, new_param))
+        new_param = f"new_value_{field_name}"
+        sources.append(f"ctx._source['{field_name}'] = params.{new_param}")
         params.update({new_param: field_value})
     if not object_types:
         object_types = VALID_OBJECT_TYPES
@@ -204,8 +198,7 @@ def update_field_values_by_query(query, field_dict, object_types=None):
 
 
 def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **kwargs):
-    """
-    Makes a request to ES to update an existing document
+    """Makes a request to ES to update an existing document
 
     Args:
         doc_id (str): The ES document id
@@ -213,6 +206,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
         kwargs (dict): Optional kwargs to be passed to opensearch
+
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[object_type]):
@@ -235,14 +229,14 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **
 
 
 def update_document_with_partial(doc_id, doc, object_type, *, retry_on_conflict=0):
-    """
-    Makes a request to ES to update an existing document
+    """Makes a request to ES to update an existing document
 
     Args:
         doc_id (str): The ES document id
         doc (dict): Full or partial ES document
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
+
     """
     _update_document_by_id(
         doc_id, {"doc": doc}, object_type, retry_on_conflict=retry_on_conflict
@@ -250,8 +244,7 @@ def update_document_with_partial(doc_id, doc, object_type, *, retry_on_conflict=
 
 
 def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
-    """
-    Makes a request to ES to create or update a document
+    """Makes a request to ES to create or update a document
 
     Args:
         doc_id (str): The ES document id
@@ -259,6 +252,7 @@ def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
         kwargs (dict): Optional kwargs to be passed to opensearch
+
     """
     _update_document_by_id(
         doc_id,
@@ -270,20 +264,20 @@ def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
 
 
 def increment_document_integer_field(doc_id, field_name, incr_amount, object_type):
-    """
-    Makes a request to ES to increment some integer field in a document
+    """Makes a request to ES to increment some integer field in a document
 
     Args:
         doc_id (str): The ES document id
         object_type (str): The object type to update (post, comment, etc)
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
+
     """
     _update_document_by_id(  # pylint: disable=redundant-keyword-arg
         doc_id,
         {
             "script": {
-                "source": "ctx._source.{} += params.incr_amount".format(field_name),
+                "source": f"ctx._source.{field_name} += params.incr_amount",
                 "lang": SCRIPTING_LANG,
                 "params": {"incr_amount": incr_amount},
             }
@@ -292,22 +286,8 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
     )
 
 
-def update_post(doc_id, post):
-    """
-    Serializes a Post object and updates it in the index
-
-    Args:
-        doc_id (str): The ES document id
-        post (channels.models.Post): A Post object
-    """
-    return update_document_with_partial(
-        doc_id, OSPostSerializer(instance=post).data, POST_TYPE
-    )
-
-
 def deindex_items(documents, object_type, update_only, **kwargs):
-    """
-    Calls index_items with error catching around not_found for objects that don't exist
+    """Calls index_items with error catching around not_found for objects that don't exist
     in the index
 
     Args:
@@ -316,7 +296,6 @@ def deindex_items(documents, object_type, update_only, **kwargs):
         update_only (bool): Update existing index only
 
     """
-
     try:
         index_items(documents, object_type, update_only, **kwargs)
     except BulkIndexError as error:
@@ -330,8 +309,7 @@ def deindex_items(documents, object_type, update_only, **kwargs):
 
 
 def index_items(documents, object_type, update_only, **kwargs):
-    """
-    Index items based on list of item ids
+    """Index items based on list of item ids
 
     Args:
         documents (iterable of dict): An iterable with opensearch documents to index
@@ -383,32 +361,8 @@ def index_items(documents, object_type, update_only, **kwargs):
                     )
 
 
-def index_posts(ids, update_only=False):
-    """
-    Index a list of posts by id
-
-    Args:
-        ids(list of int): List of Post id's
-        update_only (bool): Update existing index only
-    """
-    index_items(serialize_bulk_posts(ids), POST_TYPE, update_only)
-
-
-def index_comments(ids, update_only=False):
-    """
-    Index a list of comments by id
-
-    Args:
-        ids(list of int): List of Comment id's
-        update_only (bool): Update existing index only
-
-    """
-    index_items(serialize_bulk_comments(ids), COMMENT_TYPE, update_only)
-
-
 def index_profiles(ids, update_only=False):
-    """
-    Index a list of profiles by id
+    """Index a list of profiles by id
 
     Args:
         ids(list of int): List of Profile id's
@@ -419,18 +373,17 @@ def index_profiles(ids, update_only=False):
 
 
 def deindex_profiles(ids):
-    """
-    Deindex a list of profiles by id
+    """Deindex a list of profiles by id
 
     Args:
         ids(list of int): List of Profile ids
+
     """
     deindex_items(serialize_bulk_profiles_for_deletion(ids), PROFILE_TYPE, True)
 
 
 def index_courses(ids, update_only=False):
-    """
-    Index a list of courses by id
+    """Index a list of courses by id
 
     Args:
         ids(list of int): List of Course id's
@@ -441,11 +394,11 @@ def index_courses(ids, update_only=False):
 
 
 def deindex_courses(ids):
-    """
-    Deindex a list of courses by id
+    """Deindex a list of courses by id
 
     Args:
         ids(list of int): List of Course id's
+
     """
     deindex_items(serialize_bulk_courses_for_deletion(ids), COURSE_TYPE, True)
 
@@ -457,8 +410,7 @@ def deindex_courses(ids):
 
 
 def index_course_content_files(course_ids, update_only=False):
-    """
-    Index a list of content files by course ids
+    """Index a list of content files by course ids
 
     Args:
         course_ids(list of int): List of Course id's
@@ -473,8 +425,7 @@ def index_course_content_files(course_ids, update_only=False):
 
 
 def index_run_content_files(run_id, update_only=False):
-    """
-    Index a list of content files by run id
+    """Index a list of content files by run id
 
     Args:
         run_id(int): Course run id
@@ -509,8 +460,7 @@ def index_run_content_files(run_id, update_only=False):
 
 
 def deindex_run_content_files(run_id, unpublished_only=False):
-    """
-    Deindex and delete a list of content files by run from the index
+    """Deindex and delete a list of content files by run from the index
 
     Args:
         run_id(int): Course run id
@@ -543,8 +493,7 @@ def deindex_run_content_files(run_id, unpublished_only=False):
 
 
 def index_programs(ids, update_only=False):
-    """
-    Index a list of programs by id
+    """Index a list of programs by id
 
     Args:
         ids(list of int): List of Program id's
@@ -555,18 +504,17 @@ def index_programs(ids, update_only=False):
 
 
 def deindex_programs(ids):
-    """
-    Delete a list of programs by id
+    """Delete a list of programs by id
 
     Args:
         ids(list of int): List of Program id's
+
     """
     deindex_items(serialize_bulk_programs_for_deletion(ids), PROGRAM_TYPE, True)
 
 
 def index_user_lists(ids, update_only=False):
-    """
-    Index a list of user lists by id
+    """Index a list of user lists by id
 
     Args:
         ids(list of int): List of UserList id's
@@ -577,8 +525,7 @@ def index_user_lists(ids, update_only=False):
 
 
 def deindex_user_lists(ids):
-    """
-    Deindex a list of user lists by id
+    """Deindex a list of user lists by id
 
     Args:
         ids(list of int): List of UserList ids
@@ -588,8 +535,7 @@ def deindex_user_lists(ids):
 
 
 def index_staff_lists(ids, update_only=False):
-    """
-    Index a list of staff lists by id
+    """Index a list of staff lists by id
 
     Args:
         ids(list of int): List of StaffList id's
@@ -600,8 +546,7 @@ def index_staff_lists(ids, update_only=False):
 
 
 def deindex_staff_lists(ids):
-    """
-    Delete a list of staff lists by id
+    """Delete a list of staff lists by id
 
     Args:
         ids(list of int): List of StaffList ids
@@ -611,8 +556,7 @@ def deindex_staff_lists(ids):
 
 
 def index_videos(ids, update_only=False):
-    """
-    Index a list of videos by id
+    """Index a list of videos by id
 
     Args:
         ids(list of int): List of Video id's
@@ -623,8 +567,7 @@ def index_videos(ids, update_only=False):
 
 
 def deindex_videos(ids):
-    """
-    Deindex a list of videos by id
+    """Deindex a list of videos by id
 
     Args:
         ids(list of int): List of video ids
@@ -634,19 +577,18 @@ def deindex_videos(ids):
 
 
 def index_podcasts(ids, update_only=False):
-    """
-    Index a list of podcasts by id
+    """Index a list of podcasts by id
 
     Args:
         ids(list of int): List of Podcast id's
         update_only (bool): Update existing index only
+
     """
     index_items(serialize_bulk_podcasts(ids), PODCAST_TYPE, update_only)
 
 
 def deindex_podcasts(ids):
-    """
-    Deindex a list of podcasts by id
+    """Deindex a list of podcasts by id
 
     Args:
         ids(list of int): List of podcast ids
@@ -656,22 +598,22 @@ def deindex_podcasts(ids):
 
 
 def index_podcast_episodes(ids, update_only=False):
-    """
-    Index a list of podcast episodes by id
+    """Index a list of podcast episodes by id
 
     Args:
         ids(list of int): List of PodcastEpisode id's
         update_only (bool): Update existing index only
+
     """
     index_items(serialize_bulk_podcast_episodes(ids), PODCAST_EPISODE_TYPE, update_only)
 
 
 def deindex_podcast_episodes(ids):
-    """
-    Delete a list of podcast episodes by id
+    """Delete a list of podcast episodes by id
 
     Args:
         ids(list of int): List of PodcastEpisode ids
+
     """
     deindex_items(
         serialize_bulk_podcast_episodes_for_deletion(ids), PODCAST_EPISODE_TYPE, True
@@ -679,14 +621,14 @@ def deindex_podcast_episodes(ids):
 
 
 def create_backing_index(object_type):
-    """
-    Start the reindexing process by creating a new backing index and pointing the reindex alias toward it
+    """Start the reindexing process by creating a new backing index and pointing the reindex alias toward it
 
     Args:
         object_type (str): The object type for the index (post, comment, etc)
 
     Returns:
         str: The new backing index
+
     """
     conn = get_conn()
 
@@ -709,12 +651,12 @@ def create_backing_index(object_type):
 
 
 def switch_indices(backing_index, object_type):
-    """
-    Switch the default index to point to the backing index, and delete the reindex alias
+    """Switch the default index to point to the backing index, and delete the reindex alias
 
     Args:
         backing_index (str): The backing index of the reindex alias
         object_type (str): The object type for the index (post, comment, etc)
+
     """
     conn = get_conn()
     actions = []
@@ -749,9 +691,7 @@ def switch_indices(backing_index, object_type):
 
 
 def delete_orphaned_indices():
-    """
-    Delete any indices without aliases and any reindexing aliases
-    """
+    """Delete any indices without aliases and any reindexing aliases"""
     conn = get_conn()
     indices = conn.indices.get_alias(index="*")
     for index in indices:
@@ -768,8 +708,7 @@ def delete_orphaned_indices():
 
 
 def es_iterate_all_documents(index, query, pagesize=250):
-    """
-    Helper to iterate all values from an index
+    """Helper to iterate all values from an index
 
     index (str): The index
     query (dict): opensearch query filter

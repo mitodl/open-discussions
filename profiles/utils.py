@@ -1,14 +1,13 @@
-""" Utils for profiles """
+"""Utils for profiles"""
 import hashlib
 import re
+from contextlib import contextmanager
 from io import BytesIO
-from urllib.parse import urljoin, quote
+from urllib.parse import quote, urljoin
 from xml.sax.saxutils import escape as xml_escape
 
-from contextlib import contextmanager
 from django.conf import settings
 from django.core.files.temp import NamedTemporaryFile
-
 from PIL import Image
 
 from open_discussions.utils import generate_filepath
@@ -58,8 +57,7 @@ DEFAULT_PROFILE_IMAGE = urljoin(settings.STATIC_URL, "images/avatar_default.png"
 
 
 def generate_gravatar_image(user, image_field=None):
-    """
-    Query gravatar for an image and return those image properties
+    """Query gravatar for an image and return those image properties
 
     Args:
         user (User): the user to compute gravatar image urls for
@@ -67,26 +65,27 @@ def generate_gravatar_image(user, image_field=None):
 
     Returns:
         str: The URL to the image.
+
     """
     gravatar_hash = hashlib.md5(user.email.lower().encode("utf-8")).hexdigest()
     gravatar_image_url = GRAVATAR_IMAGE_URL.format(gravatar_hash)
     max_dimension = IMAGE_FIELDS[image_field]
-    size_param = "&s={}".format(max_dimension) if max_dimension else ""
+    size_param = f"&s={max_dimension}" if max_dimension else ""
     if user.profile.name:
         d_param = urljoin(
             settings.SITE_BASE_URL,
-            "/profile/{}/{}/fff/579cf9.png".format(user.username, max_dimension),
+            f"/profile/{user.username}/{max_dimension}/fff/579cf9.png",
         )
     else:
         d_param = urljoin(settings.SITE_BASE_URL, DEFAULT_PROFILE_IMAGE)
 
-    return "{}?d={}{}".format(gravatar_image_url, quote(d_param), size_param)
+    return f"{gravatar_image_url}?d={quote(d_param)}{size_param}"
 
 
 def image_uri(profile, image_field=IMAGE_SMALL):
     """Return the correctly formatted profile image URI for a user"""
     if profile:
-        image_file = getattr(profile, "{}_file".format(image_field))
+        image_file = getattr(profile, f"{image_field}_file")
         if not image_file.name:
             image_file = getattr(profile, image_field)
             if not image_file:
@@ -98,66 +97,48 @@ def image_uri(profile, image_field=IMAGE_SMALL):
 
 # These functions are referenced in migrations so be careful refactoring
 def profile_image_upload_uri(instance, filename):
-    """
-    upload_to handler for Profile.image
-    """
+    """upload_to handler for Profile.image"""
     return generate_filepath(filename, instance.user.username, "", "profile")
 
 
 def profile_image_upload_uri_small(instance, filename):
-    """
-    upload_to handler for Profile.image_small
-    """
+    """upload_to handler for Profile.image_small"""
     return generate_filepath(filename, instance.user.username, "_small", "profile")
 
 
 def profile_image_upload_uri_medium(instance, filename):
-    """
-    upload_to handler for Profile.image_medium
-    """
+    """upload_to handler for Profile.image_medium"""
     return generate_filepath(filename, instance.user.username, "_medium", "profile")
 
 
 def avatar_uri(instance, filename):
-    """
-    upload_to handler for Channel.avatar
-    """
+    """upload_to handler for Channel.avatar"""
     return generate_filepath(filename, instance.name, "_avatar", "channel")
 
 
 def avatar_uri_medium(instance, filename):
-    """
-    upload_to handler for Channel.avatar_medium
-    """
+    """upload_to handler for Channel.avatar_medium"""
     return generate_filepath(filename, instance.name, "_avatar_medium", "channel")
 
 
 def avatar_uri_small(instance, filename):
-    """
-    upload_to handler for Channel.avatar_small
-    """
+    """upload_to handler for Channel.avatar_small"""
     return generate_filepath(filename, instance.name, "_avatar_small", "channel")
 
 
 def banner_uri(instance, filename):
-    """
-    upload_to handler for Channel.banner
-    """
+    """upload_to handler for Channel.banner"""
     return generate_filepath(filename, instance.name, "_banner", "channel")
 
 
 def article_image_uri(instance, filename):
-    """
-    upload_to handler for Article.cover_image
-    """
+    """upload_to handler for Article.cover_image"""
     return generate_filepath(filename, instance.post.post_id, "_article", "article")
 
 
 @contextmanager
 def make_temp_image_file(*, width=500, height=500):
-    """
-    Create a temporary PNG image to test image uploads
-    """
+    """Create a temporary PNG image to test image uploads"""
     with NamedTemporaryFile(suffix=".png") as image_file:
         image = Image.new("RGBA", size=(width, height), color=(256, 0, 0))
         image.save(image_file, "png")
@@ -166,8 +147,7 @@ def make_temp_image_file(*, width=500, height=500):
 
 
 def shrink_dimensions(width, height, max_dimension):
-    """
-    Resize dimensions so max dimension is max_dimension. If dimensions are too small no resizing is done
+    """Resize dimensions so max dimension is max_dimension. If dimensions are too small no resizing is done
     Args:
         width (int): The width
         height (int): The height
@@ -184,8 +164,7 @@ def shrink_dimensions(width, height, max_dimension):
 
 
 def make_thumbnail(full_size_image, max_dimension):
-    """
-    Make a thumbnail of the image
+    """Make a thumbnail of the image
 
     Args:
         full_size_image (file):
@@ -195,6 +174,7 @@ def make_thumbnail(full_size_image, max_dimension):
     Returns:
         BytesIO:
             A jpeg image which is a thumbnail of full_size_image
+
     """
     pil_image = Image.open(full_size_image)
     pil_image.thumbnail(
@@ -208,8 +188,7 @@ def make_thumbnail(full_size_image, max_dimension):
 
 
 def make_cropped_thumbnail(full_size_image, max_width, max_height):
-    """
-    Make a cropped thumbnail of the image
+    """Make a cropped thumbnail of the image
 
     Args:
         full_size_image (file):
@@ -221,6 +200,7 @@ def make_cropped_thumbnail(full_size_image, max_width, max_height):
     Returns:
         BytesIO:
             A jpeg image which is a thumbnail of full_size_image
+
     """
     pil_image = Image.open(full_size_image)
     aspect_ratio = max_height / max_width
@@ -246,12 +226,12 @@ def make_cropped_thumbnail(full_size_image, max_width, max_height):
 
 
 def update_full_name(user, name):
-    """
-    Update the first and last names of a user.
+    """Update the first and last names of a user.
 
     Args:
         user(User): The user to modify.
         name(str): The full name of the user.
+
     """
     name_parts = name.split(" ")
     user.first_name = name_parts[0][:30]
@@ -261,28 +241,27 @@ def update_full_name(user, name):
 
 
 def dict_to_style(style_dict):
-    """
-    Transform a dict into a string formatted as an HTML style
+    """Transform a dict into a string formatted as an HTML style
 
     Args:
         style_dict(dict): A dictionary of style attributes/values
 
     Returns:
         str: An HTML style string
-    """
 
-    return "; ".join(["{}: {}".format(k, v) for k, v in style_dict.items()])
+    """
+    return "; ".join([f"{k}: {v}" for k, v in style_dict.items()])
 
 
 def generate_initials(text):
-    """
-    Extract initials from a string
+    """Extract initials from a string
 
     Args:
         text(str): The string to extract initials from
 
     Returns:
         str: The initials extracted from the string
+
     """
     if not text:
         return None
@@ -291,14 +270,12 @@ def generate_initials(text):
         split_text = text.split(" ")
         if len(split_text) > 1:
             return (split_text[0][0] + split_text[-1][0]).upper()
-        else:
-            return split_text[0][0].upper()
+        return split_text[0][0].upper()
     return None
 
 
 def generate_svg_avatar(name, size, color, bgcolor):
-    """
-    Generate an SVG avatar based on input text.  Adopted from https://github.com/CraveFood/avinit
+    """Generate an SVG avatar based on input text.  Adopted from https://github.com/CraveFood/avinit
 
     Args:
         name(str): The text to extract two initials from.
@@ -308,20 +285,20 @@ def generate_svg_avatar(name, size, color, bgcolor):
 
     Returns:
         str: an SVG image.
-    """
 
+    """
     initials = generate_initials(name) or "A"
 
     style = {
-        "fill": "#{}".format(bgcolor),
-        "border-radius": "{}px".format(size - 1),
-        "-moz-border-radius": "{}px".format(size - 1),
+        "fill": f"#{bgcolor}",
+        "border-radius": f"{size - 1}px",
+        "-moz-border-radius": f"{size - 1}px",
     }
 
     text_style = {
         "font-weight": "400px",
-        "font-size": "{}px".format(int(size / 2)),
-        "color": "#{}".format(color),
+        "font-size": f"{int(size / 2)}px",
+        "color": f"#{color}",
     }
 
     return SVG_TEMPLATE.format(

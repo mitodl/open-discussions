@@ -79,7 +79,7 @@ def mocked_catalog_responses(mocked_responses, settings, mock_micromasters_data)
         settings.MICROMASTERS_CATALOG_API_URL,
         json=mock_micromasters_data,
     )
-    yield mocked_responses
+    return mocked_responses
 
 
 @pytest.mark.usefixtures("mocked_catalog_responses")

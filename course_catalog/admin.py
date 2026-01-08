@@ -1,4 +1,4 @@
-""" admin for course catalog """
+"""admin for course catalog"""
 
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline

@@ -3,26 +3,25 @@ import datetime
 from math import ceil
 from tempfile import NamedTemporaryFile
 
-from django.contrib.auth import get_user_model
 import pytest
 import pytz
+from django.contrib.auth import get_user_model
 
-from channels.models import SpamCheckResult
 from open_discussions.factories import UserFactory
 from open_discussions.utils import (
-    now_in_utc,
-    is_near_now,
-    normalize_to_start_of_day,
     chunks,
-    merge_strings,
+    extract_values,
     filter_dict_keys,
     filter_dict_with_renamed_keys,
-    html_to_plain_text,
-    markdown_to_plain_text,
-    prefetched_iterator,
-    extract_values,
-    write_to_file,
     get_field_names,
+    html_to_plain_text,
+    is_near_now,
+    markdown_to_plain_text,
+    merge_strings,
+    normalize_to_start_of_day,
+    now_in_utc,
+    prefetched_iterator,
+    write_to_file,
 )
 
 User = get_user_model()
@@ -36,9 +35,7 @@ def test_now_in_utc():
 
 
 def test_is_near_now():
-    """
-    Test is_near_now for now
-    """
+    """Test is_near_now for now"""
     now = datetime.datetime.now(tz=pytz.UTC)
     assert is_near_now(now) is True
     later = now + datetime.timedelta(0, 6)
@@ -48,18 +45,14 @@ def test_is_near_now():
 
 
 def test_normalize_to_start_of_day():
-    """
-    Test that normalize_to_start_of_day zeroes out the time components
-    """
+    """Test that normalize_to_start_of_day zeroes out the time components"""
     assert normalize_to_start_of_day(
         datetime.datetime(2018, 1, 3, 5, 6, 7)
     ) == datetime.datetime(2018, 1, 3)
 
 
 def test_chunks():
-    """
-    test for chunks
-    """
+    """Test for chunks"""
     input_list = list(range(113))
     output_list = []
     for nums in chunks(input_list):
@@ -78,9 +71,7 @@ def test_chunks():
 
 
 def test_chunks_iterable():
-    """
-    test that chunks works on non-list iterables too
-    """
+    """Test that chunks works on non-list iterables too"""
     count = 113
     input_range = range(count)
     chunk_output = []
@@ -103,9 +94,7 @@ def test_chunks_iterable():
     ],
 )
 def test_merge_strings(list_or_string, output):
-    """
-    merge_strings should flatten a nested list of strings
-    """
+    """merge_strings should flatten a nested list of strings"""
     assert merge_strings(list_or_string) == output
 
 
@@ -121,8 +110,7 @@ def test_filter_dict_keys():
 
 
 def test_filter_dict_with_renamed_keys():
-    """
-    filter_dict_with_renamed_keys should return a dict with only the keys in a filter dict,
+    """filter_dict_with_renamed_keys should return a dict with only the keys in a filter dict,
     and should rename those keys according to the values in the filter dict.
     """
     d = {"a": 1, "b": 2, "c": 3, "d": 4}
@@ -140,8 +128,7 @@ def test_filter_dict_with_renamed_keys():
 
 
 def test_html_to_plain_text():
-    """
-    html_to_plain_text should turn a string with HTML markup into plain text with line breaks
+    """html_to_plain_text should turn a string with HTML markup into plain text with line breaks
     replaced by spaces.
     """
     html = "<div><b>bold</b><p>text with\n\nline breaks</p></div>"
@@ -151,8 +138,7 @@ def test_html_to_plain_text():
 
 
 def test_markdown_to_plain_text():
-    """
-    markdown_to_plain_text should turn a Markdown string into plain text with line breaks
+    """markdown_to_plain_text should turn a Markdown string into plain text with line breaks
     replaced by spaces.
     """
     markdown = "# header\n\nsome body text\n\n1. bullet 1\n2. bullet 2"
@@ -166,9 +152,7 @@ def test_markdown_to_plain_text():
 @pytest.mark.django_db
 @pytest.mark.parametrize("chunk_size", [2, 3, 5, 7, 9, 10])
 def test_prefetched_iterator(chunk_size):
-    """
-    prefetched_iterator should yield all items in the record set across chunk boundaries
-    """
+    """prefetched_iterator should yield all items in the record set across chunk boundaries"""
     users = UserFactory.create_batch(10)
     fetched_users = list(prefetched_iterator(User.objects.all(), chunk_size=chunk_size))
     assert len(users) == len(fetched_users)
@@ -177,9 +161,7 @@ def test_prefetched_iterator(chunk_size):
 
 
 def test_extract_values():
-    """
-    extract_values should return the correct match from a dict
-    """
+    """extract_values should return the correct match from a dict"""
     test_json = {
         "a": {"b": {"c": [{"d": [1, 2, 3]}, {"d": [4, 5], "e": "f", "b": "g"}]}}
     }
@@ -198,17 +180,10 @@ def test_write_to_file():
 
 
 def test_get_field_names():
-    """
-    Assert that get_field_names returns expected fields
-    """
-    assert set(get_field_names(SpamCheckResult)) == {
-        "user_ip",
-        "user_agent",
-        "checks",
-        "is_spam",
-        "content_type",
-        "content_object",
-        "object_id",
-        "created_on",
-        "updated_on",
-    }
+    """Assert that get_field_names returns expected fields (excluding auto-created fields)"""
+    # Test with User model instead of removed SpamCheckResult
+    user_fields = get_field_names(User)
+    assert "username" in user_fields
+    assert "email" in user_fields
+    # id is auto-created so it's not included
+    assert "id" not in user_fields

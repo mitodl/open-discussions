@@ -1,9 +1,10 @@
 """WidgetList serializer"""
 from django.db import transaction
 from rest_framework import serializers
+
 from open_discussions.serializers import WriteableSerializerMethodField
 from widgets.models import WidgetList
-from widgets.serializers.utils import get_widget_type_mapping, get_widget_classes
+from widgets.serializers.utils import get_widget_classes, get_widget_type_mapping
 
 
 def _serializer_for_widget_type(widget_type_name):
@@ -52,7 +53,7 @@ class WidgetListSerializer(serializers.ModelSerializer):
         ret = []
         for data in widgets_data:
             widget_id = data.get("id", None)
-            widget = existing_widgets_by_id.get(widget_id, None)
+            widget = existing_widgets_by_id.get(widget_id)
             widget_serializer_cls = _serializer_for_widget_type(data["widget_type"])
 
             if not widget:

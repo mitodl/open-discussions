@@ -3,16 +3,15 @@ import logging
 import os
 import re
 from tempfile import TemporaryDirectory
-from typing import List
 
 from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import PlatformType
 from course_catalog.etl.loaders import load_content_files
 from course_catalog.etl.utils import (
+    calc_checksum,
     get_learning_course_bucket,
     transform_content_files,
-    calc_checksum,
 )
 from course_catalog.models import Course, LearningResourceRun
 
@@ -20,8 +19,7 @@ log = logging.getLogger()
 
 
 def get_most_recent_course_archives(platform: str, s3_prefix: str = None) -> list[str]:
-    """
-    Retrieve a list of S3 keys for the most recent edx course archives
+    """Retrieve a list of S3 keys for the most recent edx course archives
 
     Args:
         platform(str): The edx platform
@@ -29,6 +27,7 @@ def get_most_recent_course_archives(platform: str, s3_prefix: str = None) -> lis
 
     Returns:
         list of str: edx archive S3 keys
+
     """
     bucket = get_learning_course_bucket(platform)
     if not bucket:
@@ -63,16 +62,16 @@ def get_most_recent_course_archives(platform: str, s3_prefix: str = None) -> lis
 
 
 def sync_edx_course_files(
-    platform: str, ids: List[int], keys: list[str], s3_prefix: str = None
+    platform: str, ids: list[int], keys: list[str], s3_prefix: str = None
 ):
-    """
-    Sync all edx course run files for a list of course ids to database
+    """Sync all edx course run files for a list of course ids to database
 
     Args:
         platform(str): The edx platform
         ids(list of int): list of course ids to process
         keys(list[str]): list of S3 archive keys to search through
         s3_prefix(str): path prefix to include in regex for S3
+
     """
     bucket = get_learning_course_bucket(platform)
     if s3_prefix is None:

@@ -22,7 +22,7 @@ urlpatterns = [
     re_path(r"^api/v0/auths/$", get_social_auth_types, name="get-auth-types-api"),
     re_path(r"^login/complete$", login_complete, name="login-complete"),
 ]
-if KEYCLOAK_ENABLED in settings.FEATURES and settings.FEATURES[KEYCLOAK_ENABLED]:
+if settings.FEATURES.get(KEYCLOAK_ENABLED):
     urlpatterns += [
         path(
             "api/v0/auth/<email>",

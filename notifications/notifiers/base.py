@@ -2,9 +2,9 @@
 import logging
 from datetime import timedelta
 
-from notifications.notifiers.exceptions import InvalidTriggerFrequencyError
 from notifications.models import NotificationBase
-from open_discussions.utils import now_in_utc, normalize_to_start_of_day
+from notifications.notifiers.exceptions import InvalidTriggerFrequencyError
+from open_discussions.utils import normalize_to_start_of_day, now_in_utc
 
 DELTA_ONE_DAY = timedelta(days=1)
 DELTA_ONE_WEEK = timedelta(days=7)
@@ -29,14 +29,14 @@ class BaseNotifier:
         return self.notification_settings.user
 
     def _get_most_recent_notification(self, before=None):
-        """
-        Get the most recent notification
+        """Get the most recent notification
 
         Args:
             before (NotificationBase): notification to filter recent notifications before
 
         Returns:
             NotificationBase: concrete instance of a notification or None
+
         """
         query = self.notification_cls.objects.filter(
             user=self.user,
@@ -49,8 +49,7 @@ class BaseNotifier:
         return query.order_by("-created_on").first()
 
     def can_notify(self, last_notification):
-        """
-        Returns true if we can notify this user based on their settings and when the last notification occurred
+        """Returns true if we can notify this user based on their settings and when the last notification occurred
 
         Args:
             last_notification (NotificationBase): last notification that was triggered for this NotificationSettings
@@ -60,6 +59,7 @@ class BaseNotifier:
 
         Returns:
             bool: True if we're due to send another notification
+
         """
         if (
             not self.notification_settings.user.is_active
@@ -85,20 +85,18 @@ class BaseNotifier:
         else:
             # practically, we'd only see this if our code called a notifier invalidly for a NEVER trigger_frequency
             raise InvalidTriggerFrequencyError(
-                "Unsupported trigger_frequency: {}".format(
-                    self.notification_settings.trigger_frequency
-                )
+                f"Unsupported trigger_frequency: {self.notification_settings.trigger_frequency}"
             )
 
         # return true if the normalized value is at least trigger_offset in the past
         return (normalized_created_on + trigger_offset) <= normalized_now
 
     def attempt_notify(self):
-        """
-        Attempts to notify the recipient
+        """Attempts to notify the recipient
 
         Returns:
             NotificationBase: concrete instance of a notification or None
+
         """
         last_notification = self._get_most_recent_notification()
 
@@ -108,17 +106,15 @@ class BaseNotifier:
         return None
 
     def notify(self):
-        """
-        Attempts to notify the recipient via email
-        """
+        """Attempts to notify the recipient via email"""
         return self._create_notification()
 
     def _create_notification(self):
-        """
-        Get the most recent notification
+        """Get the most recent notification
 
         Returns:
             NotificationBase: concrete instance of a notification or None
+
         """
         return self.notification_cls.objects.create(
             user=self.user,

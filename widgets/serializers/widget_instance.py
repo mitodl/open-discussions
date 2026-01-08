@@ -8,7 +8,7 @@ from widgets.serializers.utils import get_widget_type_names
 
 def _raise_not_implemented(*args, **kwargs):  # pylint: disable=unused-argument
     """Raises an error indicating this is not implemented"""
-    raise NotImplementedError()
+    raise NotImplementedError
 
 
 class WidgetConfigSerializer(serializers.Serializer):
@@ -48,7 +48,6 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
 
     def validate_configuration(self, value):
         """Returns configuration as validated by configuration_serializer_class"""
-
         if self.configuration_serializer_class is not _raise_not_implemented:
             serializer = self.configuration_serializer_class(data=value)
             serializer.is_valid(raise_exception=True)
@@ -63,7 +62,7 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
 
     def get_json(self, instance):  # pylint: disable=unused-argument
         """Renders the widget to json based on configuration"""
-        return None
+        return
 
     class Meta:
         model = WidgetInstance

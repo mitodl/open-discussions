@@ -2,10 +2,10 @@
 import logging
 
 from mail import api
-from notifications.notifiers.exceptions import CancelNotificationError
-from notifications.notifiers.base import BaseNotifier
-from notifications.models import EmailNotification
 from notifications import utils
+from notifications.models import EmailNotification
+from notifications.notifiers.base import BaseNotifier
+from notifications.notifiers.exceptions import CancelNotificationError
 from open_discussions import features
 
 log = logging.getLogger()
@@ -20,8 +20,7 @@ class EmailNotifier(BaseNotifier):
         self._template_name = template_name
 
     def can_notify(self, last_notification):
-        """
-        Returns true if we can notify this user based on their settings and when the last notification occurred
+        """Returns true if we can notify this user based on their settings and when the last notification occurred
 
         Args:
             last_notification (NotificationBase): last notification that was triggered for this NotificationSettings
@@ -31,6 +30,7 @@ class EmailNotifier(BaseNotifier):
 
         Returns:
             bool: True if we're due to send another notification
+
         """
         return (
             features.is_enabled(features.EMAIL_NOTIFICATIONS)
@@ -42,8 +42,7 @@ class EmailNotifier(BaseNotifier):
     def _get_notification_data(
         self, current_notification, last_notification
     ):  # pylint: disable=unused-argument
-        """
-        Gets the data for this notification
+        """Gets the data for this notification
 
         Args:
             current_notification (NotificationBase): current notification we're sending for
@@ -51,15 +50,16 @@ class EmailNotifier(BaseNotifier):
 
         Raises:
             InvalidTriggerFrequencyError: if the frequency is invalid for the frontpage digest
+
         """
         return {}
 
     def send_notification(self, email_notification):
-        """
-        Sends the notification to the user
+        """Sends the notification to the user
 
         Args:
             email_notification (EmailNotification): the notification to be sent
+
         """
         messages = None
         user = email_notification.user

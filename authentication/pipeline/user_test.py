@@ -1,20 +1,21 @@
 """Tests of user pipeline actions"""
 from unittest.mock import Mock
-from django.contrib.sessions.middleware import SessionMiddleware
-import pytest
-from social_django.utils import load_strategy, load_backend
 
-from open_discussions import features
-from open_discussions.factories import UserFactory
-from authentication.pipeline import user as user_actions
+import pytest
+from django.contrib.sessions.middleware import SessionMiddleware
+from social_django.utils import load_backend, load_strategy
+
 from authentication.exceptions import (
     InvalidPasswordException,
-    RequirePasswordException,
-    RequireRegistrationException,
-    RequireProviderException,
     RequirePasswordAndProfileException,
+    RequirePasswordException,
+    RequireProviderException,
+    RequireRegistrationException,
 )
+from authentication.pipeline import user as user_actions
 from authentication.utils import SocialAuthState
+from open_discussions import features
+from open_discussions.factories import UserFactory
 
 
 def validate_email_auth_request_not_email_backend(mocker):
@@ -125,8 +126,7 @@ def test_user_password_login(mocker, rf, user, user_password):
 
 
 def test_user_password_not_login(mocker, rf, user):
-    """
-    Tests that user_password performs denies authentication
+    """Tests that user_password performs denies authentication
     for an existing user if password not provided regardless of auth_type
     """
     user.set_password("abc123")
@@ -307,8 +307,7 @@ def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_
 def test_require_micromasters_provider(
     mocker, user, backend_name, flow, has_user, auth_types, raises
 ):  # pylint: disable=too-many-arguments
-    """
-    Tests that verify require_micromasters_provider behaves correctly
+    """Tests that verify require_micromasters_provider behaves correctly
 
     It should only raise RequireProviderException if the user is logging in via email and only has MM auth setup
     """
@@ -344,8 +343,7 @@ def test_require_micromasters_provider(
 def test_require_touchstone_login(
     mocker, settings, backend_name, flow, social_auth, feature_flag_val, raises
 ):  # pylint: disable=too-many-arguments
-    """
-    Tests that verify test_require_touchstone_login raises a RequireProviderException
+    """Tests that verify test_require_touchstone_login raises a RequireProviderException
     if (a) the user is logging in via email, (b) has a SAML-type authentication, and
     (c) the SAML auth feature flag in on
     """
@@ -368,9 +366,7 @@ def test_require_touchstone_login(
 
 @pytest.mark.parametrize("hijacked", [True, False])
 def test_forbid_hijack(mocker, hijacked):
-    """
-    Tests that forbid_hijack action raises an exception if a user is hijacked
-    """
+    """Tests that forbid_hijack action raises an exception if a user is hijacked"""
     mock_strategy = mocker.Mock()
     mock_strategy.session_get.return_value = hijacked
 
@@ -384,31 +380,6 @@ def test_forbid_hijack(mocker, hijacked):
             user_actions.forbid_hijack(*args, **kwargs)
     else:
         assert user_actions.forbid_hijack(*args, **kwargs) == {}
-
-
-@pytest.mark.parametrize("has_user", [True, False])
-@pytest.mark.parametrize("is_active", [True, False])
-def test_update_managed_channel_memberships(mocker, has_user, user, is_active):
-    """Test that update_managed_channel_memberships calls the api if the user is authenticated"""
-    user.is_active = is_active
-    user.save()
-
-    mock_strategy = mocker.Mock()
-    mock_backend = mocker.Mock(name="email")
-
-    mock_membership_api = mocker.patch("authentication.pipeline.user.membership_api")
-
-    args = [mock_strategy, mock_backend]
-    kwargs = {"user": user if has_user else None}
-
-    assert user_actions.update_managed_channel_memberships(*args, **kwargs) == {}
-
-    if has_user and is_active:
-        mock_membership_api.update_memberships_for_managed_channels.assert_called_once_with(
-            user_ids=[user.id]
-        )
-    else:
-        mock_membership_api.update_memberships_for_managed_channels.assert_not_called()
 
 
 @pytest.mark.parametrize("moira_enabled", [True, False])

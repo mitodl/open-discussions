@@ -2,15 +2,15 @@
 import logging
 import mimetypes
 from os.path import splitext
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 from botocore.exceptions import ClientError
 from django.conf import settings
 
 from course_catalog.constants import (
     CONTENT_TYPE_PAGE,
-    VALID_TEXT_FILE_TYPES,
     CONTENT_TYPE_VIDEO,
+    VALID_TEXT_FILE_TYPES,
 )
 from course_catalog.etl.ocw import get_content_type
 from course_catalog.etl.utils import extract_text_metadata
@@ -21,8 +21,7 @@ log = logging.getLogger(__name__)
 
 
 def transform_ocw_next_content_files(s3_resource, course_prefix, force_overwrite):
-    """
-    Transforms page and resource data from the s3 bucket into content_file data
+    """Transforms page and resource data from the s3 bucket into content_file data
 
     Args:
         s3_resource (boto3.resource): The S3 resource
@@ -63,8 +62,7 @@ def transform_ocw_next_content_files(s3_resource, course_prefix, force_overwrite
 
 
 def transform_page(s3_key, page_data):
-    """
-    Transforms the data from data.json for a page into content_file data
+    """Transforms the data from data.json for a page into content_file data
 
     Args:
         s3_key (str):S3 path for the data.json file for the page
@@ -74,7 +72,6 @@ def transform_page(s3_key, page_data):
         dict: transformed content file data
 
     """
-
     s3_path = s3_key.split("data.json")[0]
     return {
         "content_type": CONTENT_TYPE_PAGE,
@@ -90,8 +87,7 @@ def transform_page(s3_key, page_data):
 def transform_resource(
     s3_key, resource_data, s3_resource, force_overwrite
 ):  # pylint:disable=too-many-locals,too-many-branches
-    """
-    Transforms the data from data.json for a resource into content_file data
+    """Transforms the data from data.json for a resource into content_file data
 
     Args:
         s3_key (str):S3 path for the data.json file for the page
@@ -121,12 +117,12 @@ def transform_resource(
         image_src = None
 
     if not file_s3_path:
-        return
+        return None
 
     title = resource_data.get("title")
 
-    if title == "3play caption file" or title == "3play pdf file":
-        return
+    if title in {"3play caption file", "3play pdf file"}:
+        return None
 
     if not file_s3_path.startswith("courses"):
         file_s3_path = "courses" + file_s3_path.split("courses")[1]

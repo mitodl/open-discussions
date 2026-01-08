@@ -1,5 +1,4 @@
-"""
-course_catalog api functions
+"""course_catalog api functions
 """
 import logging
 from datetime import datetime
@@ -44,8 +43,7 @@ def digest_ocw_course(
     course_prefix="",
     keep_existing_image_src=False,
 ):
-    """
-    Takes in OCW course master json to store it in DB
+    """Takes in OCW course master json to store it in DB
 
     Args:
         master_json (dict): course master JSON object as an output from ocw-data-parser
@@ -54,10 +52,11 @@ def digest_ocw_course(
         course_prefix (str): (Optional) String used to query S3 bucket for course raw JSONs
         keep_existing_image_src (boolean): (Optional) Avoid overwriting image_src if  image_src is
             blank because the backpopulate is run without uploading to s3
+
     """
     if "course_id" not in master_json:
         log.error("Course %s is missing 'course_id'", master_json.get("uid"))
-        return
+        return None
 
     existing_course_instance = Course.objects.filter(
         platform=PlatformType.ocw.value,
@@ -82,7 +81,7 @@ def digest_ocw_course(
             ocw_serializer.errors,
             master_json.get("image_src"),
         )
-        return
+        return None
 
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
@@ -128,23 +127,22 @@ def digest_ocw_course(
                 master_json.get("uid"),
                 run_serializer.errors,
             )
-            return
+            return None
         run = run_serializer.save()
         load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
     return course, run
 
 
 def digest_ocw_next_course(course_json, last_modified, uid, url_path):
-    """
-    Takes in OCW next course data.json to store it in DB
+    """Takes in OCW next course data.json to store it in DB
 
     Args:
         course_json (dict): course data JSON object from s3
         last_modified (datetime): timestamp of latest modification of all course files
         uid (str): Course uid
         url_path (str):String used to query S3 bucket for course data JSONs
-    """
 
+    """
     courserun_instance = LearningResourceRun.objects.filter(
         platform=PlatformType.ocw.value, run_id=uid
     ).first()
@@ -169,7 +167,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, url_path):
             course_json.get("primary_course_number"),
             ocw_serializer.errors,
         )
-        return
+        return None
 
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
@@ -223,13 +221,14 @@ def digest_ocw_next_course(course_json, last_modified, uid, url_path):
 
 
 def format_date(date_str):
-    """
-    Coverts date from 2016/02/02 20:28:06 US/Eastern to 2016-02-02 20:28:06-05:00
+    """Coverts date from 2016/02/02 20:28:06 US/Eastern to 2016-02-02 20:28:06-05:00
 
     Args:
         date_str (String): Datetime object as string in the following format (2016/02/02 20:28:06 US/Eastern)
+
     Returns:
         Datetime object if passed date is valid, otherwise None
+
     """
     if date_str and date_str != "None":
         date_pieces = date_str.split(" ")  # e.g. 2016/02/02 20:28:06 US/Eastern
@@ -248,14 +247,14 @@ def format_date(date_str):
 
 
 def generate_course_prefix_list(bucket, course_urls=None):
-    """
-    Assembles a list of OCW course prefixes from an S3 Bucket that contains all the raw jsons files
+    """Assembles a list of OCW course prefixes from an S3 Bucket that contains all the raw jsons files
 
     Args:
         bucket (s3.Bucket): Instantiated S3 Bucket object
         course_urls (List[str] or None): List of site urls to return
     Returns:
         List of course prefixes
+
     """
     ocw_courses = set()
     log.info("Assembling list of courses...")
@@ -277,24 +276,24 @@ def generate_course_prefix_list(bucket, course_urls=None):
 
 
 def get_course_availability(course):
-    """
-    Gets the attribute `availability` for a course if any
+    """Gets the attribute `availability` for a course if any
 
     Args:
         course (Course): Course model instance
 
     Returns:
         str: The url for the course if any
+
     """
     if course.platform == PlatformType.ocw.value:
         return AvailabilityType.current.value
-    elif course.platform == PlatformType.mitx.value:
+    if course.platform == PlatformType.mitx.value:
         course_json = course.raw_json
         if course_json is None:
-            return
+            return None
         runs = course_json.get("course_runs")
         if runs is None:
-            return
+            return None
         # get appropriate course_run
         for run in runs:
             if run.get("key") == course.course_id:
@@ -302,11 +301,11 @@ def get_course_availability(course):
 
 
 def sync_ocw_course_files(ids=None):
-    """
-    Sync all OCW course run files for a list of course ids to database
+    """Sync all OCW course run files for a list of course ids to database
 
     Args:
         ids(list of int or None): list of course ids to process, all if None
+
     """
     bucket = get_ocw_learning_course_bucket()
     courses = Course.objects.filter(platform="ocw").filter(published=True)
@@ -337,8 +336,7 @@ def sync_ocw_course(
     start_timestamp=None,
     force_s3_upload=False,
 ):
-    """
-    Sync an OCW course run
+    """Sync an OCW course run
 
     Args:
         course_prefix (str): The course prefix
@@ -352,6 +350,7 @@ def sync_ocw_course(
     Returns:
         str:
             The UID, or None if the run_id is not found, or if it was found but not synced
+
     """
     loaded_raw_jsons_for_course = []
     last_modified_dates = []
@@ -388,7 +387,7 @@ def sync_ocw_course(
     if not uid:
         # skip if we're unable to fetch course's uid
         log.info("Skipping %s, no course_id", course_prefix)
-        return None
+        return
     # get the latest modified timestamp of any file in the course
     last_modified = max(last_modified_dates)
 
@@ -407,7 +406,7 @@ def sync_ocw_course(
             "%s is imported into OCW Studio. Skipping sync and s3 json upload from Plone",
             course_prefix,
         )
-        return None
+        return
 
     # Make sure that the data we are syncing is newer than what we already have
     if (  # pylint: disable=too-many-boolean-expressions
@@ -420,7 +419,7 @@ def sync_ocw_course(
         and start_timestamp <= courserun_instance.updated_on
     ):
         log.info("Already synced. No changes found for %s", course_prefix)
-        return None
+        return
 
     # fetch JSON contents for each course file in memory (slow)
     log.info("Loading JSON for %s...", course_prefix)
@@ -475,7 +474,7 @@ def sync_ocw_course(
             )
 
     if is_ocw_next_course:
-        return None
+        return
 
     log.info("Digesting %s...", course_prefix)
 
@@ -491,7 +490,7 @@ def sync_ocw_course(
         )
     except TypeError:
         log.info("Course and run not returned, skipping")
-        return None
+        return
 
     if upload_to_s3 and is_published:
         load_content_files(run, transform_content_files(course_json))
@@ -509,8 +508,7 @@ def sync_ocw_course(
 def sync_ocw_next_course(
     *, url_path, s3_resource, force_overwrite, start_timestamp=None
 ):
-    """
-    Sync an OCW course run
+    """Sync an OCW course run
 
     Args:
         url_path (str): The course url path
@@ -521,6 +519,7 @@ def sync_ocw_next_course(
     Returns:
         str:
             The UID, or None if the run_id is not found, or if it was found but not synced
+
     """
     course_json = {}
     uid = None
@@ -546,9 +545,8 @@ def sync_ocw_next_course(
 
     if not uid:
         log.info("Skipping %s, both site_uid and legacy_uid missing", url_path)
-        return None
-    else:
-        uid = uid.replace("-", "")
+        return
+    uid = uid.replace("-", "")
 
     # if course run synced before, check if modified since then
     courserun_instance = LearningResourceRun.objects.filter(
@@ -566,7 +564,7 @@ def sync_ocw_next_course(
         and start_timestamp <= courserun_instance.updated_on
     ):
         log.info("Already synced. No changes found for %s", url_path)
-        return None
+        return
 
     log.info("Digesting %s...", url_path)
 
@@ -576,7 +574,7 @@ def sync_ocw_next_course(
         )
     except TypeError:
         log.info("Course and run not returned, skipping")
-        return None
+        return
 
     upsert_course(course.id)
     load_content_files(
@@ -593,8 +591,7 @@ def sync_ocw_courses(
     start_timestamp=None,
     force_s3_upload=False,
 ):
-    """
-    Sync OCW courses to the database
+    """Sync OCW courses to the database
 
     Args:
         course_prefixes (list of str): The course prefixes to process
@@ -605,6 +602,7 @@ def sync_ocw_courses(
         force_s3_upload (bool): If True, upload parsed JSON even if course imported from OCW-Next
     Returns:
         set[str]: All LearningResourceRun.run_id values for course runs which were synced
+
     """
     raw_data_bucket = boto3.resource(
         "s3",
@@ -628,8 +626,7 @@ def sync_ocw_courses(
 
 
 def sync_ocw_next_courses(*, url_paths, force_overwrite, start_timestamp=None):
-    """
-    Sync OCW courses to the database
+    """Sync OCW courses to the database
 
     Args:
         url_paths (list of str): The course url paths to process
@@ -638,6 +635,7 @@ def sync_ocw_next_courses(*, url_paths, force_overwrite, start_timestamp=None):
 
     Returns:
         set[str]: All LearningResourceRun.run_id values for course runs which were synced
+
     """
     s3_resource = boto3.resource(
         "s3",
@@ -658,14 +656,14 @@ def sync_ocw_next_courses(*, url_paths, force_overwrite, start_timestamp=None):
 
 
 def ocw_parent_folder(prefix):
-    """
-    Get the S3 parent folder of an OCW course
+    """Get the S3 parent folder of an OCW course
 
     Args:
         prefix(str): The course prefix
 
     Returns:
         str: The parent folder for the course prefix
+
     """
     prefix_parts = prefix.split("/")
     return "/".join(prefix_parts[0:2]) if prefix_parts[0] == "PROD" else prefix_parts[0]

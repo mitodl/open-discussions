@@ -571,8 +571,7 @@ def test_recent_podcast_episodes_no_feature_flag(settings, client):
 
 
 def test_podcast_episodes(settings, client):
-    """
-    Podcast episodes and tecent podcast episodes APIs should return recent serialized podcast episodes in order of most recent first.
+    """Podcast episodes and tecent podcast episodes APIs should return recent serialized podcast episodes in order of most recent first.
     Recent podcast episodes API should limit to only one episode per podcast
     """
     latest_episodes_by_podcast = PodcastEpisodeFactory.create_batch(5)

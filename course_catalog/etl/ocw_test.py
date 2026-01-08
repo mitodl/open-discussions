@@ -10,20 +10,20 @@ import pytest
 from bs4 import BeautifulSoup as bs
 
 from course_catalog.constants import (
-    CONTENT_TYPE_PAGE,
-    VALID_TEXT_FILE_TYPES,
     CONTENT_TYPE_FILE,
+    CONTENT_TYPE_PAGE,
     CONTENT_TYPE_VIDEO,
+    VALID_TEXT_FILE_TYPES,
 )
 from course_catalog.etl.ocw import (
-    upload_mitx_course_manifest,
-    transform_content_files,
-    get_content_file_url,
-    transform_content_file,
-    get_content_file_section,
-    get_content_type,
-    transform_embedded_media,
     EXCLUDED_CONTENT_FILE_TYPES,
+    get_content_file_section,
+    get_content_file_url,
+    get_content_type,
+    transform_content_file,
+    transform_content_files,
+    transform_embedded_media,
+    upload_mitx_course_manifest,
 )
 from course_catalog.factories import VideoFactory
 
@@ -51,7 +51,7 @@ def mock_tika_functions(mocker):
         },
     )
     mock_sync_s3_text = mocker.patch("course_catalog.etl.ocw.sync_s3_text")
-    yield SimpleNamespace(
+    return SimpleNamespace(
         mock_extract_text=mock_extract_text, mock_sync_text=mock_sync_s3_text
     )
 

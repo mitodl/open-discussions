@@ -4,8 +4,8 @@ if __name__ == "__main__":
     import os
 
     if not os.environ.get("PYTHONSTARTUP"):
-        from subprocess import check_call
         import sys
+        from subprocess import check_call
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,8 +21,6 @@ if __name__ == "__main__":
 
     for app in settings.INSTALLED_APPS:
         try:
-            exec(  # pylint: disable=exec-used
-                "from {app}.models import *".format(app=app)
-            )
+            exec(f"from {app}.models import *")  # pylint: disable=exec-used
         except ModuleNotFoundError:
             pass

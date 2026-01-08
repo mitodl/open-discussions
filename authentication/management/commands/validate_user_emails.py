@@ -1,14 +1,13 @@
 """Management command for starting the verification of user emails"""
 from datetime import datetime
 
+import requests
 from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
 from django.db.models import Exists, OuterRef
 
 from authentication import email_validation_api
 from authentication.models import EmailValidation
-import requests
-
 
 User = get_user_model()
 

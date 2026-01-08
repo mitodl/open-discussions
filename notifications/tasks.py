@@ -2,22 +2,20 @@
 import celery
 from django.conf import settings
 
+from notifications import api
 from open_discussions.celery import app
 from open_discussions.utils import chunks
-from channels.models import Channel
-
-from notifications import api
 
 
 def _gen_attempt_send_notification_batches(notification_settings):
-    """
-    Generates the set of attempt_send_notification_batch tasks in a fan-out structure
+    """Generates the set of attempt_send_notification_batch tasks in a fan-out structure
 
     Args:
         notification_settings (iterable of NotificationSettings): an iterable of NotificationSettings to attempt the sends for
 
     Returns:
         celery.group: the celery group of tasks to execute
+
     """
     return celery.group(
         [
@@ -59,11 +57,11 @@ def send_weekly_frontpage_digests(self):
     rate_limit=settings.NOTIFICATION_ATTEMPT_RATE_LIMIT,  # an option to rate limit these if they become too much
 )
 def attempt_send_notification_batch(notification_settings_ids):
-    """
-    Attempt to send a notification batch
+    """Attempt to send a notification batch
 
     Args:
         notification_settings_ids (list of int): list of NotificationSettings.ids
+
     """
     api.attempt_send_notification_batch(notification_settings_ids)
 
@@ -76,49 +74,47 @@ def send_unsent_email_notifications():
 
 @app.task
 def send_email_notification_batch(notification_ids):
-    """
-    Sends a batch of notifications
+    """Sends a batch of notifications
 
     Args:
         notification_ids (list of int): notification ids to send
+
     """
     api.send_email_notification_batch(notification_ids)
 
 
 @app.task
 def send_frontpage_email_notification_batch(notification_ids):
-    """
-    Sends a batch of notifications. This is a separate task from send_email_notification_batch so that
+    """Sends a batch of notifications. This is a separate task from send_email_notification_batch so that
     frontpage notification tasks, which are not time sensitive, can be queued separately from other tasks
 
     Args:
         notification_ids (list of int): notification ids to send
+
     """
     api.send_email_notification_batch(notification_ids)
 
 
 @app.task
 def notify_subscribed_users(post_id, comment_id, new_comment_id):
-    """
-    Notifies subscribed users of a new comment
+    """Notifies subscribed users of a new comment
 
     Args:
         post_id (str): base36 id of the post replied to
         comment_id (str): base36 id of the comment replied to (may be None)
         new_comment_id (str): base36 id of the new comment
+
     """
     api.send_comment_notifications(post_id, comment_id, new_comment_id)
 
 
 @app.task
-def notify_moderators(post_id, channel_name):
-    """
-    Notifies channel moderators of a new post.
+def notify_moderators(post_id, channel_name):  # pylint: disable=unused-argument
+    """Deprecated - channel moderator notifications no longer supported.
+    Kept as stub for backward compatibility.
 
     Args:
         post_id (str): base36 id of the post
         channel_name (str): channel name
+
     """
-    channel = Channel.objects.get(name=channel_name)
-    if channel.moderator_notifications:
-        api.send_moderator_notifications(post_id, channel_name)

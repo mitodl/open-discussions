@@ -3,40 +3,10 @@ import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
 
-import { Markdown, renderTextContent } from "./Markdown"
-
-import { makePost } from "../factories/posts"
-import { makeComment } from "../factories/comments"
+import { Markdown } from "./Markdown"
 
 describe("Markdown", () => {
   const renderMD = text => mount(<Markdown source={text} />)
-
-  const renderTC = content => mount(renderTextContent(content))
-
-  let post, comment
-
-  beforeEach(() => {
-    post = makePost()
-    post.edited = false
-    comment = makeComment(post)
-    comment.edited = false
-  })
-
-  it("renderTextContent should render a post", () => {
-    const wrapper = renderTC(post)
-    assert.equal(wrapper.text(), post.text)
-  })
-
-  it("renderTextContent should render a comment", () => {
-    const wrapper = renderTC(comment)
-    assert.equal(wrapper.text(), comment.text)
-  })
-
-  it("renderTextContent should add the edited flag, if appropriate", () => {
-    post.edited = true
-    const wrapper = renderTC(post)
-    assert.include(wrapper.text(), "[edited by author]")
-  })
 
   it("should render markdown", () => {
     const wrapper = renderMD("# MARKDOWN\n\nyeah markdown")

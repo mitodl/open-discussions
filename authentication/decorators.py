@@ -1,4 +1,4 @@
-""" Authentication-based decorators"""
+"""Authentication-based decorators"""
 from functools import wraps
 
 

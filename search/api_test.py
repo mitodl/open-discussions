@@ -5,9 +5,6 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 
-from channels.api import add_user_role
-from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
-from channels.factories.models import ChannelFactory
 from course_catalog.constants import PlatformType, PrivacyLevel
 from course_catalog.factories import (
     ContentFileFactory,
@@ -25,20 +22,15 @@ from search.api import (
     SIMILAR_RESOURCE_RELEVANT_FIELDS,
     execute_learn_search,
     execute_search,
-    find_related_documents,
     find_similar_resources,
-    gen_comment_id,
-    gen_post_id,
     gen_video_id,
     get_similar_topics,
-    is_reddit_object_removed,
     transform_results,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     COURSE_TYPE,
-    GLOBAL_DOC_TYPE,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     USER_LIST_TYPE,
@@ -87,7 +79,7 @@ def search_features(settings):
     settings.FEATURES[features.PODCAST_SEARCH] = True
 
 
-@pytest.fixture()
+@pytest.fixture
 def gen_query_filters_mock(mocker):
     """Mock _apply_general_query_filters"""
 
@@ -101,16 +93,6 @@ def gen_query_filters_mock(mocker):
     )
 
 
-def test_gen_post_id():
-    """Test that gen_post_id returns an expected id"""
-    assert gen_post_id("1") == "p_1"
-
-
-def test_gen_comment_id():
-    """Test that gen_comment_id returns an expected id"""
-    assert gen_comment_id("1") == "c_1"
-
-
 def test_gen_video_id(mocker):
     """Test that gen_video_id returns an expected id"""
     assert (
@@ -119,111 +101,16 @@ def test_gen_video_id(mocker):
     )
 
 
-@pytest.mark.parametrize(
-    "banned_by_val,approved_by_val,expected_value",
-    [
-        ("admin_username", "", True),
-        ("admin_username", None, True),
-        ("admin_username", "admin_username", False),
-        ("", None, False),
-        (None, None, False),
-    ],
-)
-def test_is_reddit_object_removed(
-    mocker, banned_by_val, approved_by_val, expected_value
-):
-    """
-    Tests that is_reddit_object_removed returns the expected values based on the
-    banned_by and approved_by properties for the given object
-    """
-    reddit_obj = mocker.Mock(banned_by=banned_by_val, approved_by=approved_by_val)
-    assert is_reddit_object_removed(reddit_obj) is expected_value
-
-
 def test_execute_search(user, opensearch):
     """execute_search should execute an OpenSearch search"""
-    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
-    add_user_role(channels[0], "moderators", user)
-    add_user_role(channels[1], "contributors", user)
 
     query = {"a": "query"}
     opensearch.conn.search.return_value = {"hits": {"total": 10}}
 
     assert execute_search(user=user, query=query) == opensearch.conn.search.return_value
     opensearch.conn.search.assert_called_once_with(
-        body={
-            **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_type": [
-                                                CHANNEL_TYPE_PUBLIC,
-                                                CHANNEL_TYPE_RESTRICTED,
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_name": [
-                                                channel.name for channel in channels
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must": [
-                                                {"term": {"deleted": False}},
-                                                {"term": {"removed": False}},
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                    ]
-                }
-            },
-        },
-        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+        body=query,
+        index=["testindex_all_default"],
     )
 
 
@@ -235,71 +122,7 @@ def test_execute_search_anonymous(opensearch):
 
     assert execute_search(user=user, query=query) == opensearch.conn.search.return_value
     opensearch.conn.search.assert_called_once_with(
-        body={
-            **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_type": [
-                                                CHANNEL_TYPE_PUBLIC,
-                                                CHANNEL_TYPE_RESTRICTED,
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must": [
-                                                {"term": {"deleted": False}},
-                                                {"term": {"removed": False}},
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                    ]
-                }
-            },
-        },
+        body=query,
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -343,9 +166,6 @@ def test_execute_learn_search(
     opensearch.conn.search.return_value = {
         "hits": {"total": {"value": 10, "relation": "eq"}}
     }
-    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
-    add_user_role(channels[0], "moderators", user)
-    add_user_role(channels[1], "contributors", user)
 
     if has_resource_type_subquery:
         query = {"a": {"bool": {"object_type": COURSE_TYPE}}}
@@ -505,30 +325,6 @@ def test_execute_learn_search_podcasts(settings, user, opensearch):
     }
 
 
-def test_find_related_documents(settings, opensearch, user, gen_query_filters_mock):
-    """find_related_documents should execute a more-like-this query"""
-    posts_to_return = 7
-    settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT = posts_to_return
-    post_id = "abc"
-
-    assert (
-        find_related_documents(user=user, post_id=post_id)
-        == opensearch.conn.search.return_value
-    )
-    assert gen_query_filters_mock.call_count == 1
-    constructed_query = opensearch.conn.search.call_args[1]
-    assert constructed_query["body"]["query"] == {
-        "more_like_this": {
-            "like": {"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
-            "fields": ["plain_text", "post_title", "author_id", "channel_name"],
-            "min_term_freq": 1,
-            "min_doc_freq": 1,
-        }
-    }
-    assert constructed_query["body"]["from"] == 0
-    assert constructed_query["body"]["size"] == posts_to_return
-
-
 @pytest.mark.parametrize("is_anonymous", [True, False])
 @pytest.mark.django_db
 def test_find_similar_resources(settings, is_anonymous, opensearch, user):
@@ -615,9 +411,7 @@ def test_find_similar_resources(settings, is_anonymous, opensearch, user):
 def test_transform_results(
     user, is_anonymous, suggest_min_hits, max_suggestions, settings
 ):  # pylint: disable=too-many-locals
-    """
-    transform_results should move scripted fields into the source result
-    """
+    """transform_results should move scripted fields into the source result"""
     settings.OPENSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
     settings.OPENSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
     favorited_course = CourseFactory.create()
@@ -753,10 +547,7 @@ def test_transform_results(
 @pytest.mark.parametrize("department_fitler", [["Chemistry", "Biology"], [], ["Math"]])
 @pytest.mark.django_db
 def test_transform_department_filter(department_fitler):
-    """
-    transform_results should replace coursenum if there is a department filter
-    """
-
+    """transform_results should replace coursenum if there is a department filter"""
     course = CourseFactory.create(
         course_id="HASH+1.1",
         extra_course_numbers=["5.1", "7.1"],
@@ -804,9 +595,7 @@ def test_transform_department_filter(department_fitler):
 
 @pytest.mark.django_db
 def test_transform_department_name_aggregations():
-    """
-    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
-    """
+    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them"""
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
@@ -839,9 +628,7 @@ def test_transform_department_name_aggregations():
 
 @pytest.mark.django_db
 def test_transform_level_aggregation():
-    """
-    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
-    """
+    """Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them"""
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
@@ -891,9 +678,7 @@ def test_transform_level_aggregation():
 
 @pytest.mark.django_db
 def test_transform_topics_aggregations():
-    """
-    Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
-    """
+    """Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them"""
     results = {
         "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
@@ -924,8 +709,7 @@ def test_transform_topics_aggregations():
 
 @pytest.mark.django_db
 def test_transform_resource_type_aggregations():
-    """
-    Resource_type Aggregations with filters are nested under `agg_filter_resource_type`.
+    """Resource_type Aggregations with filters are nested under `agg_filter_resource_type`.
     transform_results should unnest them
     """
     results = {
@@ -964,10 +748,7 @@ def test_transform_resource_type_aggregations():
 def test_combine_type_buckets_in_aggregates(
     podcast_present_in_aggregate, userlist_present_in_aggregate
 ):
-    """
-    transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data
-    """
-
+    """transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data"""
     type_buckets = []
 
     if podcast_present_in_aggregate:
