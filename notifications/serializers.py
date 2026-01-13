@@ -11,18 +11,16 @@ class NotificationSettingsSerializer(serializers.ModelSerializer):
     channel_title = serializers.SerializerMethodField()
 
     def get_channel_name(self, instance):
-        """get the channel name"""
+        """Get the channel name"""
         if instance.channel:
             return instance.channel.name
-        else:
-            return None
+        return None
 
     def get_channel_title(self, instance):
-        """get the channel title"""
+        """Get the channel title"""
         if instance.channel:
             return instance.channel.title
-        else:
-            return None
+        return None
 
     class Meta:
         model = NotificationSettings

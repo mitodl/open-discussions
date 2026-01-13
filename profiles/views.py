@@ -1,38 +1,27 @@
 """Views for REST APIs for channels"""
+from cairosvg import svg2png  # pylint:disable=no-name-in-module
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.decorators.cache import cache_page
-
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from rest_framework.response import Response
-
-from cairosvg import svg2png  # pylint:disable=no-name-in-module
+from rest_framework.views import APIView
 
 from open_discussions.permissions import (
-    IsStaffPermission,
     AnonymousAccessReadonlyPermission,
+    IsStaffPermission,
 )
 from profiles.models import Profile, UserWebsite
 from profiles.permissions import HasEditPermission, HasSiteEditPermission
 from profiles.serializers import (
-    UserSerializer,
     ProfileSerializer,
+    UserSerializer,
     UserWebsiteSerializer,
 )
-from profiles.utils import generate_svg_avatar, DEFAULT_PROFILE_IMAGE
-from channels.models import Comment
-from channels.proxies import proxy_posts
-from channels.serializers.posts import BasePostSerializer
-from channels.serializers.comments import BaseCommentSerializer
-from channels.utils import (
-    get_pagination_and_reddit_obj_list,
-    get_listing_params,
-    translate_praw_exceptions,
-)
+from profiles.utils import DEFAULT_PROFILE_IMAGE, generate_svg_avatar
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -92,58 +81,20 @@ class UserContributionListView(APIView):
         """Context for the request and view"""
         return {
             "include_permalink_data": True,
-            "channel_api": self.request.channel_api,
             "current_user": self.request.user,
             "request": self.request,
             "view": self,
         }
 
     def get(self, request, *args, **kwargs):
-        # pylint:disable=too-many-locals
-        """View method for HTTP GET request"""
-        with translate_praw_exceptions(request.user):
-            api = self.request.channel_api
-            profile_username = self.kwargs["username"]
-            profile_user = User.objects.get(username=profile_username)
-            object_type = self.kwargs["object_type"]
-            listing_params = get_listing_params(self.request)
+        """View method for HTTP GET request (deprecated - discussions removed)
+        Returns empty list as posts/comments no longer exist
+        """
+        object_type = self.kwargs["object_type"]
 
-            if object_type == "posts":
-                serializer_cls = BasePostSerializer
-                listing_getter = api.list_user_posts
-            else:
-                serializer_cls = BaseCommentSerializer
-                listing_getter = api.list_user_comments
-
-            object_listing = listing_getter(profile_username, listing_params)
-            pagination, user_objects = get_pagination_and_reddit_obj_list(
-                object_listing, listing_params
-            )
-
-            if object_type == "posts":
-                user_objects = proxy_posts(user_objects)
-                user_objects = list(
-                    filter(lambda object: not object.removed, user_objects)
-                )
-            else:
-                spam_comments = Comment.objects.filter(
-                    comment_id__in=[object.id for object in user_objects], removed=True
-                ).values_list("comment_id", flat=True)
-
-                user_objects = list(
-                    filter(lambda object: object.id not in spam_comments, user_objects)
-                )
-
-            return Response(
-                {
-                    object_type: serializer_cls(
-                        user_objects,
-                        many=True,
-                        context={
-                            **self.get_serializer_context(),
-                            "users": {profile_username: profile_user},
-                        },
-                    ).data,
-                    "pagination": pagination,
-                }
-            )
+        return Response(
+            {
+                object_type: [],
+                "pagination": {"after": None, "before": None},
+            }
+        )

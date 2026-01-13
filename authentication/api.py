@@ -6,7 +6,6 @@ from django.db import IntegrityError, transaction
 from social_core.utils import get_strategy
 
 from authentication.backends.micromasters import MicroMastersAuth
-from channels import api as channels_api
 from notifications import api as notifications_api
 from profiles import api as profile_api
 
@@ -16,8 +15,7 @@ log = logging.getLogger()
 
 
 def create_user(username, email, profile_data=None, user_extra=None):
-    """
-    Ensures the user exists
+    """Ensures the user exists
 
     Args:
         email (str): the user's email
@@ -25,6 +23,7 @@ def create_user(username, email, profile_data=None, user_extra=None):
 
     Returns:
         User: the user
+
     """
     defaults = {}
 
@@ -42,16 +41,11 @@ def create_user(username, email, profile_data=None, user_extra=None):
             user, skip_moderator_setting=True
         )
 
-        # this could fail if the reddit backend is down
-        # so if it fails we want to rollback this entire transaction
-        channels_api.get_or_create_auth_tokens(user)
-
     return user
 
 
 def create_or_update_micromasters_social_auth(user, uid, details):
-    """
-    Creates or updates MicroMasters social auth for a user
+    """Creates or updates MicroMasters social auth for a user
 
     Args:
         user (User): user to create the auth for
@@ -60,6 +54,7 @@ def create_or_update_micromasters_social_auth(user, uid, details):
 
     Returns:
         UserSocialAuth: the created social auth record
+
     """
     # avoid a circular import
     from social_django.utils import STORAGE, STRATEGY, load_backend

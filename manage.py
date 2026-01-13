@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Standard manage.py command from django startproject
+"""Standard manage.py command from django startproject
 """
 
 import os

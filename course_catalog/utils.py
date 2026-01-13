@@ -1,4 +1,4 @@
-""" Utils for course catalog """
+"""Utils for course catalog"""
 import logging
 import re
 from datetime import datetime
@@ -22,38 +22,32 @@ log = logging.getLogger()
 
 
 def user_list_image_upload_uri(instance, filename):
-    """
-    upload_to handler for user-created UserList image
-    """
+    """upload_to handler for user-created UserList image"""
     return generate_filepath(
         filename, instance.author.username, instance.title, "user_list"
     )
 
 
 def staff_list_image_upload_uri(instance, filename):
-    """
-    upload_to handler for user-created UserList image
-    """
+    """upload_to handler for user-created UserList image"""
     return generate_filepath(filename, "staff_list", instance.title, "")
 
 
 # NOTE: this is unused, but a migration references it, so we'll leave it until we decide to squash migrations or something
 def program_image_upload_uri(instance, filename):
-    """
-    upload_to handler for Program image
-    """
+    """upload_to handler for Program image"""
     return generate_filepath(filename, instance.title, "", "program")
 
 
 def get_ocw_topics(topics_collection):
-    """
-    Extracts OCW topics and subtopics and returns a unique list of them
+    """Extracts OCW topics and subtopics and returns a unique list of them
 
     Args:
         topics_collection (dict): The JSON object representing the topic
 
     Returns:
         list of str: list of topics
+
     """
     topics = []
 
@@ -69,8 +63,7 @@ def get_ocw_topics(topics_collection):
 
 
 def get_year_and_semester(course_run):
-    """
-    Parse year and semester out of course run key. If course run key cannot be parsed attempt to get year from start.
+    """Parse year and semester out of course run key. If course run key cannot be parsed attempt to get year from start.
 
     Args:
         course_run (dict): The JSON object representing the particular course run
@@ -105,8 +98,7 @@ def get_year_and_semester(course_run):
 
 
 def get_course_url(course_id, course_json, platform):
-    """
-    Get the url for a course if any
+    """Get the url for a course if any
 
     Args:
         course_id (str): The course_id of the course
@@ -115,6 +107,7 @@ def get_course_url(course_id, course_json, platform):
 
     Returns:
         str: The url for the course if any
+
     """
     if platform == PlatformType.ocw.value:
         if course_json is not None:
@@ -130,13 +123,12 @@ def get_course_url(course_id, course_json, platform):
                     preferred_urls.append(url)
             if preferred_urls:
                 return preferred_urls[0].split("?")[0]
-        return "{}{}/course/".format(settings.MITX_ALT_URL, course_id)
+        return f"{settings.MITX_ALT_URL}{course_id}/course/"
     return None
 
 
 def get_ocw_department_list(course_json):
-    """
-    Get list of OCW department numbers
+    """Get list of OCW department numbers
     Args:
         course_json (dict): The raw json for the course
     Returns:
@@ -157,8 +149,7 @@ def get_ocw_department_list(course_json):
 
 
 def semester_year_to_date(semester, year, ending=False):
-    """
-    Convert semester and year to a rough date
+    """Convert semester and year to a rough date
 
     Args:
         semester (str): Semester ("Fall", "Spring", etc)
@@ -167,9 +158,10 @@ def semester_year_to_date(semester, year, ending=False):
 
     Returns:
         datetime: The rough date of the course
+
     """
     if semester is None or year is None:
-        return
+        return None
     if semester.lower() == "fall":
         month_day = "12-31" if ending else "09-01"
     elif semester.lower() == "summer":
@@ -179,15 +171,12 @@ def semester_year_to_date(semester, year, ending=False):
     elif semester.lower() == "january iap":
         month_day = "01-31" if ending else "01-01"
     else:
-        return
-    return datetime.strptime("{}-{}".format(year, month_day), "%Y-%m-%d").replace(
-        tzinfo=pytz.UTC
-    )
+        return None
+    return datetime.strptime(f"{year}-{month_day}", "%Y-%m-%d").replace(tzinfo=pytz.UTC)
 
 
 def get_list_items_by_resource(user, object_type, object_id):
-    """
-    Get serialized list items for a particular user and resource
+    """Get serialized list items for a particular user and resource
 
     Args:
         user (User): the User to filter list items by
@@ -196,6 +185,7 @@ def get_list_items_by_resource(user, object_type, object_id):
 
     Returns:
         list of dicts: serialized UserListItem data
+
     """
     from course_catalog.models import UserListItem
     from course_catalog.serializers import MicroUserListItemSerializer
@@ -210,8 +200,7 @@ def get_list_items_by_resource(user, object_type, object_id):
 
 
 def load_course_blocklist():
-    """
-    Get a list of blocklisted course ids
+    """Get a list of blocklisted course ids
 
     Returns:
         list of str: list of course ids
@@ -226,8 +215,7 @@ def load_course_blocklist():
 
 
 def load_course_duplicates(platform):
-    """
-    Get a list of blocklisted course ids for a platform
+    """Get a list of blocklisted course ids for a platform
     Args:
         platform (string): the platform for which course duplicates are needed
     Returns:
@@ -244,8 +232,7 @@ def load_course_duplicates(platform):
 
 
 def get_s3_object_and_read(obj, iteration=0):
-    """
-    Attempts to read S3 data, and tries again up to MAX_S3_GET_ITERATIONS if it encounters an error.
+    """Attempts to read S3 data, and tries again up to MAX_S3_GET_ITERATIONS if it encounters an error.
     This helps to prevent read timeout errors from stopping sync.
 
     Args:
@@ -254,19 +241,18 @@ def get_s3_object_and_read(obj, iteration=0):
 
     Returns:
         bytes: The contents of a json file read from S3
+
     """
     try:
         return obj.get()["Body"].read()
     except Exception:  # pylint: disable=broad-except
         if iteration < settings.MAX_S3_GET_ITERATIONS:
             return get_s3_object_and_read(obj, iteration + 1)
-        else:
-            raise
+        raise
 
 
 def safe_load_json(json_string, json_file_key):
-    """
-    Loads the passed string as a JSON object with exception handing and logging.
+    """Loads the passed string as a JSON object with exception handing and logging.
     Some OCW JSON content may be malformed.
 
     Args:
@@ -275,6 +261,7 @@ def safe_load_json(json_string, json_file_key):
 
     Returns:
         JSON (dict): the JSON contents as JSON
+
     """
     try:
         loaded_json = rapidjson.loads(json_string)
@@ -285,14 +272,14 @@ def safe_load_json(json_string, json_file_key):
 
 
 def parse_instructors(staff):
-    """
-    Parses staff/instructors users including their full name, salutation etc
+    """Parses staff/instructors users including their full name, salutation etc
 
     Args:
         array (dict): staff/instructors
 
     Returns:
         array (dict): parsed instructors
+
     """
     instructors = []
     for person in staff:

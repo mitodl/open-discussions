@@ -1,5 +1,4 @@
-"""
-OpenSearch connection functionality
+"""OpenSearch connection functionality
 """
 import uuid
 from functools import partial
@@ -11,8 +10,7 @@ from search.constants import VALID_OBJECT_TYPES
 
 
 def configure_connections():
-    """
-    Create connections for the application
+    """Create connections for the application
 
     This should only be called once
     """
@@ -34,35 +32,30 @@ def configure_connections():
 
 
 def get_conn():
-    """
-    Get the default connection
+    """Get the default connection
 
     Returns:
         opensearch.client.Opensearch: An OpenSearch client
+
     """
     return connections.get_connection()
 
 
 def make_backing_index_name(object_type):
-    """
-    Make a unique name for use for a backing index
+    """Make a unique name for use for a backing index
 
     Args:
         object_type(str): The object type (post, comment, profile)
 
     Returns:
         str: A new name for a backing index
+
     """
-    return "{prefix}_{object_type}_{hash}".format(
-        prefix=settings.OPENSEARCH_INDEX,
-        object_type=object_type,
-        hash=uuid.uuid4().hex,
-    )
+    return f"{settings.OPENSEARCH_INDEX}_{object_type}_{uuid.uuid4().hex}"
 
 
 def make_alias_name(is_reindexing, object_type):
-    """
-    Make the name used for the Opensearch alias
+    """Make the name used for the Opensearch alias
 
     Args:
         object_type(str): The object type of the index (post, comment, etc)
@@ -70,6 +63,7 @@ def make_alias_name(is_reindexing, object_type):
 
     Returns:
         str: The name of the alias
+
     """
     return "{prefix}_{object_type}_{suffix}".format(
         prefix=settings.OPENSEARCH_INDEX,
@@ -83,8 +77,7 @@ get_reindexing_alias_name = partial(make_alias_name, True)
 
 
 def get_active_aliases(conn, *, object_types=None, include_reindexing=True):
-    """
-    Returns aliases which exist for specified object types
+    """Returns aliases which exist for specified object types
 
     Args:
         conn(opensearch.client.Opensearch): An Opensearch client
@@ -93,28 +86,27 @@ def get_active_aliases(conn, *, object_types=None, include_reindexing=True):
 
     Returns:
         list of str: Aliases which exist
+
     """
     if not object_types:
         object_types = VALID_OBJECT_TYPES
     if include_reindexing:
         return active_aliases_with_reindexing(conn, object_types)
-    else:
-        return [
-            alias
-            for alias in [get_default_alias_name(obj) for obj in object_types]
-            if conn.indices.exists(alias)
-        ]
+    return [
+        alias
+        for alias in [get_default_alias_name(obj) for obj in object_types]
+        if conn.indices.exists(alias)
+    ]
 
 
 def active_aliases_with_reindexing(conn, object_types):
-    """
-    Returns aliases which exist for specified object types including reindexing aliases
+    """Returns aliases which exist for specified object types including reindexing aliases
 
     Args:
         conn(opensearch.client.Opensearch): An Opensearch client
         object_types(list of str): list of object types (post, comment, etc)
-    """
 
+    """
     return [
         alias
         for alias_tuple in [
@@ -127,11 +119,11 @@ def active_aliases_with_reindexing(conn, object_types):
 
 
 def refresh_index(index):
-    """
-    Refresh the opensearch index
+    """Refresh the opensearch index
 
     Args:
         index (str): The opensearch index to refresh
+
     """
     conn = get_conn()
     conn.indices.refresh(index)

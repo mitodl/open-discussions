@@ -1,16 +1,17 @@
 """tests for the ckeditor view"""
-from time import time
 import math
-import pytest
-import jwt
+from time import time
 
+import jwt
+import pytest
 from django.urls import reverse
 from rest_framework import status
+
 from open_discussions.features import ARTICLE_UI
 
 
 def test_get_ckeditor(client, user, settings):
-    """test that a JWT is sent up"""
+    """Test that a JWT is sent up"""
     settings.CKEDITOR_SECRET_KEY = "super secret"
     settings.FEATURES[ARTICLE_UI] = True
     settings.CKEDITOR_ENVIRONMENT_ID = "environment"
@@ -40,7 +41,7 @@ def test_get_ckeditor(client, user, settings):
 def test_get_ckeditor_status(
     client, user, settings, secret_key, feature_enabled, env_id, exp_status
 ):  # pylint: disable=too-many-arguments
-    """test that we return the status we expect"""
+    """Test that we return the status we expect"""
     settings.CKEDITOR_SECRET_KEY = secret_key
     settings.FEATURES[ARTICLE_UI] = feature_enabled
     settings.CKEDITOR_ENVIRONMENT_ID = env_id

@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 
-from course_catalog.constants import PrivacyLevel, UserListType, EDX_PLATFORMS
+from course_catalog.constants import EDX_PLATFORMS, PrivacyLevel, UserListType
 from course_catalog.etl.constants import (
     CourseLoaderConfig,
     LearningResourceRunLoaderConfig,
@@ -96,8 +96,7 @@ def load_instructors(resource, instructors_data):
 
 
 def load_offered_bys(resource, offered_bys_data, *, config=OfferedByLoaderConfig()):
-    """
-    Loads a list of offered_by into the resource.
+    """Loads a list of offered_by into the resource.
 
     Args:
         resource (LearningResource): learning resource
@@ -106,6 +105,7 @@ def load_offered_bys(resource, offered_bys_data, *, config=OfferedByLoaderConfig
 
     Returns:
         offered_bys (list of LearningResourceOfferor): list of created or updated offered_bys
+
     """
     if offered_bys_data is None:
         return resource.offered_by.all()
@@ -128,8 +128,7 @@ def load_offered_bys(resource, offered_bys_data, *, config=OfferedByLoaderConfig
 
 
 def load_run(learning_resource, run_data, *, config=LearningResourceRunLoaderConfig()):
-    """
-    Load the resource run into the database
+    """Load the resource run into the database
 
     Args:
         learning_resource (LearningResource): the concrete parent learning resource
@@ -138,6 +137,7 @@ def load_run(learning_resource, run_data, *, config=LearningResourceRunLoaderCon
 
     Returns:
         LearningResourceRun: the created/updated resource run
+
     """
     run_id = run_data.pop("run_id")
     platform = run_data.get("platform")
@@ -175,8 +175,7 @@ def load_run(learning_resource, run_data, *, config=LearningResourceRunLoaderCon
 
 
 def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig()):
-    """
-    Load the course into the database
+    """Load the course into the database
 
     Args:
         course_data (dict):
@@ -191,6 +190,7 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
     Returns:
         Course:
             the created/updated course
+
     """
     # pylint: disable=too-many-branches,too-many-locals
 
@@ -271,14 +271,14 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
 
 
 def load_courses(platform, courses_data, *, config=CourseLoaderConfig()):
-    """
-    Load a list of courses
+    """Load a list of courses
 
     Args:
         courses_data (list of dict):
             a list of course data values
         config (CourseLoaderConfig):
             configuration on how to load this program
+
     """
     blocklist = load_course_blocklist()
     duplicates = load_course_duplicates(platform)
@@ -302,8 +302,7 @@ def load_courses(platform, courses_data, *, config=CourseLoaderConfig()):
 
 
 def load_program(program_data, blocklist, duplicates, *, config=ProgramLoaderConfig()):
-    """
-    Load the program into the database
+    """Load the program into the database
 
     Args:
         program_data (dict):
@@ -318,6 +317,7 @@ def load_program(program_data, blocklist, duplicates, *, config=ProgramLoaderCon
     Returns:
         Program:
             the created/updated program
+
     """
     # pylint: disable=too-many-locals
 
@@ -411,8 +411,7 @@ def load_video(video_data, *, config=VideoLoaderConfig()):
 
 
 def load_videos(videos_data, *, config=VideoLoaderConfig()):
-    """
-    Loads a list of videos data
+    """Loads a list of videos data
 
     Args:
         videos_data (iter of dict): iterable of the video data
@@ -420,13 +419,13 @@ def load_videos(videos_data, *, config=VideoLoaderConfig()):
     Returns:
         list of Video:
             the list of loaded videos
+
     """
     return [load_video(video_data, config=config) for video_data in videos_data]
 
 
 def load_playlist_user_list(playlist, user_list_title):
-    """
-    Load a playlist into a user list
+    """Load a playlist into a user list
 
     Args:
         playlist (Playlist): the playlist to generate a user list from
@@ -434,6 +433,7 @@ def load_playlist_user_list(playlist, user_list_title):
     Returns:
         UserList or None:
             the created/updated user list or None
+
     """
     owner_username = settings.OPEN_VIDEO_USER_LIST_OWNER
     if not owner_username:
@@ -494,8 +494,7 @@ def load_playlist_user_list(playlist, user_list_title):
 
 
 def load_playlist(video_channel, playlist_data, *, config=PlaylistLoaderConfig()):
-    """
-    Load a playlist
+    """Load a playlist
 
     Args:
         video_channel (VideoChannel): the video channel instance this playlist is under
@@ -504,6 +503,7 @@ def load_playlist(video_channel, playlist_data, *, config=PlaylistLoaderConfig()
     Returns:
         Playlist:
             the created or updated playlist
+
     """
     platform = playlist_data.pop("platform")
     playlist_id = playlist_data.pop("playlist_id")
@@ -544,8 +544,7 @@ def load_playlist(video_channel, playlist_data, *, config=PlaylistLoaderConfig()
 
 
 def load_playlists(video_channel, playlists_data):
-    """
-    Load a list of channel playlists
+    """Load a list of channel playlists
 
     Args:
         video_channel (VideoChannel): the video channel instance this playlist is under
@@ -555,6 +554,7 @@ def load_playlists(video_channel, playlists_data):
     Returns:
         list of Playlist:
             the created or updated playlists
+
     """
     playlists = [
         load_playlist(video_channel, playlist_data) for playlist_data in playlists_data
@@ -578,8 +578,7 @@ def load_playlists(video_channel, playlists_data):
 
 
 def load_video_channel(video_channel_data):
-    """
-    Load a single video channel
+    """Load a single video channel
 
     Arg:
         video_channel_data (dict):
@@ -607,8 +606,7 @@ def load_video_channel(video_channel_data):
 
 
 def load_video_channels(video_channels_data):
-    """
-    Load a list of video channels
+    """Load a list of video channels
 
     Args:
         video_channels_data (iter of dict): iterable of the video channels data
@@ -616,6 +614,7 @@ def load_video_channels(video_channels_data):
     Returns:
         list of VideoChannel:
             list of the loaded videos
+
     """
     video_channels = []
 
@@ -659,8 +658,7 @@ def load_video_channels(video_channels_data):
 
 
 def load_content_file(course_run, content_file_data):
-    """
-    Sync a course run file/page to the database
+    """Sync a course run file/page to the database
 
     Args:
         course_run (LearningResourceRun): a LearningResourceRun for a Course
@@ -668,6 +666,7 @@ def load_content_file(course_run, content_file_data):
 
     Returns:
         Int: the id of the object that was created or updated
+
     """
     try:
         content_file, _ = ContentFile.objects.update_or_create(
@@ -683,8 +682,7 @@ def load_content_file(course_run, content_file_data):
 
 
 def load_content_files(course_run, content_files_data):
-    """
-    Sync all content files for a course run to database and S3 if not present in DB
+    """Sync all content files for a course run to database and S3 if not present in DB
 
     Args:
         course_run (LearningResourceRun): a course run
@@ -714,8 +712,7 @@ def load_content_files(course_run, content_files_data):
 
 
 def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderConfig()):
-    """
-    Load a podcast_episode into the database
+    """Load a podcast_episode into the database
     Args:
         episode_data (dict): data for the episode
         podcast (Podcast): podcast that the episode belongs to
@@ -724,6 +721,7 @@ def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderCo
 
     Returns:
         list of PodcastEpisode objects that were created/updated
+
     """
     episode_id = episode_data.pop("episode_id")
     topics_data = episode_data.pop("topics", [])
@@ -745,8 +743,7 @@ def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderCo
 
 
 def load_podcast(podcast_data, *, config=PodcastLoaderConfig()):
-    """
-    Load a single podcast
+    """Load a single podcast
 
     Arg:
         podcast_data (dict):
@@ -793,8 +790,7 @@ def load_podcast(podcast_data, *, config=PodcastLoaderConfig()):
 
 
 def load_podcasts(podcasts_data):
-    """
-    Load a list of podcasts
+    """Load a list of podcasts
 
     Args:
         podcasts_data (iter of dict): iterable of podcast data
@@ -802,6 +798,7 @@ def load_podcasts(podcasts_data):
     Returns:
         list of Podcasts:
             list of the loaded podcasts
+
     """
     podcasts = []
 

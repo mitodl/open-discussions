@@ -4,18 +4,14 @@ from django.db.models import JSONField
 
 
 class WidgetList(models.Model):
-    """
-    WidgetList handles authentication and is linked to a set of WidgetInstances
-    """
+    """WidgetList handles authentication and is linked to a set of WidgetInstances"""
 
     class Meta:
         app_label = "widgets"
 
 
 class WidgetInstance(models.Model):
-    """
-    WidgetInstance contains data for a single widget instance, regardless of what class of widget it is
-    """
+    """WidgetInstance contains data for a single widget instance, regardless of what class of widget it is"""
 
     widget_list = models.ForeignKey(
         WidgetList, related_name="widgets", on_delete=models.CASCADE

@@ -1,5 +1,4 @@
-"""
-Test course_catalog utils
+"""Test course_catalog utils
 """
 import json
 from datetime import datetime
@@ -22,10 +21,8 @@ from course_catalog.utils import (
 
 @pytest.fixture(name="test_instructors_data")
 def fixture_test_instructors_data():
-    """
-    Test instructors data
-    """
-    with open("./test_json/test_instructors_data.json", "r") as test_data:
+    """Test instructors data"""
+    with open("./test_json/test_instructors_data.json") as test_data:
         return json.load(test_data)["instructors"]
 
 
@@ -99,9 +96,7 @@ def test_get_course_url(course_id, course_json, platform, expected):
     ],
 )
 def test_semester_year_to_date(semester, year, ending, expected):
-    """
-    Test that a correct rough date is returned for semester and year
-    """
+    """Test that a correct rough date is returned for semester and year"""
     if expected is None:
         assert semester_year_to_date(semester, year, ending=ending) is None
     else:
@@ -219,9 +214,7 @@ def test_safe_load_bad_json(mocker):
 
 
 def test_parse_instructors(test_instructors_data):
-    """
-    Verify that instructors assignment is working as expected
-    """
+    """Verify that instructors assignment is working as expected"""
     for instructor in test_instructors_data:
         parsed_instructors = parse_instructors([instructor["data"]])
         parsed_instructor = parsed_instructors[0]

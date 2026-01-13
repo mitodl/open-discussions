@@ -1,7 +1,7 @@
 """Configuration for betamax"""
 from betamax import Betamax
-from betamax.util import deserialize_prepared_request
 from betamax.matchers.body import BodyMatcher
+from betamax.util import deserialize_prepared_request
 from betamax_serializers.pretty_json import PrettyJSONSerializer
 
 

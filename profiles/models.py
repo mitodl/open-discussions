@@ -1,18 +1,18 @@
 """Profile models"""
 from uuid import uuid4
 
-from django.db.models import JSONField
-from django.db import models, transaction
 from django.conf import settings
+from django.db import models, transaction
+from django.db.models import JSONField
 
 from profiles.utils import (
+    IMAGE_MEDIUM_MAX_DIMENSION,
+    IMAGE_SMALL_MAX_DIMENSION,
+    MAX_IMAGE_FIELD_LENGTH,
+    make_thumbnail,
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
     profile_image_upload_uri_small,
-    make_thumbnail,
-    MAX_IMAGE_FIELD_LENGTH,
-    IMAGE_SMALL_MAX_DIMENSION,
-    IMAGE_MEDIUM_MAX_DIMENSION,
 )
 
 PROFILE_PROPS = (
@@ -43,14 +43,14 @@ SOCIAL_SITE_NAME_MAP = {
 
 
 def filter_profile_props(data):
-    """
-    Filters the passed profile data to valid profile fields
+    """Filters the passed profile data to valid profile fields
 
     Args:
         data (dict): profile data
 
     Return:
         dict: filtered dict
+
     """
     return {key: value for key, value in data.items() if key in PROFILE_PROPS}
 
@@ -98,12 +98,8 @@ class Profile(models.Model):
                 )
 
                 # name doesn't matter here, we use upload_to to produce that
-                self.image_small_file.save(
-                    "{}.jpg".format(uuid4().hex), small_thumbnail
-                )
-                self.image_medium_file.save(
-                    "{}.jpg".format(uuid4().hex), medium_thumbnail
-                )
+                self.image_small_file.save(f"{uuid4().hex}.jpg", small_thumbnail)
+                self.image_medium_file.save(f"{uuid4().hex}.jpg", medium_thumbnail)
             else:
                 self.image_small_file = None
                 self.image_medium_file = None
@@ -112,7 +108,7 @@ class Profile(models.Model):
         )
 
     def __str__(self):
-        return "{}".format(self.name)
+        return f"{self.name}"
 
 
 class UserWebsite(models.Model):
@@ -130,4 +126,4 @@ class UserWebsite(models.Model):
         unique_together = ("profile", "site_type")
 
     def __str__(self):
-        return "url: {}; site_type: {}".format(self.url, self.site_type)
+        return f"url: {self.url}; site_type: {self.site_type}"

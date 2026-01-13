@@ -1,40 +1,36 @@
 """Common open_discussions middleware"""
-from django.conf import settings
 from django import shortcuts
+from django.conf import settings
 
 from open_discussions.utils import FeatureFlag
 
 
 class QueryStringFeatureFlagMiddleware:
-    """
-    Extracts feature flags from the query string
-    """
+    """Extracts feature flags from the query string"""
 
     @classmethod
     def get_flag_key(cls, suffix):
-        """
-        Determines the full key for a given feature flag suffix
+        """Determines the full key for a given feature flag suffix
 
         Args:
             suffix (str): suffix to append to the key prefix
 
         Returns:
             str: the full key value
+
         """
-        return "{prefix}_FEATURE_{suffix}".format(
-            prefix=settings.MIDDLEWARE_FEATURE_FLAG_QS_PREFIX, suffix=suffix
-        )
+        return f"{settings.MIDDLEWARE_FEATURE_FLAG_QS_PREFIX}_FEATURE_{suffix}"
 
     @classmethod
     def encode_feature_flags(cls, data):
-        """
-        Encodes the set of feature flags from the request by creating a bit mask
+        """Encodes the set of feature flags from the request by creating a bit mask
 
         Args:
             data (dict): request query dict
 
         Returns:
             str: value encoded as a str
+
         """
         mask = 0
         if data is None:
@@ -50,11 +46,11 @@ class QueryStringFeatureFlagMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        """
-        Processes an individual request for the feature flag query parameters
+        """Processes an individual request for the feature flag query parameters
 
         Args:
             request (django.http.request.Request): the request to inspect
+
         """
         prefix = self.get_flag_key("")
         if request.GET and any(key.startswith(prefix) for key in request.GET.keys()):
@@ -74,33 +70,31 @@ class QueryStringFeatureFlagMiddleware:
 
 
 class CookieFeatureFlagMiddleware:
-    """
-    Extracts feature flags from a cookie
-    """
+    """Extracts feature flags from a cookie"""
 
     @classmethod
     def decode_feature_flags(cls, value):
-        """
-        Decodes a set of feature flags from a bitmask value
+        """Decodes a set of feature flags from a bitmask value
 
         Args:
             value (int): the bitmask value
 
         Returns:
             set: the set of feature values in the value
+
         """
         return set(member for member in FeatureFlag if member.value & value)
 
     @classmethod
     def get_feature_flags(cls, request):
-        """
-        Determines the set of features enabled on a request via cookie
+        """Determines the set of features enabled on a request via cookie
 
         Args:
             request (django.http.request.Request): the request to inspect
 
         Returns:
             set: the set of FeatureFlag values set in the cookie if present
+
         """
         if settings.MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME in request.COOKIES:
             try:
@@ -112,19 +106,18 @@ class CookieFeatureFlagMiddleware:
             except ValueError:
                 return set()
             return cls.decode_feature_flags(value)
-        else:
-            return set()
+        return set()
 
     def __init__(self, get_response):
         """One-time configuration"""
         self.get_response = get_response
 
     def __call__(self, request):
-        """
-        Processes an individual request for the feature flag cookie
+        """Processes an individual request for the feature flag cookie
 
         Args:
             request (django.http.request.Request): the request to inspect
+
         """
         request.open_discussions_feature_flags = self.get_feature_flags(request)
 

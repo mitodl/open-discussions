@@ -1,5 +1,4 @@
-"""
-Django settings specific to course catalog ingestion
+"""Django settings specific to course catalog ingestion
 """
 from open_discussions.envs import get_bool, get_int, get_string
 

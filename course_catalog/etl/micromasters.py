@@ -1,8 +1,8 @@
 """MicroMasters course catalog ETL"""
 import copy
 
-from django.conf import settings
 import requests
+from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.constants import COMMON_HEADERS

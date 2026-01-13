@@ -1,21 +1,18 @@
+"""infinite_example views
 """
-infinite_example views
-"""
-from django.shortcuts import render
 from django.conf import settings
-from course_catalog.permissions import is_staff_list_editor
+from django.shortcuts import render
 
+from course_catalog.permissions import is_staff_list_editor
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions.permissions import is_admin_user
 
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
     """Render the example app"""
-
     user = request.user
 
     js_settings = {
-        "embedlyKey": settings.EMBEDLY_KEY,
         "ocw_next_base_url": settings.OCW_NEXT_BASE_URL,
         "search_page_size": settings.OPENSEARCH_DEFAULT_PAGE_SIZE,
         "user": {

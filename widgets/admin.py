@@ -1,10 +1,9 @@
 """Widget admin interface"""
 from django import forms
 from django.contrib import admin
-
 from django_json_widget.widgets import JSONEditorWidget
 
-from widgets.models import WidgetList, WidgetInstance
+from widgets.models import WidgetInstance, WidgetList
 from widgets.serializers.utils import get_widget_type_names
 
 

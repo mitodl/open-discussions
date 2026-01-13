@@ -2,16 +2,18 @@
 
 import logging
 from urllib.parse import urljoin
-from django.conf import settings
+
 import github
+import requests
 import yaml
 from bs4 import BeautifulSoup as bs
-import requests
-from requests.exceptions import HTTPError
 from dateutil.parser import parse
-from open_discussions.utils import now_in_utc
+from django.conf import settings
+from requests.exceptions import HTTPError
+
 from course_catalog.etl.utils import generate_unique_id
 from course_catalog.models import PodcastEpisode
+from open_discussions.utils import now_in_utc
 
 CONFIG_FILE_REPO = "mitodl/open-podcast-data"
 CONFIG_FILE_FOLDER = "podcasts"
@@ -21,13 +23,12 @@ log = logging.getLogger()
 
 
 def github_podcast_config_files():
-    """
-    Function that returns a list of pyGithub files with podcast config channel data
+    """Function that returns a list of pyGithub files with podcast config channel data
 
     Returns:
         A list of pyGithub contentFile objects
-    """
 
+    """
     if settings.GITHUB_ACCESS_TOKEN:
         github_client = github.Github(settings.GITHUB_ACCESS_TOKEN)
     else:
@@ -39,8 +40,7 @@ def github_podcast_config_files():
 
 
 def validate_podcast_config(podcast_config):
-    """
-    Validates a playlist config
+    """Validates a playlist config
 
     Args:
         podcast_config (dict): the podcast config object
@@ -48,6 +48,7 @@ def validate_podcast_config(podcast_config):
     Returns:
         list of str:
             list of errors or an empty list if no errors
+
     """
     errors = []
 
@@ -67,12 +68,12 @@ def validate_podcast_config(podcast_config):
 
 
 def get_podcast_configs():
-    """
-    Fetch podcast configs from github
+    """Fetch podcast configs from github
 
     Returns:
         list of dict:
             a list of configuration objects
+
     """
     podcast_configs = []
 
@@ -96,11 +97,11 @@ def get_podcast_configs():
 
 
 def extract():
-    """
-    Function for extracting podcast data
+    """Function for extracting podcast data
 
     Returns:
         A generator that returns tupes ((BeautifulSoup object, dict)) with the rss and config data for the podcast
+
     """
     configs = get_podcast_configs()
 
@@ -121,8 +122,7 @@ def extract():
 
 
 def transform_episode(rss_data, offered_by, topics, parent_image, podcast_id):
-    """
-    Transform a podcast episode into our normalized data
+    """Transform a podcast episode into our normalized data
 
     Args:
         rss_data (beautiful soup object): the extracted episode data
@@ -133,8 +133,8 @@ def transform_episode(rss_data, offered_by, topics, parent_image, podcast_id):
     Returns:
         dict:
             normalized podcast episode data
-    """
 
+    """
     episode_id = generate_unique_id(rss_data.guid.text)
     rss_data.guid.string = f"{podcast_id}: {rss_data.guid.text}"
 
@@ -160,16 +160,15 @@ def transform_episode(rss_data, offered_by, topics, parent_image, podcast_id):
 
 
 def transform(extracted_podcasts):
-    """
-    Transforms raw podcast data into normalized data structure
+    """Transforms raw podcast data into normalized data structure
 
     Args:
         extracted_podcast (iterable of tuple): the rss data and config data for the podcast
 
     Returns:
         generator that yields normalized podcast data
-    """
 
+    """
     for rss_data, config_data in extracted_podcasts:
         try:
             image = (
@@ -226,8 +225,7 @@ def transform(extracted_podcasts):
 
 
 def get_all_mit_podcasts_channel_rss():
-    """
-    Get channel information for the MIT aggregate podcast
+    """Get channel information for the MIT aggregate podcast
     Returns:
         Beautiful soup object of the rss for the  MIT aggregate podcast, excluding episodes
     """
@@ -238,11 +236,11 @@ def get_all_mit_podcasts_channel_rss():
         settings.SITE_BASE_URL, "/static/images/podcast_cover_art.png"
     )
 
-    rss = """<?xml version='1.0' encoding='UTF-8'?>
+    rss = f"""<?xml version='1.0' encoding='UTF-8'?>
     <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
         <channel>
             <title>MIT Open Aggregated Podcast Feed</title>
-            <link>{podcast_url}</link>
+            <link>{podcasts_url}</link>
             <language>en-us</language>
             <pubDate>{current_timestamp}</pubDate>
             <lastBuildDate>{current_timestamp}</lastBuildDate>
@@ -253,33 +251,27 @@ def get_all_mit_podcasts_channel_rss():
             <description>Episodes from podcasts from around MIT</description>
             <itunes:owner>
                 <itunes:name>MIT Open Learning</itunes:name>
-                <itunes:email>{email}</itunes:email>
+                <itunes:email>{settings.EMAIL_SUPPORT}</itunes:email>
             </itunes:owner>
             <image>
               <url>{cover_image_url}</url>
               <title>MIT Open Aggregated Podcast Feed</title>
-              <link>{podcast_url}</link>
+              <link>{podcasts_url}</link>
             </image>
             <itunes:explicit>no</itunes:explicit>
             <itunes:category text="Education"/></itunes:category>
         </channel>
-    </rss>""".format(
-        podcast_url=podcasts_url,
-        current_timestamp=current_timestamp,
-        email=settings.EMAIL_SUPPORT,
-        cover_image_url=cover_image_url,
-    )
+    </rss>"""
     return bs(rss, "xml")
 
 
 def generate_aggregate_podcast_rss():
-    """
-    Creates and saves an rss file for the MIT aggregate podcast
+    """Creates and saves an rss file for the MIT aggregate podcast
 
     Returns:
         Beautiful soup object of the rss for the  MIT aggregate podcast
-    """
 
+    """
     rss = get_all_mit_podcasts_channel_rss()
     episode_rss_list = (
         PodcastEpisode.objects.filter(published=True)

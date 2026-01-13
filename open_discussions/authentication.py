@@ -41,17 +41,14 @@ class IgnoreExpiredJwtAuthentication(JSONWebTokenAuthentication):
 
 
 class StatelessTokenAuthentication(BaseAuthentication):
-    """
-    Stateless authentication via a authorization token
+    """Stateless authentication via a authorization token
 
     NOTE: this is a highly trusting version of authentication and should only be
           used for certain things such as email unsubscribes
     """
 
     def authenticate(self, request):
-        """
-        Attempts to authenticate using a stateless token
-        """
+        """Attempts to authenticate using a stateless token"""
         from open_discussions.auth_utils import unsign_and_verify_username_from_token
 
         if "HTTP_AUTHORIZATION" in request.META:
@@ -78,8 +75,7 @@ class StatelessTokenAuthentication(BaseAuthentication):
 
 
 class BearerAuthentication(TokenAuthentication):
-    """
-    Token based authentication overriding the OOTB keyword.
+    """Token based authentication overriding the OOTB keyword.
 
     Clients should authenticate by passing the token key in the 'Authorization'
     HTTP header, prepended with the string 'Bearer '.  For example:

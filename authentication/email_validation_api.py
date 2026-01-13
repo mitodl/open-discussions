@@ -1,23 +1,22 @@
 """Email validation APIs"""
 
-from contextlib import contextmanager
-from csv import DictWriter
-from dataclasses import dataclass, field
 import json
 import logging
 import os
 import tempfile
 import typing
+from contextlib import contextmanager
+from csv import DictWriter
+from dataclasses import dataclass, field
 from urllib.parse import urljoin
 from zipfile import ZipFile
 
+import requests
 from anymail.utils import get_anymail_setting
 from django.db import transaction
-import requests
 
 from authentication.models import EmailValidation
 from open_discussions.utils import chunks
-
 
 log = logging.getLogger()
 
@@ -52,14 +51,14 @@ class CsvBatchFile:
 
 @contextmanager
 def csv_batch_file(name: str):
-    """
-    Get a temporary file and CSV writer
+    """Get a temporary file and CSV writer
 
     Args:
         name(str): the name of the operation/upload
 
     Returns:
         CsvBatchFile: the batch and associated state and files
+
     """
     with tempfile.NamedTemporaryFile(
         prefix=name, suffix=".csv", mode="w", delete=False
@@ -76,11 +75,8 @@ def get_api_key():
 
 
 def send_to_mailgun(csv_batch):
-    """
-    Send the CSV file to mailgun
-
-    """
-    with open(csv_batch.file.name, "r") as csv_file:
+    """Send the CSV file to mailgun"""
+    with open(csv_batch.file.name) as csv_file:
         # send the temporary file up to mailgun
         resp = requests.post(
             urljoin(VALIDATION_API_URL, csv_batch.name),
@@ -97,10 +93,7 @@ def batch_validation_csv_files(
     *,
     upload_batch_size: int,
 ):
-    """
-    Yields CSV files to upload to mailgun
-    """
-
+    """Yields CSV files to upload to mailgun"""
     # create the iterator here so it can be reused across while loop steps
     user_chunks_iter = chunks(users.only("email"), chunk_size=1000)
 
@@ -146,9 +139,7 @@ def start_user_email_validation(
     *,
     upload_batch_size: int,
 ):
-    """
-    Start the bulk verification of users' email addresses.
-    """
+    """Start the bulk verification of users' email addresses."""
     for csv_batch in batch_validation_csv_files(
         users,
         list_name_base,
@@ -192,7 +183,7 @@ def unzip_result_file(zip_filename: str, temp_dir: str):
 
 def process_result_file(path: str):
     """Process a results JSON file"""
-    with open(path, "r") as f:
+    with open(path) as f:
         results = json.loads(f.read())
 
     log.info("Processing %s results from %s", len(results), path)

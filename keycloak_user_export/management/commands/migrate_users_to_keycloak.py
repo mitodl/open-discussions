@@ -1,11 +1,11 @@
-from urllib.parse import urljoin
 import sys
+from urllib.parse import urljoin
 
+import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models import Q
 from django.core.management import BaseCommand, CommandError
-import requests
+from django.db.models import Q
 
 from keycloak_user_export.models import UserExportToKeycloak
 
@@ -13,8 +13,7 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    """
-    Creates Keycloak user records for all Django user records which have no associated
+    """Creates Keycloak user records for all Django user records which have no associated
     social-auth record for the "ol-oidc" provider.  The Keycloak user
     record is populated with the Django user's first_name, last_name, and email.
 
@@ -57,8 +56,7 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        """parse arguments"""
-
+        """Parse arguments"""
         # pylint: disable=expression-not-assigned
         parser.add_argument(
             "--verbose",
@@ -104,8 +102,7 @@ class Command(BaseCommand):
         client_id: str,
         client_secret: str,
     ):
-        """
-        Creates a new access token for a Keycloak realm administrator for use with the admin-cli client.
+        """Creates a new access token for a Keycloak realm administrator for use with the admin-cli client.
 
         Args:
             session (requests.Session): The requests session to use and update
@@ -142,8 +139,7 @@ class Command(BaseCommand):
         )
 
     def _generate_keycloak_user_payload(self, user, keycloak_group_path):
-        """
-        Returns a dictionary formatted as the expected user representation for the
+        """Returns a dictionary formatted as the expected user representation for the
         Keycloak partialImport Admin REST API endpoint.
 
         Args:
@@ -152,6 +148,7 @@ class Command(BaseCommand):
 
         Returns:
             dict: user representation for use with the Keycloak partialImport Admin REST API endpoint.
+
         """
         user_keycloak_payload = {
             "createdTimestamp": user.date_joined.timestamp() * 1000,
@@ -176,13 +173,13 @@ class Command(BaseCommand):
         return user_keycloak_payload
 
     def _verify_environment_variables_configured(self):
-        """
-        Verify that KEYCLOAK_BASE_URL and KEYCLOAK_REALM_NAME are configured as environment
+        """Verify that KEYCLOAK_BASE_URL and KEYCLOAK_REALM_NAME are configured as environment
         variables.
 
         Raises:
             CommandError: KEYCLOAK_BASE_URL must be defined as an environment variable.
             CommandError: KEYCLOAK_REALM_NAME must be defined as an environment variable.
+
         """
         if getattr(settings, "KEYCLOAK_BASE_URL", None) is None:
             raise CommandError(
