@@ -1,25 +1,23 @@
 """Factories for making test data"""
 import factory
+import pytz
 from factory import Faker, SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
-import pytz
-import base36
 
-from open_discussions.factories import UserFactory
 from notifications.models import (
-    NotificationSettings,
-    EmailNotification,
-    PostEvent,
     FREQUENCIES,
-    FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
-    FREQUENCY_WEEKLY,
+    FREQUENCY_IMMEDIATE,
     FREQUENCY_NEVER,
-    NOTIFICATION_TYPES,
-    NOTIFICATION_TYPE_FRONTPAGE,
+    FREQUENCY_WEEKLY,
     NOTIFICATION_TYPE_COMMENTS,
+    NOTIFICATION_TYPE_FRONTPAGE,
+    NOTIFICATION_TYPES,
+    EmailNotification,
+    NotificationSettings,
 )
+from open_discussions.factories import UserFactory
 
 
 class NotificationSettingsFactory(DjangoModelFactory):
@@ -27,7 +25,6 @@ class NotificationSettingsFactory(DjangoModelFactory):
 
     user = SubFactory(UserFactory)
     notification_type = FuzzyChoice(NOTIFICATION_TYPES)
-    channel = None
 
     via_app = Faker("boolean")
     via_email = Faker("boolean")
@@ -68,14 +65,3 @@ class EmailNotificationFactory(DjangoModelFactory):
             sent_at=Faker("past_datetime", tzinfo=pytz.utc),
         )
         sending = factory.Trait(state=EmailNotification.STATE_SENDING)
-
-
-class PostEventFactory(DjangoModelFactory):
-    """Factory for PostEvent"""
-
-    user = SubFactory(UserFactory)
-    post_id = factory.Sequence(base36.dumps)
-    email_notification = SubFactory(EmailNotificationFactory)
-
-    class Meta:
-        model = PostEvent

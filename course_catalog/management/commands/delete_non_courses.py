@@ -1,8 +1,8 @@
 """Management command for deleting non-course files from S3"""
 from django.core.management import BaseCommand
 
-from course_catalog.constants import NON_COURSE_DIRECTORIES
 from course_catalog.api import get_ocw_learning_course_bucket
+from course_catalog.constants import NON_COURSE_DIRECTORIES
 
 
 class Command(BaseCommand):

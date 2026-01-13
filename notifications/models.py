@@ -1,10 +1,8 @@
 """Notification models"""
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
 from django.db.models.constraints import UniqueConstraint
 
-from channels.models import Base36IntegerField, Channel
 from open_discussions.models import TimestampedModel
 
 NOTIFICATION_TYPE_FRONTPAGE = "frontpage"
@@ -57,10 +55,6 @@ class NotificationSettings(TimestampedModel):
         max_length=10, choices=FREQUENCY_CHOICES, blank=False
     )
 
-    channel = models.ForeignKey(
-        Channel, on_delete=models.CASCADE, default=None, blank=True, null=True
-    )
-
     @classmethod
     def frontpage_settings(cls):
         """Returns a QuerySet filtered to frontpage notification settings"""
@@ -89,13 +83,8 @@ class NotificationSettings(TimestampedModel):
     class Meta:
         constraints = [
             UniqueConstraint(
-                fields=["user", "notification_type", "channel"],
-                name="unique_with_channel",
-            ),
-            UniqueConstraint(
                 fields=["user", "notification_type"],
-                condition=Q(channel=None),
-                name="unique_without_channel",
+                name="unique_user_notification_type",
             ),
         ]
 
@@ -103,8 +92,7 @@ class NotificationSettings(TimestampedModel):
 
 
 class NotificationBase(TimestampedModel):
-    """
-    Abstract base model for notifications
+    """Abstract base model for notifications
 
     The intent here is to keep a core base behavior that is simple, but allow
     specific delivery mechanisms to add their own fields by having them be separate tables
@@ -145,30 +133,3 @@ class EmailNotification(NotificationBase):
         index_together = (
             ("state", "updated_on"),
         ) + NotificationBase.Meta.index_together
-
-
-class CommentEvent(TimestampedModel):
-    """Represents a new comment on a subscribed object"""
-
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    post_id = Base36IntegerField()
-    comment_id = Base36IntegerField(null=True)
-    email_notification = models.ForeignKey(
-        EmailNotification, on_delete=models.CASCADE, null=True
-    )
-
-    class Meta:
-        unique_together = (("user", "post_id", "comment_id"),)
-
-
-class PostEvent(TimestampedModel):
-    """Represents a new post in a chennel where the moderators want to see post notifications"""
-
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    post_id = Base36IntegerField()
-    email_notification = models.ForeignKey(
-        EmailNotification, on_delete=models.CASCADE, null=True
-    )
-
-    class Meta:
-        unique_together = (("user", "post_id"),)

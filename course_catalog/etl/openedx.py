@@ -1,17 +1,16 @@
+"""ETL extract and transformations for openedx
 """
-ETL extract and transformations for openedx
-"""
-from collections import namedtuple
-from dateutil.parser import parse
 import logging
+from collections import namedtuple
 
 import pytz
 import requests
+from dateutil.parser import parse
 from toolz import compose
 
 from course_catalog.etl.constants import COMMON_HEADERS
-from course_catalog.utils import get_year_and_semester, semester_year_to_date
 from course_catalog.etl.utils import extract_valid_department_from_id
+from course_catalog.utils import get_year_and_semester, semester_year_to_date
 
 OpenEdxConfiguration = namedtuple(
     "OpenEdxConfiguration",
@@ -34,14 +33,14 @@ log = logging.getLogger()
 
 
 def _get_access_token(config):
-    """
-    Get an access token for edx
+    """Get an access token for edx
 
     Args:
         config (OpenEdxConfiguration): configuration for the openedx backend
 
     Returns:
         str: the access token
+
     """
     payload = {
         "grant_type": "client_credentials",
@@ -58,8 +57,7 @@ def _get_access_token(config):
 
 
 def _get_openedx_catalog_page(url, access_token):
-    """
-    Fetch a page of OpenEdx catalog data
+    """Fetch a page of OpenEdx catalog data
 
     Args:
         url (str): the url to fetch data from
@@ -67,6 +65,7 @@ def _get_openedx_catalog_page(url, access_token):
 
     Returns:
         tuple(list of dict, str or None): a tuple with the next set of courses and the url to the next page of results, if any
+
     """
     response = requests.get(
         url, headers={**COMMON_HEADERS, "Authorization": f"JWT {access_token}"}
@@ -79,21 +78,20 @@ def _get_openedx_catalog_page(url, access_token):
 
 
 def _parse_openedx_datetime(datetime_str):
-    """
-    Parses an OpenEdx datetime string
+    """Parses an OpenEdx datetime string
 
     Args:
         datetime_str (str): the datetime as a string
 
     Returns:
         str: the parsed datetime
+
     """
     return parse(datetime_str).astimezone(pytz.utc)
 
 
 def _get_course_marketing_url(config, course):
-    """
-    Get the url for a course if any
+    """Get the url for a course if any
 
     Args:
         config (OpenEdxConfiguration): configuration for the openedx backend
@@ -101,6 +99,7 @@ def _get_course_marketing_url(config, course):
 
     Returns:
         str: The url for the course if any
+
     """
     for course_run in course.get("course_runs", []):
         url = course_run.get("marketing_url", "")
@@ -110,8 +109,7 @@ def _get_course_marketing_url(config, course):
 
 
 def _is_course_or_run_deleted(title):
-    """
-    Returns True if '[delete]', 'delete ' (note the ending space character)
+    """Returns True if '[delete]', 'delete ' (note the ending space character)
     exists in a course's title or if the course title equals 'delete' for the
     purpose of skipping the course
 
@@ -134,14 +132,14 @@ def _is_course_or_run_deleted(title):
 
 
 def _filter_course(course):
-    """
-    Filter courses to onces that are valid to ingest
+    """Filter courses to onces that are valid to ingest
 
     Args:
         course (dict): the course data
 
     Returns:
         bool: True if the course should be ingested
+
     """
     return not _is_course_or_run_deleted(course.get("title")) and course.get(
         "course_runs", []
@@ -149,27 +147,27 @@ def _filter_course(course):
 
 
 def _filter_course_run(course_run):
-    """
-    Filter course runs to onces that are valid to ingest
+    """Filter course runs to onces that are valid to ingest
 
     Args:
         course_run (dict): the course run data
 
     Returns:
         bool: True if the course run should be ingested
+
     """
     return not _is_course_or_run_deleted(course_run.get("title"))
 
 
 def _transform_course_run(config, course_run, course_last_modified, marketing_url):
-    """
-    Transform a course run into the normalized data structure
+    """Transform a course run into the normalized data structure
 
     Args:
         config (OpenEdxConfiguration): configuration for the openedx backend
 
     Returns:
         dict: the tranformed course run data
+
     """
     year, semester = get_year_and_semester(course_run)
     course_run_last_modified = _parse_openedx_datetime(course_run.get("modified"))
@@ -221,8 +219,7 @@ def _transform_course_run(config, course_run, course_last_modified, marketing_ur
 
 
 def _transform_course(config, course):
-    """
-    Filter courses to onces that are valid to ingest
+    """Filter courses to onces that are valid to ingest
 
     Args:
         config (OpenEdxConfiguration): configuration for the openedx backend
@@ -230,6 +227,7 @@ def _transform_course(config, course):
 
     Returns:
         dict: the tranformed course data
+
     """
     last_modified = _parse_openedx_datetime(course.get("modified"))
     marketing_url = _get_course_marketing_url(config, course)
@@ -262,22 +260,22 @@ def _transform_course(config, course):
 
 
 def openedx_extract_transform_factory(get_config):
-    """
-    Factory for generating OpenEdx extract and transform functions based on the configuration
+    """Factory for generating OpenEdx extract and transform functions based on the configuration
 
     Args:
         get_config (callable): callable to get configuration for the openedx backend
 
     Returns:
         OpenEdxExtractTransform: the generated extract and transform functions
+
     """
 
     def extract():
-        """
-        Extract the OpenEdx catalog by walking all the pages
+        """Extract the OpenEdx catalog by walking all the pages
 
         Yields:
             dict: an object representing each course
+
         """
         config = get_config()
 
@@ -302,8 +300,7 @@ def openedx_extract_transform_factory(get_config):
             yield from courses
 
     def transform(courses):
-        """
-        Transforms the extracted openedx data into our normalized data structure
+        """Transforms the extracted openedx data into our normalized data structure
 
         Args:
             list of dict: the merged catalog responses

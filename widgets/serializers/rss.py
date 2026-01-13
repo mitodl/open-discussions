@@ -2,17 +2,17 @@
 import logging
 import time
 
+import feedparser
 from cache_memoize import cache_memoize
 from django.conf import settings
-import feedparser
 from rest_framework.serializers import ValidationError
 
 from open_discussions.constants import ISOFORMAT
+from widgets.serializers.react_fields import ReactIntegerField, ReactURLField
 from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
 )
-from widgets.serializers.react_fields import ReactURLField, ReactIntegerField
 
 MAX_FEED_ITEMS = 10
 
@@ -30,14 +30,14 @@ class RssFeedWidgetConfigSerializer(WidgetConfigSerializer):
 
 @cache_memoize(settings.WIDGETS_RSS_CACHE_TTL, cache_alias="external_assets")
 def _fetch_rss(url):
-    """
-    Fetches the RSS feed data
+    """Fetches the RSS feed data
 
     Args:
         url (str): the RSS feed url to fetch
 
     Returns:
         feedparser.FeedParserDict: rss feed data
+
     """
     # NOTE: if you change what this function returns you need to ensure caches are evicted
     #       across all our environments, ideally in an automated way because cache_memoize

@@ -32,7 +32,7 @@ def test_sync_edx_course_files(
     s3_prefix,
     published,
 ):  # pylint: disable=too-many-arguments,too-many-locals
-    """sync edx courses from a tarball stored in S3"""
+    """Sync edx courses from a tarball stored in S3"""
     mock_load_content_files = mocker.patch(
         "course_catalog.etl.edx_shared.load_content_files",
         autospec=True,
@@ -86,7 +86,7 @@ def test_sync_edx_course_files(
 def test_sync_edx_course_files_invalid_tarfile(
     mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
 ):
-    """an invalid mitxonline tarball should be skipped"""
+    """An invalid mitxonline tarball should be skipped"""
     run = LearningResourceRunFactory.create(
         platform=platform,
         content_type=ContentType.objects.get_for_model(Course),

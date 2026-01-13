@@ -1,49 +1,42 @@
-"""Notifier for new posts for moderators"""
-from django.db import transaction
-
+"""Notifier for moderator posts (deprecated - discussions removed)"""
 from notifications.notifiers.email import EmailNotifier
-from notifications.models import NOTIFICATION_TYPE_MODERATOR, PostEvent
-from notifications.utils import praw_error_to_cancelled
-from channels import api
-from channels.serializers.posts import PostSerializer
 
 
 class ModeratorPostsNotifier(EmailNotifier):
-    """Notifier for posts for moderators"""
+    """Notifier for moderator post emails (deprecated - discussions removed)"""
 
-    def __init__(self, notification_settings):
-        super().__init__(NOTIFICATION_TYPE_MODERATOR, notification_settings)
-
-    @praw_error_to_cancelled()
-    def _get_notification_data(
-        self, current_notification, last_notification
-    ):  # pylint: disable=unused-argument
-        """
-        Gets the data for this notification
-
-        Args:
-            current_notification (NotificationBase): current notification we're sending for
-            last_notification (NotificationBase): last notification that was triggered for this NotificationSettings
-        """
-        ctx = {"current_user": self.user}
-        event = PostEvent.objects.get(email_notification=current_notification)
-        api_client = api.Api(self.user)
-        post = api_client.get_post(event.post_id)
-        return {"post": PostSerializer(post, context=ctx).data, "moderator_email": True}
-
-    def create_moderator_post_event(self, user, post_id):
-        """
-        Creates a new PostEvent
-
-        Args:
-            user (User): the moderator who should be notified
-            post_id (str): the base36 id of the new post
+    def should_send_notification(self):
+        """Returns False - moderator notifications disabled
 
         Returns:
-            CommentEvent: the created event
-        """
-        kwargs = {}
+            bool: False
 
-        with transaction.atomic():
-            kwargs["email_notification"] = self._create_notification()
-            return PostEvent.objects.create(user=user, post_id=post_id, **kwargs)
+        """
+        return False
+
+    def get_base_context(self):
+        """Get the template context for the moderator notification
+
+        Returns:
+            dict: empty dict
+
+        """
+        return {}
+
+    def get_template_name(self):
+        """Get the template name for the moderator notification
+
+        Returns:
+            str: template name
+
+        """
+        return "moderator_post_email"
+
+    def create_moderator_post_event(self, user, post_id):
+        """Creates a moderator post event (deprecated - no-op)
+
+        Args:
+            user (User): the user
+            post_id (str): base36 post id
+
+        """

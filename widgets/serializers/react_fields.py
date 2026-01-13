@@ -18,14 +18,14 @@ class ReactField:
 
     def _get_input_type(self):
         """Returns the field's input type"""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get_field_spec(self):
-        """
-        Returns the default field specs for a field
+        """Returns the default field specs for a field
 
         Returns:
             dict: representing the field spec
+
         """
         return {
             "field_name": self.field_name,
@@ -110,7 +110,7 @@ class ReactCheckboxField(serializers.BooleanField, ReactField):
     """ReactField extension for storing a boolean"""
 
     def _get_input_type(self):
-        """return the input type"""
+        """Return the input type"""
         return "checkbox"
 
 

@@ -1,8 +1,7 @@
 """Interactions models"""
-from django.db import models
-
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
 
 from open_discussions.utils import now_in_utc
 

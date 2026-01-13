@@ -13,38 +13,30 @@ from open_discussions.factories import UserFactory
 @pytest.fixture
 def user(db, use_betamax, request):
     """Create a user"""
-    if use_betamax:
-        return request.getfixturevalue("reddit_user")
     return UserFactory.create()
 
 
 @pytest.fixture
 def staff_user(db, use_betamax, request):
     """Create a staff user"""
-    if use_betamax:
-        request.getfixturevalue("configure_betamax")
-        return request.getfixturevalue("reddit_staff_user")
     return UserFactory.create(is_staff=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 def index_user(db, use_betamax, request):
     """Create a user to be used for indexing"""
-    if use_betamax:
-        request.getfixturevalue("configure_betamax")
-        return request.getfixturevalue("reddit_index_user")
     user = UserFactory.create(is_staff=True)
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def logged_in_user(client, user):
     """Log the user in and yield the user object"""
     client.force_login(user)
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def logged_in_profile(client):
     """Add a Profile and logged-in User"""
     user = UserFactory.create(username="george")
@@ -66,9 +58,7 @@ def jwt_token(db, user, client, rf, settings):
 
 @pytest.fixture
 def client(db):
-    """
-    Similar to the builtin client but this provides the DRF client instead of the Django test client.
-    """
+    """Similar to the builtin client but this provides the DRF client instead of the Django test client."""
     return APIClient()
 
 

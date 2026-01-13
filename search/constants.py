@@ -1,11 +1,8 @@
-""" Constants for search """
+"""Constants for search"""
 from opensearchpy.exceptions import ConnectionError as ESConnectionError
-from praw.exceptions import PRAWException
-from prawcore.exceptions import PrawcoreException
 from urllib3.exceptions import TimeoutError as UrlTimeoutError
 
-from channels.constants import COMMENT_TYPE, POST_TYPE
-
+# Local definitions for removed discussion types
 ALIAS_ALL_INDICES = "all"
 PROFILE_TYPE = "profile"
 COURSE_TYPE = "course"
@@ -31,8 +28,6 @@ LEARNING_RESOURCE_TYPES = (
 )
 
 VALID_OBJECT_TYPES = (
-    POST_TYPE,
-    COMMENT_TYPE,
     PROFILE_TYPE,
     COURSE_TYPE,
     PROGRAM_TYPE,
@@ -194,31 +189,9 @@ BASE_OBJECT_TYPE = {
 PROFILE_OBJECT_TYPE = {
     **BASE_OBJECT_TYPE,
     "author_bio": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "author_channel_membership": {"type": "keyword"},
-    "author_channel_join_data": {
-        "type": "nested",
-        "properties": {"name": {"type": "keyword"}, "joined": {"type": "date"}},
-    },
     "author_avatar_medium": {"type": "keyword"},
     "suggest_field1": {"type": "alias", "path": "author_name.trigram"},
     "suggest_field2": {"type": "alias", "path": "author_bio.trigram"},
-}
-
-CONTENT_OBJECT_TYPE = {
-    **BASE_OBJECT_TYPE,
-    "channel_name": {"type": "keyword"},
-    "channel_title": ENGLISH_TEXT_FIELD,
-    "channel_type": {"type": "keyword"},
-    "text": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "score": {"type": "long"},
-    "post_id": {"type": "keyword"},
-    "post_title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "post_slug": {"type": "keyword"},
-    "created": {"type": "date"},
-    "deleted": {"type": "boolean"},
-    "removed": {"type": "boolean"},
-    "suggest_field1": {"type": "alias", "path": "post_title.trigram"},
-    "suggest_field2": {"type": "alias", "path": "text.trigram"},
 }
 
 
@@ -364,20 +337,6 @@ PODCAST_EPISODE_OBJECT_TYPE = {
 }
 
 MAPPING = {
-    POST_TYPE: {
-        **CONTENT_OBJECT_TYPE,
-        "post_link_url": {"type": "keyword"},
-        "post_link_thumbnail": {"type": "keyword"},
-        "num_comments": {"type": "long"},
-        "plain_text": ENGLISH_TEXT_FIELD,
-        "post_type": {"type": "keyword"},
-    },
-    COMMENT_TYPE: {
-        **CONTENT_OBJECT_TYPE,
-        "comment_id": {"type": "keyword"},
-        "parent_comment_id": {"type": "keyword"},
-        "parent_post_removed": {"type": "boolean"},
-    },
     PROFILE_TYPE: PROFILE_OBJECT_TYPE,
     COURSE_TYPE: COURSE_OBJECT_TYPE,
     PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
@@ -390,4 +349,3 @@ MAPPING = {
 }
 
 SEARCH_CONN_EXCEPTIONS = (ESConnectionError, UrlTimeoutError)
-REDDIT_EXCEPTIONS = (PrawcoreException, PRAWException)

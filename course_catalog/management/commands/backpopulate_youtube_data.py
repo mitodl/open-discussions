@@ -1,13 +1,14 @@
 """Management command for populating youtube course data"""
 from datetime import datetime
-from django.core.management import BaseCommand
+
 import pytz
+from django.core.management import BaseCommand
 
 from course_catalog.constants import PlatformType
 from course_catalog.models import Video
 from course_catalog.tasks import get_youtube_data, get_youtube_transcripts
-from open_discussions.utils import now_in_utc
 from open_discussions.constants import ISOFORMAT
+from open_discussions.utils import now_in_utc
 from search.search_index_helpers import deindex_video
 
 

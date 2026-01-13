@@ -18,7 +18,7 @@ from open_discussions.factories import UserFactory
 # pylint:disable=redefined-outer-name,unused-argument
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_staff_list_index(mocker):
     """Mocks index updating functions for staff lists"""
     return SimpleNamespace(

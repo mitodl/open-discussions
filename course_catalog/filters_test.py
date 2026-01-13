@@ -9,7 +9,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_course_filter_micromasters():
-    """test that the offered_by filter works"""
+    """Test that the offered_by filter works"""
     mm = LearningResourceOfferorFactory.create(is_micromasters=True)
     mitx = LearningResourceOfferorFactory.create(is_mitx=True)
 
@@ -27,7 +27,6 @@ def test_course_filter_micromasters():
 
 def test_course_filter_audience():
     """Test that the audience filter works"""
-
     professional_course = CourseFactory.create(platform=PlatformType.xpro.value)
     open_course = CourseFactory.create(platform=PlatformType.mitxonline.value)
 

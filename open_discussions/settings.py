@@ -1,6 +1,4 @@
-"""
-Django settings for open_discussions.
-
+"""Django settings for open_discussions.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.10/topics/settings/
@@ -32,7 +30,7 @@ from open_discussions.settings_celery import *
 from open_discussions.settings_course_etl import *
 from open_discussions.settings_spectacular import open_spectacular_settings
 
-VERSION = "0.235.0"
+VERSION = "0.236.0"
 
 log = logging.getLogger()
 
@@ -118,17 +116,15 @@ INSTALLED_APPS = (
     "open_discussions",
     "authentication",
     "infinite_example",
-    "channels",
-    "channels_fields",
     "profiles",
     "mail",
     "notifications",
+    "embedly",
     "search",
     "widgets",
     "course_catalog",
     "interactions",
     "moira_lists",
-    "discussions",
     "keycloak_user_export",
 )
 
@@ -142,7 +138,6 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "authentication.middleware.BlockedIPMiddleware",
-    "open_discussions.middleware.channel_api.ChannelApiMiddleware",
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 )
@@ -229,9 +224,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 CLOUDFRONT_DIST = get_string("CLOUDFRONT_DIST", None)
 if CLOUDFRONT_DIST:
-    STATIC_URL = urljoin(
-        "https://{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST), STATIC_URL
-    )
+    STATIC_URL = urljoin(f"https://{CLOUDFRONT_DIST}.cloudfront.net", STATIC_URL)
 
 STATIC_ROOT = "staticfiles"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
@@ -521,8 +514,8 @@ LOGGING = {
             "format": (
                 "[%(asctime)s] %(levelname)s %(process)d [%(name)s] "
                 "%(filename)s:%(lineno)d - "
-                "[{hostname}] - %(message)s"
-            ).format(hostname=HOSTNAME),
+                f"[{HOSTNAME}] - %(message)s"
+            ),
             "datefmt": "%Y-%m-%d %H:%M:%S",
         }
     },
@@ -593,7 +586,7 @@ if OPEN_DISCUSSIONS_USE_S3 and (
 if OPEN_DISCUSSIONS_USE_S3:
     # Configure Django Storages to use Cloudfront distribution for S3 assets
     if CLOUDFRONT_DIST:
-        AWS_S3_CUSTOM_DOMAIN = "{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST)
+        AWS_S3_CUSTOM_DOMAIN = f"{CLOUDFRONT_DIST}.cloudfront.net"
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     AWS_DEFAULT_ACL = "public-read"
 
@@ -647,22 +640,6 @@ INDEXING_API_USERNAME = get_string("INDEXING_API_USERNAME", None)
 if not INDEXING_API_USERNAME:
     raise ImproperlyConfigured("Missing setting INDEXING_API_USERNAME")
 INDEXING_ERROR_RETRIES = get_int("INDEXING_ERROR_RETRIES", 1)
-
-# reddit-specific settings
-OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = get_string(
-    "OPEN_DISCUSSIONS_REDDIT_CLIENT_ID", None
-)
-OPEN_DISCUSSIONS_REDDIT_SECRET = get_string("OPEN_DISCUSSIONS_REDDIT_SECRET", None)
-OPEN_DISCUSSIONS_REDDIT_URL = get_string("OPEN_DISCUSSIONS_REDDIT_URL", "")
-OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = get_bool(
-    "OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL", True
-)
-OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN = get_string(
-    "OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN", "INSECURE"
-)
-OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT = get_int(
-    "OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT", 50
-)
 
 # JWT authentication settings
 OPEN_DISCUSSIONS_JWT_SECRET = get_string(
@@ -838,7 +815,7 @@ if DEBUG:
 
 
 def setup_x509():
-    """write the moira x509 certification & key to files"""
+    """Write the moira x509 certification & key to files"""
     from open_discussions.utils import write_x509_files
 
     write_x509_files()

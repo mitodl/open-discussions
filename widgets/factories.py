@@ -3,7 +3,7 @@ import factory
 from factory.django import DjangoModelFactory
 
 from open_discussions.factories import UserFactory
-from widgets.models import WidgetList, WidgetInstance
+from widgets.models import WidgetInstance, WidgetList
 
 
 class WidgetListFactory(DjangoModelFactory):

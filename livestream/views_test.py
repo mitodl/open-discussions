@@ -1,11 +1,11 @@
 """tests for the livestream views"""
+import pytest
 from django.urls import reverse
 from rest_framework import status
-import pytest
 
 
 def test_get_upcoming_events(client, user, mocker, settings):
-    """test that things work normally"""
+    """Test that things work normally"""
     settings.LIVESTREAM_ACCOUNT_ID = 3_234_234
     settings.LIVESTREAM_SECRET_KEY = "secret ^_^"
     client.force_login(user)
@@ -42,7 +42,7 @@ def test_get_upcoming_events(client, user, mocker, settings):
 def test_get_events_no_vars(
     client, user, mocker, settings, account_id, secret_key, should_get
 ):  # pylint: disable=too-many-arguments
-    """we should get a 503 if the settings aren't present"""
+    """We should get a 503 if the settings aren't present"""
     settings.LIVESTREAM_ACCOUNT_ID = account_id
     settings.LIVESTREAM_SECRET_KEY = secret_key
     client.force_login(user)

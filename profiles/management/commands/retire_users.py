@@ -1,22 +1,21 @@
 """Management command for retiring users"""
-from functools import reduce
 import operator
 import sys
+from functools import reduce
 
-from django.core.management import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management import BaseCommand
 from django.db.models import Q
 from tabulate import tabulate
 
 from search import search_index_helpers
-
 
 User = get_user_model()
 
 
 def spammer_bios():
     """Get the list of spammer bios"""
-    with open("profiles/management/commands/data/spammer_bios.txt", "r") as f:
+    with open("profiles/management/commands/data/spammer_bios.txt") as f:
         yield from f.read().splitlines()
 
 
@@ -39,7 +38,7 @@ class Command(BaseCommand):
 
     def retire_user(self, user):
         """Retire an individual user"""
-        self.stdout.write("Retiring user: {}".format(user))
+        self.stdout.write(f"Retiring user: {user}")
         self.stdout.write(
             "    Setting user inactive, clearing email, and setting unusable password"
         )
@@ -48,24 +47,18 @@ class Command(BaseCommand):
         user.set_unusable_password()
         user.save()
 
-        self.stdout.write(
-            "    Deleting {} social auths".format(user.social_auth.count())
-        )
+        self.stdout.write(f"    Deleting {user.social_auth.count()} social auths")
         user.social_auth.all().delete()
 
         self.stdout.write(
-            "    Deleting {} channel invitations".format(
-                user.received_invitations.count()
-            )
+            f"    Deleting {user.received_invitations.count()} channel invitations"
         )
         user.received_invitations.all().delete()
 
         search_index_helpers.deindex_profile(user)
 
         self.stdout.write(
-            "    Deleting {} post/comment subscriptions".format(
-                user.content_subscriptions.count()
-            )
+            f"    Deleting {user.content_subscriptions.count()} post/comment subscriptions"
         )
         user.content_subscriptions.all().delete()
 

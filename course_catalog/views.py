@@ -1,5 +1,4 @@
-"""
-course_catalog views
+"""course_catalog views
 """
 import logging
 import operator
@@ -87,9 +86,7 @@ log = logging.getLogger()
 
 @api_view(["GET"])
 def ocw_course_report(request):
-    """
-    Returns a JSON object reporting OCW course sync statistics
-    """
+    """Returns a JSON object reporting OCW course sync statistics"""
     ocw_courses = Course.objects.filter(
         platform=PlatformType.ocw.value,
         learning_resource_type=ResourceType.course.value,
@@ -115,24 +112,18 @@ def ocw_course_report(request):
 
 
 class DefaultPagination(LimitOffsetPagination):
-    """
-    Pagination class for course_catalog viewsets which gets default_limit and max_limit from settings
-    """
+    """Pagination class for course_catalog viewsets which gets default_limit and max_limit from settings"""
 
     default_limit = 10
     max_limit = 100
 
 
 class FavoriteViewMixin:
-    """
-    Mixin for viewsets with models that can be favorited
-    """
+    """Mixin for viewsets with models that can be favorited"""
 
     @action(methods=["POST"], detail=True)
     def favorite(self, request, pk=None):
-        """
-        Create a favorite item for this object
-        """
+        """Create a favorite item for this object"""
         obj = self.get_object()
         try:
             FavoriteItem.objects.create(user=request.user, item=obj)
@@ -142,9 +133,7 @@ class FavoriteViewMixin:
 
     @action(methods=["POST"], detail=True)
     def unfavorite(self, request, pk=None):
-        """
-        Delete a favorite item for this object
-        """
+        """Delete a favorite item for this object"""
         obj = self.get_object()
         favorite_item = FavoriteItem.objects.filter(
             user=request.user,
@@ -156,9 +145,7 @@ class FavoriteViewMixin:
 
 
 class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for Courses
-    """
+    """Viewset for Courses"""
 
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
@@ -203,18 +190,14 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
     @action(methods=["GET"], detail=False)
     def new(self, request):
-        """
-        Get new courses
-        """
+        """Get new courses"""
         page = self.paginate_queryset(self.get_queryset().order_by("-created_on"))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
     @action(methods=["GET"], detail=False)
     def upcoming(self, request):
-        """
-        Get upcoming courses
-        """
+        """Get upcoming courses"""
         page = self.paginate_queryset(
             self._get_base_queryset(runs__start_date__gt=timezone.now()).order_by(
                 "runs__start_date"
@@ -225,17 +208,14 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
     @action(methods=["GET"], detail=False)
     def featured(self, request):
-        """
-        Get featured courses
-        """
+        """Get featured courses"""
         page = self.paginate_queryset(self._get_base_queryset(featured=True))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
 
 class LargePagination(LimitOffsetPagination):
-    """
-    Pagination class for list views for when we have to
+    """Pagination class for list views for when we have to
     fetch all the results on the frontend :/
     """
 
@@ -244,9 +224,7 @@ class LargePagination(LimitOffsetPagination):
 
 
 class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for User Lists & Learning Paths
-    """
+    """Viewset for User Lists & Learning Paths"""
 
     serializer_class = UserListSerializer
     pagination_class = DefaultPagination
@@ -265,7 +243,6 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
 
     def list(self, request, *args, **kwargs):
         """Override default list to only get lists authored by user"""
-
         if request.user.is_anonymous:
             queryset = UserList.objects.none()
         elif self.request.query_params.get("public", False):
@@ -291,9 +268,7 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
 
 
 class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for User List Items
-    """
+    """Viewset for User List Items"""
 
     queryset = UserListItem.objects.select_related("content_type").order_by("position")
     serializer_class = UserListItemSerializer
@@ -321,9 +296,7 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
 
 
 class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for Staff Lists
-    """
+    """Viewset for Staff Lists"""
 
     serializer_class = StaffListSerializer
     pagination_class = DefaultPagination
@@ -342,7 +315,6 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
 
     def list(self, request, *args, **kwargs):
         """Get all stafflists for stafflist editors, public stafflists for all others"""
-
         if is_staff_list_editor(request) or is_admin_user(request):
             queryset = self.get_queryset()
         else:
@@ -366,9 +338,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
 class StaffListItemViewSet(
     NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin
 ):
-    """
-    Viewset for Staff List Items
-    """
+    """Viewset for Staff List Items"""
 
     queryset = StaffListItem.objects.select_related("content_type").order_by("position")
     serializer_class = StaffListItemSerializer
@@ -396,9 +366,7 @@ class StaffListItemViewSet(
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for Programs
-    """
+    """Viewset for Programs"""
 
     serializer_class = ProgramSerializer
     pagination_class = DefaultPagination
@@ -417,9 +385,7 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
 
 class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for Videos
-    """
+    """Viewset for Videos"""
 
     serializer_class = VideoSerializer
     pagination_class = DefaultPagination
@@ -438,9 +404,7 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
     @action(methods=["GET"], detail=False)
     def new(self, request):
-        """
-        Get newly published videos
-        """
+        """Get newly published videos"""
         page = self.paginate_queryset(
             self.get_queryset().filter(published=True).order_by("-last_modified")
         )
@@ -449,9 +413,7 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
 
 class FavoriteItemViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Viewset for favorites
-    """
+    """Viewset for favorites"""
 
     serializer_class = FavoriteItemSerializer
     pagination_class = LargePagination
@@ -463,9 +425,7 @@ class FavoriteItemViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TopicViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Viewset for topics
-    """
+    """Viewset for topics"""
 
     queryset = CourseTopic.objects.all()
     serializer_class = CourseTopicSerializer
@@ -475,9 +435,7 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
 
 @method_decorator(blocked_ip_exempt, name="dispatch")
 class WebhookOCWView(APIView):
-    """
-    Handle webhooks coming from the OCW bucket
-    """
+    """Handle webhooks coming from the OCW bucket"""
 
     permission_classes = ()
     authentication_classes = ()
@@ -517,9 +475,7 @@ class WebhookOCWView(APIView):
 
 @method_decorator(blocked_ip_exempt, name="dispatch")
 class WebhookOCWNextView(APIView):
-    """
-    Handle webhooks coming from the OCW Next bucket
-    """
+    """Handle webhooks coming from the OCW Next bucket"""
 
     permission_classes = ()
     authentication_classes = ()
@@ -589,9 +545,7 @@ class WebhookOCWNextView(APIView):
 
 
 class PodcastViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for Podcasts
-    """
+    """Viewset for Podcasts"""
 
     serializer_class = PodcastSerializer
     permission_classes = (AnonymousAccessReadonlyPermission & PodcastFeatureFlag,)
@@ -614,10 +568,7 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
 
 def shared_podcast_episode_query(user):
-    """
-    Shared query set for PodcastEpisodesViewSet and RecentPodcastEpisodesViewSet
-    """
-
+    """Shared query set for PodcastEpisodesViewSet and RecentPodcastEpisodesViewSet"""
     return (
         PodcastEpisode.objects.filter(published=True, podcast__published=True)
         .prefetch_related(
@@ -632,9 +583,7 @@ def shared_podcast_episode_query(user):
 
 
 class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for PodcastEpisodes
-    """
+    """Viewset for PodcastEpisodes"""
 
     serializer_class = PodcastEpisodeSerializer
     pagination_class = DefaultPagination
@@ -648,9 +597,7 @@ class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
 
 class RecentPodcastEpisodesViewSet(PodcastEpisodesViewSet):
-    """
-    Viewset for most recent PodcastEpisode for each Podcast
-    """
+    """Viewset for most recent PodcastEpisode for each Podcast"""
 
     def get_queryset(self):
         user = self.request.user
@@ -669,9 +616,7 @@ class RecentPodcastEpisodesViewSet(PodcastEpisodesViewSet):
 
 
 class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
-    """
-    Viewset for listing PodcastEpisodes for a given Podcast primary key
-    """
+    """Viewset for listing PodcastEpisodes for a given Podcast primary key"""
 
     serializer_class = PodcastEpisodeSerializer
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
@@ -693,10 +638,7 @@ class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
 
 @cache_page(60 * settings.RSS_FEED_CACHE_MINUTES)
 def podcast_rss_feed(request):
-    """
-    View to display the combined podcast rss file
-    """
-
+    """View to display the combined podcast rss file"""
     rss = generate_aggregate_podcast_rss()
     return HttpResponse(
         rss.prettify(), content_type="application/rss+xml; charset=utf-8"

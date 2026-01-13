@@ -1,5 +1,4 @@
-"""
-Admin site bindings for profiles
+"""Admin site bindings for profiles
 """
 
 from django.contrib import admin

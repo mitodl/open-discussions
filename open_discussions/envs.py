@@ -1,7 +1,7 @@
 """Functions reading and parsing environment variables"""
 import os
-
 from ast import literal_eval
+
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -10,8 +10,7 @@ class EnvironmentVariableParseException(ImproperlyConfigured):
 
 
 def get_string(name, default):
-    """
-    Get an environment variable as a string.
+    """Get an environment variable as a string.
 
     Args:
         name (str): An environment variable name
@@ -20,13 +19,13 @@ def get_string(name, default):
     Returns:
         str:
             The environment variable value, or the default
+
     """
     return os.environ.get(name, default)
 
 
 def get_bool(name, default):
-    """
-    Get an environment variable as a boolean.
+    """Get an environment variable as a boolean.
 
     Args:
         name (str): An environment variable name
@@ -35,6 +34,7 @@ def get_bool(name, default):
     Returns:
         bool:
             The environment variable value parsed as a bool
+
     """
     value = os.environ.get(name)
     if value is None:
@@ -43,19 +43,16 @@ def get_bool(name, default):
     parsed_value = value.lower()
     if parsed_value == "true":
         return True
-    elif parsed_value == "false":
+    if parsed_value == "false":
         return False
 
     raise EnvironmentVariableParseException(
-        "Expected value in {name}={value} to be a boolean".format(
-            name=name, value=value
-        )
+        f"Expected value in {name}={value} to be a boolean"
     )
 
 
 def get_int(name, default):
-    """
-    Get an environment variable as an int.
+    """Get an environment variable as an int.
 
     Args:
         name (str): An environment variable name
@@ -64,6 +61,7 @@ def get_int(name, default):
     Returns:
         int:
             The environment variable value parsed as an int
+
     """
     value = os.environ.get(name)
     if value is None:
@@ -73,17 +71,14 @@ def get_int(name, default):
         parsed_value = int(value)
     except ValueError as ex:
         raise EnvironmentVariableParseException(
-            "Expected value in {name}={value} to be an int".format(
-                name=name, value=value
-            )
+            f"Expected value in {name}={value} to be an int"
         ) from ex
 
     return parsed_value
 
 
 def get_any(name, default):
-    """
-    Get an environment variable as a bool, int, or a string.
+    """Get an environment variable as a bool, int, or a string.
 
     Args:
         name (str): An environment variable name
@@ -92,6 +87,7 @@ def get_any(name, default):
     Returns:
         any:
             The environment variable value parsed as a bool, int, or a string
+
     """
     try:
         return get_bool(name, default)
@@ -103,23 +99,23 @@ def get_any(name, default):
 
 
 def get_list_of_str(name, default):
-    """
-    Get an environment variable as a list of strings.
+    """Get an environment variable as a list of strings.
+
     Args:
         name (str): An environment variable name
         default (list): The default value to use if the environment variable doesn't exist.
+
     Returns:
         list of str:
             The environment variable value parsed as a list of strings
+
     """
     value = os.environ.get(name)
     if value is None:
         return default
 
     parse_exception = EnvironmentVariableParseException(
-        "Expected value in {name}={value} to be a list of str".format(
-            name=name, value=value
-        )
+        f"Expected value in {name}={value} to be a list of str"
     )
 
     try:
@@ -138,17 +134,17 @@ def get_list_of_str(name, default):
 
 
 def get_key(name, default):
-    """
-    Get an environment variable as a string representing a private or public key.
+    """Get an environment variable as a string representing a private or public key.
     The difference is that keys are automatically escaped and they need to be unescaped and
     encoded into bytestrings.
 
-     Args:
+    Args:
         name (str): An environment variable name
         default (str): The default value to use if the environment variable doesn't exist.
 
     Returns:
         bytes: The environment variable value, or the default as bytestring
+
     """
     value = get_string(name, default)
     if not isinstance(value, str):

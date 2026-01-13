@@ -1,24 +1,23 @@
 """Testing utils"""
 import abc
 import json
-from contextlib import contextmanager
 import traceback
+from contextlib import contextmanager
 from unittest.mock import Mock
 
-from django.http.response import HttpResponse
-
 import pytest
+from django.http.response import HttpResponse
 
 
 def any_instance_of(*classes):
-    """
-    Returns a type that evaluates __eq__ in isinstance terms
+    """Returns a type that evaluates __eq__ in isinstance terms
 
     Args:
         classes (list of types): variable list of types to ensure equality against
 
     Returns:
         AnyInstanceOf: dynamic class type with the desired equality
+
     """
 
     class AnyInstanceOf(abc.ABC):
@@ -53,16 +52,15 @@ def assert_not_raises():
 
 
 class MockResponse(HttpResponse):
-    """
-    Mocked HTTP response object that can be used as a stand-in for request.Response and
+    """Mocked HTTP response object that can be used as a stand-in for request.Response and
     django.http.response.HttpResponse objects
     """
 
     def __init__(self, content, status_code):
-        """
-        Args:
-            content (str): The response content
-            status_code (int): the response status code
+        """Args:
+        content (str): The response content
+        status_code (int): the response status code
+
         """
         self.status_code = status_code
         self.decoded_content = content
@@ -74,49 +72,48 @@ class MockResponse(HttpResponse):
 
 
 def drf_datetime(dt):
-    """
-    Returns a datetime formatted as a DRF DateTimeField formats it
+    """Returns a datetime formatted as a DRF DateTimeField formats it
 
     Args:
         dt(datetime): datetime to format
 
     Returns:
         str: ISO 8601 formatted datetime
+
     """
     return dt.isoformat().replace("+00:00", "Z")
 
 
 def _sort_values_for_testing(obj):
-    """
-    Sort an object recursively if possible to do so
+    """Sort an object recursively if possible to do so
 
     Args:
         obj (any): A dict, list, or some other JSON type
 
     Returns:
         any: A sorted version of the object passed in, or the same object if no sorting can be done
+
     """
     if isinstance(obj, dict):
         return {key: _sort_values_for_testing(value) for key, value in obj.items()}
-    elif isinstance(obj, list):
+    if isinstance(obj, list):
         items = [_sort_values_for_testing(value) for value in obj]
         # this will produce incorrect results since everything is converted to a string
         # for example [10, 9] will be sorted like that
         # but here we only care that the items are compared in a consistent way so tests pass
         return sorted(items, key=json.dumps)
-    else:
-        return obj
+    return obj
 
 
 def assert_json_equal(obj1, obj2, sort=False):
-    """
-    Asserts that two objects are equal after a round trip through JSON serialization/deserialization.
+    """Asserts that two objects are equal after a round trip through JSON serialization/deserialization.
     Particularly helpful when testing DRF serializers where you may get back OrderedDict and other such objects.
 
     Args:
         obj1 (object): the first object
         obj2 (object): the second object
         sort (bool): If true, sort items which are iterable before comparing
+
     """
     converted1 = json.loads(json.dumps(obj1))
     converted2 = json.loads(json.dumps(obj2))
@@ -127,8 +124,7 @@ def assert_json_equal(obj1, obj2, sort=False):
 
 
 class PickleableMock(Mock):
-    """
-    A Mock that can be passed to pickle.dumps()
+    """A Mock that can be passed to pickle.dumps()
 
     Source: https://github.com/testing-cabal/mock/issues/139#issuecomment-122128815
     """
