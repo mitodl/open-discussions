@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.236.0
+---------------
+
+- Feature/remove discussions phase 5 (#4415)
+
 Version 0.235.0 (Released December 15, 2025)
 ---------------
 
