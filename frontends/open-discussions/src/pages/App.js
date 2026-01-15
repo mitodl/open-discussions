@@ -31,6 +31,7 @@ import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import LearnRouter from "./LearnRouter"
 import PodcastFrontpage from "./PodcastFrontpage"
 
+import { NotFound } from "../components/ErrorPages"
 import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../components/Drawer"
@@ -312,6 +313,7 @@ class App extends React.Component<Props> {
             <PodcastFrontpage />
             <LearningResourceDrawer hideSimilarLearningResources />
           </Route>
+          <Route component={NotFound} />
         </div>
       </div>
     )
