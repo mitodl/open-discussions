@@ -313,7 +313,7 @@ class App extends React.Component<Props> {
             <PodcastFrontpage />
             <LearningResourceDrawer hideSimilarLearningResources />
           </Route>
-          <Route component={NotFound} />
+          <Route path="*" component={NotFound} />
         </div>
       </div>
     )
