@@ -26,7 +26,6 @@ const NotFoundWithShutdown = () => (
     <MetaTags>
       <meta name="robots" content="noindex,noarchive" />
     </MetaTags>
-    <ShutdownNotice />
     <Card>
       <div className="not-found">
         <div className="header">Page not found</div>
@@ -35,6 +34,7 @@ const NotFoundWithShutdown = () => (
         </div>
       </div>
     </Card>
+    <ShutdownNotice />
   </div>
 )
 

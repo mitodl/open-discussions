@@ -30,8 +30,8 @@ export class HomePage extends React.Component<Props> {
     return (
       <React.Fragment>
         <MetaTags canonicalLink={match?.url} />
-        <ShutdownNotice />
         <IntroCard />
+        <ShutdownNotice />
         <div className="home-content">
           <p>
             Welcome to MIT Open Learning. Use the search feature to find
