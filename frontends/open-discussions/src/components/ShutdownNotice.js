@@ -11,9 +11,9 @@ export default function ShutdownNotice() {
   return (
     <Card className="shutdown-notice">
       <div className="shutdown-message">
-        <h2>Service Shutdown Notice</h2>
+        <h2>This Site Is Closing</h2>
         <p>
-          This site is being shut down. The discussion channels that were
+          MIT open is shutting down. The discussion channels that were
           previously available on open.mit.edu are no longer in service.
         </p>
         <p>

@@ -6,7 +6,6 @@ import R from "ramda"
 
 import MetaTags from "../components/MetaTags"
 
-import ShutdownNotice from "../components/ShutdownNotice"
 import NewCoursesWidget from "../components/NewCoursesWidget"
 import LiveStream from "../components/LiveStream"
 import IntroCard from "../components/IntroCard"
@@ -31,7 +30,6 @@ export class HomePage extends React.Component<Props> {
       <React.Fragment>
         <MetaTags canonicalLink={match?.url} />
         <IntroCard />
-        <ShutdownNotice />
         <div className="home-content">
           <p>
             Welcome to MIT Open Learning. Use the search feature to find

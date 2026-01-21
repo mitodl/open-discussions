@@ -2,7 +2,6 @@ import React from "react"
 
 import Card from "./Card"
 import MetaTags from "./MetaTags"
-import ShutdownNotice from "./ShutdownNotice"
 
 const ErrorPage = (header: string, detail: string, noIndex: boolean) => () =>
   (
@@ -21,7 +20,7 @@ const ErrorPage = (header: string, detail: string, noIndex: boolean) => () =>
     </div>
   )
 
-const NotFoundWithShutdown = () => (
+const NotFoundPage = () => (
   <div>
     <MetaTags>
       <meta name="robots" content="noindex,noarchive" />
@@ -34,11 +33,10 @@ const NotFoundWithShutdown = () => (
         </div>
       </div>
     </Card>
-    <ShutdownNotice />
   </div>
 )
 
-export const NotFound = NotFoundWithShutdown
+export const NotFound = NotFoundPage
 
 export const NotAuthorized = ErrorPage(
   "Stop! Who goes there?",
