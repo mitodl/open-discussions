@@ -191,7 +191,7 @@ class App extends React.Component<Props> {
 
     // Check if we should show the shutdown notice
     // Don't show on podcasts or search pages
-    const shouldShowShutdownNotice = 
+    const shouldShowShutdownNotice =
       !location.pathname.startsWith(`${match.url}podcasts`) &&
       !location.pathname.startsWith(`${match.url}search`)
 
