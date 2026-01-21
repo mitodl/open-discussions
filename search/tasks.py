@@ -10,10 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from opensearchpy.exceptions import NotFoundError, RequestError
-from prawcore.exceptions import NotFound
 
-from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
-from channels.models import Comment, Post
 from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PrivacyLevel
 from course_catalog.models import (
     ContentFile,
@@ -26,9 +23,8 @@ from course_catalog.models import (
     Video,
 )
 from course_catalog.utils import load_course_blocklist
-from embedly.api import get_embedly_content
 from open_discussions.celery import app
-from open_discussions.utils import chunks, html_to_plain_text, merge_strings
+from open_discussions.utils import chunks, merge_strings
 from profiles.models import Profile
 from search import indexing_api as api
 from search.api import gen_content_file_id, gen_course_id
@@ -38,7 +34,6 @@ from search.constants import (
     PODCAST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
-    REDDIT_EXCEPTIONS,
     RESOURCE_FILE_TYPE,
     SEARCH_CONN_EXCEPTIONS,
     STAFF_LIST_TYPE,
@@ -75,21 +70,15 @@ PARTIAL_UPDATE_TASK_SETTINGS = dict(
 
 @contextmanager
 def wrap_retry_exception(*exception_classes):
-    """
-    Wrap exceptions with RetryException so Celery can use it for autoretry
+    """Wrap exceptions with RetryException so Celery can use it for autoretry
 
     Args:
         *exception_classes (tuple of type): Exception classes which should become RetryException
+
     """
     try:
         yield
     except Exception as ex:  # pylint:disable=bare-except
-        if isinstance(ex, NotFound):
-            # No corresponding reddit post/comment found for django model object.  Log error and continue indexing.
-            log.exception(
-                "No corresponding reddit post/comment found for django model object"
-            )
-            return
         # Celery is confused by exceptions which don't take a string as an argument, so we need to wrap before raising
         if isinstance(ex, exception_classes):
             raise RetryException(str(ex)) from ex
@@ -120,13 +109,13 @@ def upsert_profile(profile_id):
 
 
 def _update_fields_by_username(username, field_dict, object_types):
-    """
-    Runs a task to update a field value for all docs associated with a given user.
+    """Runs a task to update a field value for all docs associated with a given user.
 
     Args:
         username (str): The username to query by
         field_dict (dict): Dictionary of fields to update
         object_types (list of str): The object types to update
+
     """
     api.update_field_values_by_query(
         query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
@@ -136,57 +125,14 @@ def _update_fields_by_username(username, field_dict, object_types):
 
 
 @app.task
-def update_author_posts_comments(profile_id):
-    """Update author name and avatar in all associated post and comment docs"""
-    profile_obj = Profile.objects.get(id=profile_id)
-    profile_data = OSProfileSerializer().serialize(profile_obj)
-    update_keys = {
-        key: value
-        for key, value in profile_data.items()
-        if key in ["author_name", "author_headline", "author_avatar_small"]
-    }
-    _update_fields_by_username(
-        profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]
-    )
-
-
-@app.task
-def update_link_post_with_preview(doc_id, data):
-    """
-    Task that fetches Embedly preview data for a link post and updates the corresponding
-    database and OpenSearch objects
+def update_author_posts_comments(profile_id):  # pylint: disable=unused-argument
+    """Deprecated - Update author name and avatar in all associated post and comment docs.
+    Posts and comments removed - this is now a no-op.
 
     Args:
-        doc_id (str): ES document ID
-        data (dict): Dict of serialized post data produced by OSPostSerializer
-    """
-    if not data["post_link_url"]:
-        return None
-    response = get_embedly_content(data["post_link_url"]).json()
-    # Parse the embedly response to produce the link preview text
-    preview_text = (
-        html_to_plain_text(response["content"]).strip()
-        if response.get("content")
-        else response["description"]
-    )
-    # Update the post in the database
-    post = Post.objects.get(post_id=data["post_id"])
-    post.preview_text = preview_text
-    post.save()
-    # Update the post in ES
-    return api.update_post(doc_id, post)
+        profile_id: Profile ID (deprecated)
 
-
-@app.task
-def create_post_document(doc_id, data):
     """
-    Task that makes a request to create an ES document for a post, and if it's a link-type
-    post, updates the newly-created post with preview text
-    """
-    tasks = [create_document.si(doc_id, data)]
-    if data.get("post_type") == LINK_TYPE_LINK and data.get("post_link_url"):
-        tasks.append(update_link_post_with_preview.si(doc_id, data))
-    return celery.chain(tasks)()
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
@@ -215,7 +161,6 @@ def upsert_course(course_id):
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
 def upsert_content_file(file_id):
     """Upsert content file based on stored database information"""
-
     content_file_obj = ContentFile.objects.get(id=file_id)
     content_file_data = OSContentFileSerializer(content_file_obj).data
     api.upsert_document(
@@ -334,16 +279,13 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
 
 @app.task
 def update_field_values_by_query(query, field_dict, object_types):
-    """
-    Task that makes a request to update a field value for all ES documents that match some query.
-    """
+    """Task that makes a request to update a field value for all ES documents that match some query."""
     return api.update_field_values_by_query(query, field_dict, object_types)
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_profiles(ids, update_only=False):
-    """
-    Index user profiles by a list of Profile.id
+    """Index user profiles by a list of Profile.id
 
     Args:
         ids(list of int): List of profile id's
@@ -362,15 +304,14 @@ def index_profiles(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_profiles(ids):
-    """
-    Index user profiles by a list of Profile.id
+    """Index user profiles by a list of Profile.id
 
     Args:
         ids(list of int): List of profile id's
 
     """
     try:
-        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
             api.deindex_profiles(ids)
     except (RetryException, Ignore):
         raise
@@ -381,51 +322,8 @@ def bulk_deindex_profiles(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_posts(post_ids, update_only=False):
-    """
-    Index a list of posts by a list of Post.id
-
-    Args:
-        post_ids (list of int): list of Post.id to index
-        update_only (bool): update existing index only
-
-    """
-    try:
-        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
-            api.index_posts(post_ids, update_only)
-    except (RetryException, Ignore):
-        raise
-    except:  # pylint: disable=bare-except
-        error = "index_posts threw an error"
-        log.exception(error)
-        return error
-
-
-@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_comments(comment_ids, update_only=False):
-    """
-    Index a list of comments by a list of Comment.id
-
-    Args:
-        comment_ids (list of int): list of Comment.id to index
-        update_only (bool): update existing index only
-
-    """
-    try:
-        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
-            api.index_comments(comment_ids, update_only)
-    except (RetryException, Ignore):
-        raise
-    except:  # pylint: disable=bare-except
-        error = "index_comments threw an error"
-        log.exception(error)
-        return error
-
-
-@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_courses(ids, update_only=False):
-    """
-    Index courses
+    """Index courses
 
     Args:
         ids(list of int): List of course id's
@@ -446,8 +344,7 @@ def index_courses(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_courses(ids):
-    """
-    Deindex courses by a list of course.id
+    """Deindex courses by a list of course.id
 
     Args:
         ids(list of int): List of course id's
@@ -466,8 +363,7 @@ def bulk_deindex_courses(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_course_content_files(course_ids, update_only=False):
-    """
-    Index content files for a list of course ids
+    """Index content files for a list of course ids
 
     Args:
         course_ids(list of int): List of course id's
@@ -488,8 +384,7 @@ def index_course_content_files(course_ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_run_content_files(run_id, update_only=False):
-    """
-    Index content files for a LearningResourceRun
+    """Index content files for a LearningResourceRun
 
     Args:
         run_id(int): LearningResourceRun id
@@ -510,8 +405,7 @@ def index_run_content_files(run_id, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def deindex_run_content_files(run_id):
-    """
-    Deindex content files for a LearningResourceRun
+    """Deindex content files for a LearningResourceRun
 
     Args:
         run_id(int): LearningResourceRun id
@@ -530,8 +424,7 @@ def deindex_run_content_files(run_id):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_programs(ids, update_only=False):
-    """
-    Index programs
+    """Index programs
 
     Args:
         ids(list of int): List of program id's
@@ -551,8 +444,7 @@ def index_programs(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_programs(ids):
-    """
-    Deindex programs
+    """Deindex programs
 
     Args:
         ids(list of int): List of program id's
@@ -571,8 +463,7 @@ def bulk_deindex_programs(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_user_lists(ids, update_only=False):
-    """
-    Index UserLists
+    """Index UserLists
 
     Args:
         ids(list of int): List of UserList id's
@@ -592,8 +483,7 @@ def index_user_lists(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_user_lists(ids):
-    """
-    Deindex UserLists
+    """Deindex UserLists
 
     Args:
         ids(list of int): List of UserList id's
@@ -612,8 +502,7 @@ def bulk_deindex_user_lists(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_staff_lists(ids, update_only=False):
-    """
-    Index StaffLists
+    """Index StaffLists
 
     Args:
         ids(list of int): List of StaffList id's
@@ -633,8 +522,7 @@ def index_staff_lists(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_staff_lists(ids):
-    """
-    Deindex StaffLists
+    """Deindex StaffLists
 
     Args:
         ids(list of int): List of StaffList id's
@@ -653,8 +541,7 @@ def bulk_deindex_staff_lists(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_videos(ids, update_only=False):
-    """
-    Index Videos
+    """Index Videos
 
     Args:
         ids(list of int): List of Video id's
@@ -674,8 +561,7 @@ def index_videos(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_videos(ids):
-    """
-    Deindex videos
+    """Deindex videos
 
     Args:
         ids(list of int): List of video id's
@@ -694,12 +580,12 @@ def bulk_deindex_videos(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_podcasts(ids, update_only=False):
-    """
-    Index Podcasts
+    """Index Podcasts
 
     Args:
         ids(list of int): List of Podcast id's
         update_only (bool): update existing index only
+
     """
     try:
         with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
@@ -714,8 +600,7 @@ def index_podcasts(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_podcasts(ids):
-    """
-    Deindex podcasts
+    """Deindex podcasts
 
     Args:
         ids(list of int): List of podcast id's
@@ -734,12 +619,12 @@ def bulk_deindex_podcasts(ids):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_podcast_episodes(ids, update_only=False):
-    """
-    Index PodcastEpisodes
+    """Index PodcastEpisodes
 
     Args:
         ids(list of int): List of PodcastEpisode id's
         update_only (bool): update existing index only
+
     """
     try:
         with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
@@ -754,8 +639,7 @@ def index_podcast_episodes(ids, update_only=False):
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_deindex_podcast_episodes(ids):
-    """
-    Deindex podcast_episodes
+    """Deindex podcast_episodes
 
     Args:
         ids(list of int): List of podcast_episode id's
@@ -774,9 +658,7 @@ def bulk_deindex_podcast_episodes(ids):
 
 @app.task(bind=True)
 def start_recreate_index(self, indexes):
-    """
-    Wipe and recreate index and mapping, and index all items.
-    """
+    """Wipe and recreate index and mapping, and index all items."""
     try:
         new_backing_indices = {
             obj_type: api.create_backing_index(obj_type) for obj_type in indexes
@@ -786,24 +668,6 @@ def start_recreate_index(self, indexes):
         log.info("starting to index %s objects...", ", ".join(indexes))
 
         index_tasks = []
-
-        if POST_TYPE in indexes:
-            index_tasks = index_tasks + [
-                index_posts.si(post_ids)
-                for post_ids in chunks(
-                    Post.objects.order_by("id").values_list("id", flat=True),
-                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
-
-        if COMMENT_TYPE in indexes:
-            index_tasks = index_tasks + [
-                index_comments.si(comment_ids)
-                for comment_ids in chunks(
-                    Comment.objects.order_by("id").values_list("id", flat=True),
-                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
 
         if PROFILE_TYPE in indexes:
             index_tasks = index_tasks + [
@@ -928,9 +792,7 @@ def start_recreate_index(self, indexes):
 @app.task(bind=True)
 def start_update_index(self, indexes, platform):
     # pylint: disable=too-many-branches
-    """
-    Wipe and recreate index and mapping, and index all items.
-    """
+    """Wipe and recreate index and mapping, and index all items."""
     try:
         log.info("starting to index %s objects...", ", ".join(indexes))
 
@@ -938,12 +800,6 @@ def start_update_index(self, indexes, platform):
 
         if COURSE_TYPE in indexes or RESOURCE_FILE_TYPE in indexes:
             blocklisted_ids = load_course_blocklist()
-
-        if POST_TYPE in indexes:
-            index_tasks = index_tasks + get_update_posts_tasks()
-
-        if COMMENT_TYPE in indexes:
-            index_tasks = index_tasks + get_update_comments_tasks()
 
         if PROFILE_TYPE in indexes:
             index_tasks = index_tasks + get_update_profiles_tasks()
@@ -985,28 +841,6 @@ def start_update_index(self, indexes, platform):
     raise self.replace(index_tasks)
 
 
-def get_update_posts_tasks():
-    """Get list of tasks to update posts"""
-    return [
-        index_posts.si(post_ids, True)
-        for post_ids in chunks(
-            Post.objects.order_by("id").values_list("id", flat=True),
-            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-        )
-    ]
-
-
-def get_update_comments_tasks():
-    """Get list of tasks to update comments"""
-    return [
-        index_comments.si(comment_ids, True)
-        for comment_ids in chunks(
-            Comment.objects.order_by("id").values_list("id", flat=True),
-            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-        )
-    ]
-
-
 def get_update_profiles_tasks():
     """Get list of tasks to update profiles"""
     index_tasks = [
@@ -1036,13 +870,11 @@ def get_update_profiles_tasks():
 
 
 def get_update_courses_tasks(blocklisted_ids, platform):
-    """
-    Get list of tasks to update courses
+    """Get list of tasks to update courses
     Args:
         blocklisted_ids(list of int): List of course id's to exclude
         platform(str): Platform filter for the task
     """
-
     course_update_query = (
         Course.objects.filter(published=True)
         .exclude(course_id__in=blocklisted_ids)
@@ -1077,13 +909,11 @@ def get_update_courses_tasks(blocklisted_ids, platform):
 
 
 def get_update_resource_files_tasks(blocklisted_ids, platform):
-    """
-    Get list of tasks to update course files
+    """Get list of tasks to update course files
     Args:
         blocklisted_ids(list of int): List of course id's to exclude
         platform(str): Platform filter for the task
     """
-
     if platform is None or platform in RESOURCE_FILE_PLATFORMS:
         course_update_query = (
             Course.objects.filter(published=True)
@@ -1105,14 +935,11 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
                 chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
-    else:
-        return []
+    return []
 
 
 def get_update_programs_tasks():
-    """
-    Get list of tasks to update programs
-    """
+    """Get list of tasks to update programs"""
     index_tasks = [
         index_programs.si(ids, True)
         for ids in chunks(
@@ -1137,10 +964,7 @@ def get_update_programs_tasks():
 
 
 def get_update_user_lists_tasks():
-    """
-    Get list of tasks to update user lists
-    """
-
+    """Get list of tasks to update user lists"""
     index_tasks = [
         index_user_lists.si(ids, True)
         for ids in chunks(
@@ -1165,10 +989,7 @@ def get_update_user_lists_tasks():
 
 
 def get_update_staff_lists_tasks():
-    """
-    Get list of tasks to update staff lists
-    """
-
+    """Get list of tasks to update staff lists"""
     index_tasks = [
         index_staff_lists.si(ids, True)
         for ids in chunks(
@@ -1194,10 +1015,7 @@ def get_update_staff_lists_tasks():
 
 
 def get_update_videos_tasks():
-    """
-    Get list of tasks to update videos
-    """
-
+    """Get list of tasks to update videos"""
     index_tasks = [
         index_videos.si(ids, True)
         for ids in chunks(
@@ -1222,9 +1040,7 @@ def get_update_videos_tasks():
 
 
 def get_update_podcasts_tasks():
-    """
-    Get list of tasks to update podcasts
-    """
+    """Get list of tasks to update podcasts"""
     index_tasks = [
         index_podcasts.si(ids, True)
         for ids in chunks(
@@ -1249,9 +1065,7 @@ def get_update_podcasts_tasks():
 
 
 def get_update_podcast_episodes_tasks():
-    """
-    Get list of tasks to update podcast episodes
-    """
+    """Get list of tasks to update podcast episodes"""
     index_tasks = [
         index_podcast_episodes.si(ids, True)
         for ids in chunks(
@@ -1277,12 +1091,12 @@ def get_update_podcast_episodes_tasks():
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def finish_recreate_index(results, backing_indices):
-    """
-    Swap reindex backing index with default backing index
+    """Swap reindex backing index with default backing index
 
     Args:
         results (list or bool): Results saying whether the error exists
         backing_indices (dict): The backing OpenSearch indices keyed by object type
+
     """
     errors = merge_strings(results)
     if errors:

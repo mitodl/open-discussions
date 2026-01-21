@@ -9,12 +9,7 @@ import { DropUpArrow, DropDownArrow } from "./Arrow"
 import ResponsiveWrapper from "./ResponsiveWrapper"
 
 import { isProfileComplete } from "../lib/util"
-import {
-  profileURL,
-  userListIndexURL,
-  SETTINGS_URL,
-  LOGIN_URL
-} from "../lib/url"
+import { profileURL, userListIndexURL, LOGIN_URL } from "../lib/url"
 import { PHONE } from "../lib/constants"
 
 import type { Profile } from "../flow/discussionTypes"
@@ -32,9 +27,6 @@ type DropdownMenuProps = {
 
 export const LoggedInMenu = (props: DropdownMenuProps) => (
   <DropdownMenu {...props}>
-    <li>
-      <Link to={SETTINGS_URL}>Settings</Link>
-    </li>
     {SETTINGS.profile_ui_enabled && SETTINGS.username ? (
       <li>
         <Link to={profileURL(SETTINGS.username)}>Profile</Link>

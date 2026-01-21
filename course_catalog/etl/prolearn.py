@@ -3,7 +3,6 @@ import json
 import re
 from datetime import datetime
 from decimal import Decimal
-from typing import List
 from urllib.parse import urljoin
 
 import pytz
@@ -92,14 +91,14 @@ query {
 
 
 def parse_offered_by(document: dict) -> str:
-    """
-    Get a properly formatted offered_by value for a course/program
+    """Get a properly formatted offered_by value for a course/program
 
     Args:
         document: course or program data
 
     Returns:
         str: offered_by value
+
     """
     department = document["department"].lstrip("MIT").strip()
     return (
@@ -108,68 +107,67 @@ def parse_offered_by(document: dict) -> str:
 
 
 def parse_date(num) -> datetime:
-    """
-    Get a datetime value from an list containing one integer
+    """Get a datetime value from an list containing one integer
 
     Args:
         list of int: list containing one integer
 
     Returns:
         datetime: start or end date
+
     """
     if num:
         return datetime.fromtimestamp(num, tz=pytz.UTC)
 
 
 def parse_price(document: dict) -> Decimal:
-    """
-    Get a Decimal value for a course/program price
+    """Get a Decimal value for a course/program price
 
     Args:
         document: course or program data
 
     Returns:
         Decimal: price of the course/program
+
     """
     price_str = (
         re.sub(r"[^\d.]", "", document["field_price"])
-        if document.get("field_price", None) is not None
+        if document.get("field_price") is not None
         else ""
     )
     return [{"price": round(Decimal(price_str), 2)}] if price_str else []
 
 
-def parse_topic(document: dict) -> List[dict]:
-    """
-    Get a list containing one {"name": <topic>} dict object
+def parse_topic(document: dict) -> list[dict]:
+    """Get a list containing one {"name": <topic>} dict object
 
     Args:
         document: course or program data
 
     Returns:
         list of dict: list containing one topic dict with a name attribute
+
     """
-    topic = document.get("ucc_name", None)
+    topic = document.get("ucc_name")
     return transform_topics([{"name": topic}]) if topic else []
 
 
 def parse_image(document: dict) -> str:
-    """
-    Get a full url for a course/program image
+    """Get a full url for a course/program image
 
     Args:
         document: course or program data
 
     Returns:
         str: full url of image src
+
     """
-    url = document.get("featured_image_url", None)
+    url = document.get("featured_image_url")
     return urljoin(settings.PROLEARN_CATALOG_API_URL, url) if url else None
 
 
 def parse_url(document: dict) -> str:
-    """
-    Get a full url for a course/program.
+    """Get a full url for a course/program.
     Order of preference: course_link, course_application_url, url
 
     Args:
@@ -177,15 +175,15 @@ def parse_url(document: dict) -> str:
 
     Returns:
         str: full url of the course or program
+
     """
     return (
         document["course_link"] or document["course_application_url"] or document["url"]
     )
 
 
-def extract_data(course_or_program: str, platform: str) -> List[dict]:
-    """
-    Queries the prolearn api url for either courses or programs from a department, and returns the results
+def extract_data(course_or_program: str, platform: str) -> list[dict]:
+    """Queries the prolearn api url for either courses or programs from a department, and returns the results
 
     Args:
         course_or_program (str): "course" or "program"
@@ -193,6 +191,7 @@ def extract_data(course_or_program: str, platform: str) -> List[dict]:
 
     Returns:
         list of dict: courses or programs
+
     """
     if settings.PROLEARN_CATALOG_API_URL:
         department = PROLEARN_DEPARTMENT_MAPPING.get(platform)
@@ -209,35 +208,35 @@ def extract_data(course_or_program: str, platform: str) -> List[dict]:
     return []
 
 
-def extract_programs(department: str) -> List[dict]:
-    """
-    Query the ProLearn catalog data for programs
+def extract_programs(department: str) -> list[dict]:
+    """Query the ProLearn catalog data for programs
 
     Returns:
         list of dict: programs
+
     """
     return extract_data("program", department)
 
 
-def extract_courses(department: str) -> List[dict]:
-    """
-    Query the ProLearn catalog data for courses
+def extract_courses(department: str) -> list[dict]:
+    """Query the ProLearn catalog data for courses
 
     Returns:
         list of dict: courses
+
     """
     return extract_data("course", department)
 
 
-def transform_programs(programs: List[dict]) -> List[dict]:
-    """
-    Transform the prolearn catalog data for programs into a format suitable for saving to the database
+def transform_programs(programs: list[dict]) -> list[dict]:
+    """Transform the prolearn catalog data for programs into a format suitable for saving to the database
 
     Args:
         programs: list of programs as dicts
 
     Returns:
         list of dict: List of programs as transformed dicts
+
     """
     # normalize the prolearn data into the course_catalog/models.py data structures
     return [
@@ -286,14 +285,14 @@ def transform_programs(programs: List[dict]) -> List[dict]:
 
 
 def _transform_runs(course_run: dict) -> dict:
-    """
-    Transforms a course run into our normalized data structure
+    """Transforms a course run into our normalized data structure
 
     Args:
         course_run (dict): course run data
 
     Returns:
         dict: normalized course run data
+
     """
     return [
         {
@@ -319,14 +318,14 @@ def _transform_runs(course_run: dict) -> dict:
 
 
 def _transform_course(course: dict) -> dict:
-    """
-    Transforms a course into our normalized data structure
+    """Transforms a course into our normalized data structure
 
     Args:
         course (dict): course data
 
     Returns:
         dict: normalized course data
+
     """
     return {
         "course_id": course["nid"],
@@ -341,14 +340,14 @@ def _transform_course(course: dict) -> dict:
     }
 
 
-def transform_courses(courses: List[dict]) -> List[dict]:
-    """
-    Transforms a list of courses into our normalized data structure
+def transform_courses(courses: list[dict]) -> list[dict]:
+    """Transforms a list of courses into our normalized data structure
 
     Args:
         courses (list of dict): courses data
 
     Returns:
         list of dict: normalized courses data
+
     """
     return [_transform_course(course) for course in courses]

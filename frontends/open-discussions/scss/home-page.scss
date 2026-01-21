@@ -86,3 +86,40 @@
     }
   }
 }
+
+.shutdown-notice {
+  margin-bottom: 20px;
+  border-left: 4px solid #d9534f;
+  background-color: #f8d7da;
+
+  .shutdown-message {
+    h2 {
+      color: #721c24;
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      color: #721c24;
+      margin-bottom: 12px;
+      font-size: 16px;
+      line-height: 1.5;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    a {
+      color: #721c24;
+      text-decoration: underline;
+      font-weight: 600;
+
+      &:hover {
+        color: #491217;
+      }
+    }
+  }
+}

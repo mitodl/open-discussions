@@ -1,5 +1,4 @@
-"""
-Tests for the indexing API
+"""Tests for the indexing API
 """
 import pytest
 
@@ -28,42 +27,35 @@ def test_get_active_aliases(mocker, include_reindexing, indexes_exist, object_ty
                 ]
             else:
                 assert active_aliases == ["testindex_course_default"]
+        elif include_reindexing:
+            assert active_aliases == [
+                "testindex_profile_default",
+                "testindex_profile_reindexing",
+                "testindex_course_default",
+                "testindex_course_reindexing",
+                "testindex_program_default",
+                "testindex_program_reindexing",
+                "testindex_userlist_default",
+                "testindex_userlist_reindexing",
+                "testindex_stafflist_default",
+                "testindex_stafflist_reindexing",
+                "testindex_video_default",
+                "testindex_video_reindexing",
+                "testindex_podcast_default",
+                "testindex_podcast_reindexing",
+                "testindex_podcastepisode_default",
+                "testindex_podcastepisode_reindexing",
+            ]
         else:
-            if include_reindexing:
-                assert active_aliases == [
-                    "testindex_post_default",
-                    "testindex_post_reindexing",
-                    "testindex_comment_default",
-                    "testindex_comment_reindexing",
-                    "testindex_profile_default",
-                    "testindex_profile_reindexing",
-                    "testindex_course_default",
-                    "testindex_course_reindexing",
-                    "testindex_program_default",
-                    "testindex_program_reindexing",
-                    "testindex_userlist_default",
-                    "testindex_userlist_reindexing",
-                    "testindex_stafflist_default",
-                    "testindex_stafflist_reindexing",
-                    "testindex_video_default",
-                    "testindex_video_reindexing",
-                    "testindex_podcast_default",
-                    "testindex_podcast_reindexing",
-                    "testindex_podcastepisode_default",
-                    "testindex_podcastepisode_reindexing",
-                ]
-            else:
-                assert active_aliases == [
-                    "testindex_post_default",
-                    "testindex_comment_default",
-                    "testindex_profile_default",
-                    "testindex_course_default",
-                    "testindex_program_default",
-                    "testindex_userlist_default",
-                    "testindex_stafflist_default",
-                    "testindex_video_default",
-                    "testindex_podcast_default",
-                    "testindex_podcastepisode_default",
-                ]
+            assert active_aliases == [
+                "testindex_profile_default",
+                "testindex_course_default",
+                "testindex_program_default",
+                "testindex_userlist_default",
+                "testindex_stafflist_default",
+                "testindex_video_default",
+                "testindex_podcast_default",
+                "testindex_podcastepisode_default",
+            ]
     else:
         assert active_aliases == []

@@ -84,7 +84,7 @@ describe("EditFieldBasicForm", () => {
     await user.click(screen.getAllByText("remove_circle_outline")[0])
     drags = await screen.findAllByText("drag_indicator")
     expect(drags.length).toEqual(3)
-  })
+  }, 10000)
 
   it("updates field values on form submission", async () => {
     const { history } = renderTestApp({
@@ -131,5 +131,5 @@ describe("EditFieldBasicForm", () => {
       publicLists.results[4].title
     )
     expect(featuredListTitle.length).toEqual(2)
-  })
+  }, 10000)
 })

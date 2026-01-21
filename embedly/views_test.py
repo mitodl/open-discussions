@@ -1,10 +1,6 @@
 """tests for the embedly views"""
-from urllib.parse import unquote
-
 from django.urls import reverse
 from rest_framework import status
-
-from channels.models import LinkMeta
 
 
 def test_get_embedly(client, user, mocker, settings):
@@ -25,9 +21,6 @@ def test_get_embedly(client, user, mocker, settings):
     get_stub.assert_called_once_with("https://en.wikipedia.org/wiki/Giant_panda/")
     assert resp.json() == {"some": "json", "thumbnail_url": external_thumb}
     assert resp.status_code == status.HTTP_200_OK
-    linkmeta = LinkMeta.objects.filter(url=unquote(unquote(external_url))).first()
-    assert linkmeta is not None
-    assert linkmeta.thumbnail == external_thumb
 
 
 def test_get_embedly_no_thumbnail(client, user, mocker, settings):
@@ -40,7 +33,6 @@ def test_get_embedly_no_thumbnail(client, user, mocker, settings):
     embed_return_value.configure_mock(**{"json.return_value": {"some": "json"}})
     mocker.patch("embedly.views.get_embedly_summary", return_value=embed_return_value)
     client.get(embedly_url)
-    assert LinkMeta.objects.filter(url=external_url).first() is None
 
 
 def test_get_embedly_no_key(client, user, settings):

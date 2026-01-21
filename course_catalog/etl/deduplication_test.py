@@ -1,16 +1,18 @@
 """Tests for the deduplication ETL functions"""
 from datetime import datetime
+
 import pytest
 import pytz
-from course_catalog.etl.deduplication import (
-    get_most_relevant_run,
-    generate_duplicates_yaml,
-)
+
 from course_catalog.constants import AvailabilityType
+from course_catalog.etl.deduplication import (
+    generate_duplicates_yaml,
+    get_most_relevant_run,
+)
 from course_catalog.factories import (
-    LearningResourceRunFactory,
     CourseFactory,
     LearningResourceOfferorFactory,
+    LearningResourceRunFactory,
 )
 from course_catalog.models import LearningResourceRun
 
@@ -18,7 +20,6 @@ from course_catalog.models import LearningResourceRun
 @pytest.mark.django_db
 def test_get_most_relevant_run():
     """Verify that most_relevant_run returns the correct run"""
-
     most_relevant_run = LearningResourceRunFactory.create(
         availability=AvailabilityType.archived.value,
         best_start_date=datetime(2019, 10, 1, tzinfo=pytz.utc),

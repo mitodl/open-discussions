@@ -2,16 +2,15 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.mixins import ListModelMixin, UpdateModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from notifications.models import NOTIFICATION_TYPE_COMMENTS, NOTIFICATION_TYPE_FRONTPAGE
 from notifications.serializers import NotificationSettingsSerializer
-from notifications.models import NOTIFICATION_TYPE_FRONTPAGE, NOTIFICATION_TYPE_COMMENTS
-
 from open_discussions.authentication import (
-    StatelessTokenAuthentication,
     IgnoreExpiredJwtAuthentication,
+    StatelessTokenAuthentication,
 )
 
 

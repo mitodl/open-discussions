@@ -6,8 +6,8 @@ import pytest
 import pytz
 
 from notifications.factories import NotificationSettingsFactory
-from notifications.models import NotificationBase, FREQUENCY_DAILY, FREQUENCY_WEEKLY
-from notifications.notifiers.base import BaseNotifier, DELTA_ONE_WEEK, DELTA_ONE_DAY
+from notifications.models import FREQUENCY_DAILY, FREQUENCY_WEEKLY, NotificationBase
+from notifications.notifiers.base import DELTA_ONE_DAY, DELTA_ONE_WEEK, BaseNotifier
 from notifications.notifiers.exceptions import InvalidTriggerFrequencyError
 from open_discussions.utils import now_in_utc
 

@@ -1,13 +1,13 @@
 """Tests for verification_api"""
-from django.core.mail import EmailMessage
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.shortcuts import reverse
 import pytest
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.mail import EmailMessage
+from django.shortcuts import reverse
 from social_core.backends.email import EmailAuth
 from social_django.utils import load_backend, load_strategy
 
-from mail import verification_api
 from authentication.models import BlockedEmailRegex
+from mail import verification_api
 from open_discussions.test_utils import any_instance_of
 
 pytestmark = [pytest.mark.django_db]

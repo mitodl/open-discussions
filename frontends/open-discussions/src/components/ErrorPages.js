@@ -20,11 +20,23 @@ const ErrorPage = (header: string, detail: string, noIndex: boolean) => () =>
     </div>
   )
 
-export const NotFound = ErrorPage(
-  "Page not found",
-  "This is a 404 error. This is not the page you were looking for.",
-  true
+const NotFoundPage = () => (
+  <div>
+    <MetaTags>
+      <meta name="robots" content="noindex,noarchive" />
+    </MetaTags>
+    <Card>
+      <div className="not-found">
+        <div className="header">Page not found</div>
+        <div className="detail">
+          This is a 404 error. This is not the page you were looking for.
+        </div>
+      </div>
+    </Card>
+  </div>
 )
+
+export const NotFound = NotFoundPage
 
 export const NotAuthorized = ErrorPage(
   "Stop! Who goes there?",

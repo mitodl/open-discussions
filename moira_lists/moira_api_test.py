@@ -9,13 +9,13 @@ from moira_lists.exceptions import MoiraException
 from moira_lists.factories import MoiraListFactory
 from moira_lists.models import MoiraList
 from moira_lists.moira_api import (
-    user_moira_lists,
-    get_moira_client,
-    query_moira_lists,
-    update_user_moira_lists,
-    moira_user_emails,
-    update_moira_list_users,
     get_list_members,
+    get_moira_client,
+    moira_user_emails,
+    query_moira_lists,
+    update_moira_list_users,
+    update_user_moira_lists,
+    user_moira_lists,
 )
 from open_discussions.factories import UserFactory
 
@@ -62,9 +62,7 @@ def test_get_moira_client_error(mock_moira):
 
 
 def test_query_moira_lists(mock_moira_client):
-    """
-    Test that expected lists are returned.
-    """
+    """Test that expected lists are returned."""
     list_names = ["test_moira_list01", "test_moira_list02"]
     mock_moira_client.return_value.user_list_membership.return_value = [
         {"listName": list_name} for list_name in list_names
@@ -74,9 +72,7 @@ def test_query_moira_lists(mock_moira_client):
 
 
 def test_query_moira_lists_no_lists(mock_moira_client):
-    """
-    Test that an empty list is returned if Moira throws a java NPE
-    """
+    """Test that an empty list is returned if Moira throws a java NPE"""
     mock_moira_client.return_value.user_list_membership.side_effect = Fault(
         "java.lang.NullPointerException"
     )
@@ -85,9 +81,7 @@ def test_query_moira_lists_no_lists(mock_moira_client):
 
 
 def test_query_moira_lists_error(mock_moira_client):
-    """
-    Test that a Moira exception is raised if moira client call fails with anything other than a java NPE
-    """
+    """Test that a Moira exception is raised if moira client call fails with anything other than a java NPE"""
     mock_moira_client.return_value.user_list_membership.side_effect = Fault(
         "Not a java NPE"
     )
@@ -96,9 +90,7 @@ def test_query_moira_lists_error(mock_moira_client):
 
 
 def test_user_moira_lists(mocker):
-    """
-    Test that expected list is returned for a user
-    """
+    """Test that expected list is returned for a user"""
     user = UserFactory.create()
     mock_lists = ["test.list.1", "test.list.2"]
     mock_query_moira_lists = mocker.patch(
@@ -110,9 +102,7 @@ def test_user_moira_lists(mocker):
 
 
 def test_user_moira_lists_anonymous():
-    """
-    Test that empty list is returned for anonymous user
-    """
+    """Test that empty list is returned for anonymous user"""
     assert user_moira_lists(AnonymousUser()) == []
 
 

@@ -21,16 +21,12 @@ class EmailDebuggerView(View):
     template_name = "email_debugger.html"
 
     def get(self, request):
-        """
-        Dispalys the debugger UI
-        """
+        """Dispalys the debugger UI"""
         form = self.form_cls(initial=self.initial)
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):
-        """
-        Renders a test email
-        """
+        """Renders a test email"""
         form = self.form_cls(request.POST)
 
         if not form.is_valid():

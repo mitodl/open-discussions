@@ -1,14 +1,13 @@
 """URL configurations for profiles"""
-from django.urls import re_path, include
-
+from django.urls import include, re_path
 from rest_framework.routers import DefaultRouter
 
 from profiles.views import (
-    UserViewSet,
     ProfileViewSet,
+    UserContributionListView,
+    UserViewSet,
     UserWebsiteViewSet,
     name_initials_avatar_view,
-    UserContributionListView,
 )
 
 router = DefaultRouter()

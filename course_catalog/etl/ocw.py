@@ -11,18 +11,18 @@ from bs4 import BeautifulSoup as bs
 from django.conf import settings
 
 from course_catalog.constants import (
-    CONTENT_TYPE_PAGE,
     CONTENT_TYPE_FILE,
-    VALID_TEXT_FILE_TYPES,
-    CONTENT_TYPE_VIDEO,
+    CONTENT_TYPE_PAGE,
     CONTENT_TYPE_PDF,
+    CONTENT_TYPE_VIDEO,
+    VALID_TEXT_FILE_TYPES,
 )
 from course_catalog.etl.utils import (
+    extract_text_from_url,
     extract_text_metadata,
     sync_s3_text,
-    extract_text_from_url,
 )
-from course_catalog.models import ContentFile, get_max_length, Video
+from course_catalog.models import ContentFile, Video, get_max_length
 
 log = logging.getLogger()
 
@@ -30,11 +30,11 @@ EXCLUDED_CONTENT_FILE_TYPES = ["DownloadSection", "CourseHomeSection"]
 
 
 def get_ocw_learning_course_bucket():
-    """
-    Get the OCW S3 Bucket or None
+    """Get the OCW S3 Bucket or None
 
     Returns:
         boto3.Bucket: the OCW S3 Bucket or None
+
     """
     s3 = boto3.resource(
         "s3",
@@ -45,8 +45,7 @@ def get_ocw_learning_course_bucket():
 
 
 def transform_content_files(course_run_json):
-    """
-    Transforms relevant sections of course_run master_json into course content_file data
+    """Transforms relevant sections of course_run master_json into course content_file data
 
     Args:
         course_run_json (dict): The course run master JSON
@@ -105,8 +104,7 @@ def transform_content_files(course_run_json):
 def transform_content_file(
     course_run_json, content_file_data, is_page=False
 ):  # pylint: disable=too-many-locals
-    """
-    Transforms content file json based on parent course run master_json
+    """Transforms content file json based on parent course run master_json
 
     Args:
         course_run_json (dict): course run master_json
@@ -115,6 +113,7 @@ def transform_content_file(
 
     Returns:
         dict: transformed content_file json
+
     """
     content_json = {}
     content_file = copy.deepcopy(content_file_data)
@@ -193,8 +192,7 @@ def transform_content_file(
 def transform_embedded_media(
     course_run_json, embedded_media_item
 ):  # pylint: disable=too-many-locals
-    """
-    Transforms course_embedded_media json based on parent course run master_json
+    """Transforms course_embedded_media json based on parent course run master_json
 
     Args:
         course_run_json (dict): course run master_json
@@ -202,6 +200,7 @@ def transform_embedded_media(
 
     Returns:
         dict: transformed content_file json
+
     """
     embedded_media_files = embedded_media_item["embedded_media"]
     videos = [
@@ -287,8 +286,7 @@ def transform_embedded_media(
 
 
 def get_content_file_url(content_file_data, is_page=False):
-    """
-    Calculate the best URL for a content file.
+    """Calculate the best URL for a content file.
     Otherwise, use the S3 URL - this should be converted to the appropriate CDN url if needed on the front end.
 
     Args:
@@ -297,6 +295,7 @@ def get_content_file_url(content_file_data, is_page=False):
 
     Returns:
         str: url
+
     """
     if is_page:
         return content_file_data.get("url", "")
@@ -310,8 +309,7 @@ def get_content_file_url(content_file_data, is_page=False):
 
 
 def get_page_by_uid(uid, pages):
-    """
-    Get a page by its UID
+    """Get a page by its UID
 
     Args:
         uid (str): The page UID to search for
@@ -319,6 +317,7 @@ def get_page_by_uid(uid, pages):
 
     Returns:
          dict: The matching page if any
+
     """
     page_info = [page for page in pages if page["uid"] == uid]
     if page_info:
@@ -326,8 +325,7 @@ def get_page_by_uid(uid, pages):
 
 
 def get_content_file_section(content_file, pages_section):
-    """
-    Get the section the content belongs to if any (title and slug).
+    """Get the section the content belongs to if any (title and slug).
     Currently this means the title of the parent/current page if it is a 'section' page.
     This is based on a best guess from designs and may need future tweaking.
 
@@ -337,6 +335,7 @@ def get_content_file_section(content_file, pages_section):
 
     Returns:
         (str, str): page section title, page section slug
+
     """
     section = "Section"
     uid = content_file.get("parent_uid")
@@ -350,14 +349,14 @@ def get_content_file_section(content_file, pages_section):
 
 
 def upload_mitx_course_manifest(courses):
-    """
-    Uploads the course information from MITx to the OCW bucket as a JSON manifest file
+    """Uploads the course information from MITx to the OCW bucket as a JSON manifest file
 
     Args:
         courses (list of dict): the list of course data as they came from MITx
 
     Returns:
         bool: success of upload
+
     """
     if not all(
         [
@@ -387,8 +386,7 @@ def upload_mitx_course_manifest(courses):
 
 
 def get_content_type(file_type):
-    """
-    Return the appropriate content type for a file type
+    """Return the appropriate content type for a file type
     TODO: add more content types (text? spreadsheet?)
 
     Args:
@@ -396,6 +394,7 @@ def get_content_type(file_type):
 
     Returns:
         str: The content type
+
     """
     if not file_type:
         return CONTENT_TYPE_FILE

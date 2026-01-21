@@ -2,7 +2,6 @@
 from urllib.parse import quote
 
 import pytest
-
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.shortcuts import reverse
 from rest_framework import status
@@ -10,8 +9,8 @@ from social_core.exceptions import AuthAlreadyAssociated
 from social_django.utils import load_backend, load_strategy
 
 from authentication.middleware import (
-    SocialAuthExceptionRedirectMiddleware,
     BlockedIPMiddleware,
+    SocialAuthExceptionRedirectMiddleware,
 )
 from authentication.models import BlockedIPRange
 from open_discussions.factories import UserFactory
@@ -74,7 +73,7 @@ def test_process_view_blocked_ip_middleware(  # pylint:disable=too-many-argument
 ):
     """Check that `process_view` raises a PermissionDenied error when appropriate"""
     user = UserFactory.create(is_superuser=is_super)
-    view = "search" if exempt_view else "channel-list"
+    view = "search" if exempt_view else "courses-list"
     request = rf.post(reverse(view))
     request.user = user
 

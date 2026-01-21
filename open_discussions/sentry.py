@@ -1,18 +1,16 @@
 """Sentry setup and configuration"""
-from celery.exceptions import WorkerLostError
 import sentry_sdk
+from celery.exceptions import WorkerLostError
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
-
 
 # these errors occur when a shutdown is happening (usually caused by a SIGTERM)
 SHUTDOWN_ERRORS = (WorkerLostError, SystemExit)
 
 
 def before_send(event, hint):
-    """
-    Filter or transform events before they're sent to Sentry
+    """Filter or transform events before they're sent to Sentry
 
     Args:
         event (dict): event object
@@ -20,6 +18,7 @@ def before_send(event, hint):
 
     Returns:
         dict or None: returns the modified event or None to filter out the event
+
     """
     if "exc_info" in hint:
         _, exc_value, _ = hint["exc_info"]
@@ -30,14 +29,14 @@ def before_send(event, hint):
 
 
 def init_sentry(*, dsn, environment, version, log_level):
-    """
-    Initializes sentry
+    """Initializes sentry
 
     Args:
         dsn (str): the sentry DSN key
         environment (str): the application environment
         version (str): the version of the application
         log_level (str): the sentry log level
+
     """
     sentry_sdk.init(  # pylint:disable=abstract-class-instantiated
         dsn=dsn,

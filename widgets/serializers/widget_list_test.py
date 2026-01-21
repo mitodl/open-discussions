@@ -5,7 +5,6 @@ from widgets.factories import WidgetInstanceFactory, WidgetListFactory
 from widgets.serializers.widget_list import WidgetListSerializer
 from widgets.views_test import EXPECTED_AVAILABLE_WIDGETS
 
-
 pytestmark = [pytest.mark.django_db]
 
 
