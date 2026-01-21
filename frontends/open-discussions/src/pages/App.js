@@ -38,6 +38,7 @@ import Toolbar from "../components/Toolbar"
 import ContentToolbar from "../components/ContentToolbar"
 import AudioPlayer from "../components/AudioPlayer"
 import LearningResourceDrawer from "../components/LearningResourceDrawer"
+import ShutdownNotice from "../components/ShutdownNotice"
 
 import { actions } from "../actions"
 import {
@@ -176,6 +177,7 @@ class App extends React.Component<Props> {
   render() {
     const {
       match,
+      location,
       snackbar,
       banner,
       showUserMenu,
@@ -186,6 +188,12 @@ class App extends React.Component<Props> {
     const audioPlayerPadding = audioPlayerLoaded
       ? " audio-player-padding-bottom"
       : ""
+
+    // Check if we should show the shutdown notice
+    // Don't show on podcasts or search pages
+    const shouldShowShutdownNotice =
+      !location.pathname.startsWith(`${match.url}podcasts`) &&
+      !location.pathname.startsWith(`${match.url}search`)
 
     return (
       <div className="app">
@@ -220,6 +228,7 @@ class App extends React.Component<Props> {
         />
         <div className={`content${audioPlayerPadding}`}>
           <AudioPlayer />
+          {shouldShowShutdownNotice && <ShutdownNotice />}
           <Route exact path={match.url} component={HomePage} />
           <Route path={`${match.url}manage/`} component={AdminPage} />
           <Route
