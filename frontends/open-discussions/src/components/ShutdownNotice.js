@@ -13,11 +13,11 @@ export default function ShutdownNotice() {
       <div className="shutdown-message">
         <h2>This Site Is Closing</h2>
         <p>
-          MIT open is shutting down. The discussion channels that were
+          MIT Open is shutting down. The discussion channels that were
           previously available on open.mit.edu are no longer in service.
         </p>
         <p>
-          We encourage you to explore our new learning platform at{" "}
+          We encourage you to explore our new learning platform, MIT Learn, at{" "}
           <a
             href="https://learn.mit.edu"
             target="_blank"
