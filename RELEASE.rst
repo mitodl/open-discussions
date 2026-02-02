@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.236.0
+Version 0.236.0 (Released February 02, 2026)
 ---------------
 
 - Add shutdown notice globally across site (except podcasts and search pages) (#4422)
