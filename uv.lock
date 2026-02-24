@@ -1757,7 +1757,6 @@ dependencies = [
     { name = "toolz" },
     { name = "ulid-py" },
     { name = "urllib3" },
-    { name = "uwsgi" },
     { name = "wrapt" },
     { name = "xbundle" },
 ]
@@ -1791,6 +1790,9 @@ dev = [
     { name = "responses" },
     { name = "safety" },
     { name = "semantic-version" },
+]
+prod = [
+    { name = "uwsgi" },
 ]
 
 [package.metadata]
@@ -1857,7 +1859,6 @@ requires-dist = [
     { name = "toolz", specifier = ">=0.10.0,<0.11" },
     { name = "ulid-py", specifier = ">=0.0.3,<0.0.4" },
     { name = "urllib3", specifier = ">=1.25.10,<2" },
-    { name = "uwsgi", specifier = ">=2.0.21,<3" },
     { name = "wrapt", specifier = ">=1.14.1,<2" },
     { name = "xbundle", specifier = ">=0.3.1,<0.4" },
 ]
@@ -1892,6 +1893,7 @@ dev = [
     { name = "safety", specifier = ">=2.3.4,<3" },
     { name = "semantic-version", specifier = ">=2.10.0,<3" },
 ]
+prod = [{ name = "uwsgi", specifier = ">=2.0.21,<3" }]
 
 [[package]]
 name = "opensearch-dsl"

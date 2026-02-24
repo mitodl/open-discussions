@@ -5,7 +5,7 @@ description = "Search index and discussion forum for use with other MIT applicat
 authors = [{ name = "MIT ODL" }]
 requires-python = ">=3.11,<4"
 readme = "README.md"
-license = "BSD-3"
+license = "BSD-3-Clause"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
@@ -74,7 +74,6 @@ dependencies = [
     "toolz>=0.10.0,<0.11",
     "ulid-py>=0.0.3,<0.0.4",
     "urllib3>=1.25.10,<2",
-    "uwsgi>=2.0.21,<3",
     "wrapt>=1.14.1,<2",
     "xbundle>=0.3.1,<0.4",
     "social-auth-core[openidconnect]>=4.4.2,<5",
@@ -97,6 +96,9 @@ exclude = '''
 '''
 
 [dependency-groups]
+prod = [
+    "uwsgi>=2.0.21,<3",
+]
 dev = [
     "astroid>=2.15.4,<3",
     "betamax>=0.8.0,<0.9",
