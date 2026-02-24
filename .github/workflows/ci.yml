@@ -57,6 +57,8 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --frozen --no-group prod
+
+      - name: Code formatting
         run: uv run black --check .
 
       - name: Lint
