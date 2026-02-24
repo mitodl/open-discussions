@@ -16,33 +16,23 @@ RUN curl --silent --location https://bootstrap.pypa.io/get-pip.py | python3 -
 COPY --chmod=644 certs/*.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates 
 
-# Poetry env configuration
-ENV  \
-  # poetry:
-  POETRY_VERSION=1.8.2 \
-  POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_CACHE_DIR='/tmp/cache/poetry' \
-  POETRY_HOME='/home/mitodl/.local' \
-  VIRTUAL_ENV="/opt/venv"
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-ENV PATH="$VIRTUAL_ENV/bin:$POETRY_HOME/bin:$PATH"
+ENV UV_PROJECT_ENVIRONMENT="/opt/venv"
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Add, and run as, non-root user.
 RUN mkdir /app
 RUN adduser --disabled-password --gecos "" mitodl
 RUN mkdir /var/media && chown -R mitodl:mitodl /var/media
-RUN mkdir "${VIRTUAL_ENV}" && chown -R mitodl:mitodl "${VIRTUAL_ENV}"
-
 
 USER mitodl
-# Install poetry
-RUN pipx install "poetry==$POETRY_VERSION"
 
 # Install project packages
 WORKDIR /app
-COPY pyproject.toml poetry.lock /app
-RUN python3 -m venv "$VIRTUAL_ENV"
-RUN poetry install
+COPY pyproject.toml uv.lock /app
+RUN uv sync --frozen --no-install-project
 
 USER root
 RUN apt-get clean && apt-get purge
