@@ -1,0 +1,23 @@
+[
+  "course_catalog/serializers.py:177:30:ORM001",
+  "course_catalog/serializers.py:227:35:ORM001",
+  "course_catalog/serializers.py:233:30:ORM001",
+  "course_catalog/serializers.py:602:20:ORM002",
+  "course_catalog/serializers.py:616:20:ORM001",
+  "course_catalog/serializers.py:629:63:ORM002",
+  "course_catalog/serializers.py:667:36:ORM001",
+  "course_catalog/serializers.py:679:40:ORM001",
+  "course_catalog/serializers.py:680:19:ORM002",
+  "course_catalog/serializers.py:720:37:ORM001",
+  "course_catalog/serializers.py:731:41:ORM001",
+  "course_catalog/serializers.py:733:20:ORM002",
+  "interactions/serializers.py:67:30:ORM001",
+  "interactions/serializers.py:80:16:ORM001",
+  "profiles/serializers.py:79:16:ORM002",
+  "search/serializers.py:166:16:ORM002",
+  "search/serializers.py:167:27:ORM002",
+  "search/serializers.py:291:30:ORM002",
+  "search/serializers.py:368:23:ORM002",
+  "search/serializers.py:472:16:ORM002",
+  "search/serializers.py:517:16:ORM002"
+]
