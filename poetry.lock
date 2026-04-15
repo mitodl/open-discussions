@@ -1023,14 +1023,14 @@ static3 = "*"
 
 [[package]]
 name = "django"
-version = "4.2.25"
+version = "4.2.30"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.8"
 groups = ["main", "dev"]
 files = [
-    {file = "django-4.2.25-py3-none-any.whl", hash = "sha256:9584cf26b174b35620e53c2558b09d7eb180a655a3470474f513ff9acb494f8c"},
-    {file = "django-4.2.25.tar.gz", hash = "sha256:2391ab3d78191caaae2c963c19fd70b99e9751008da22a0adcc667c5a4f8d311"},
+    {file = "django-4.2.30-py3-none-any.whl", hash = "sha256:4d07aaf1c62f9984842b67c2874ebbf7056a17be253860299b93ae1881faad65"},
+    {file = "django-4.2.30.tar.gz", hash = "sha256:4ebc7a434e3819db6cf4b399fb5b3f536310a30e8486f08b66886840be84b37c"},
 ]
 
 [package.dependencies]
@@ -4572,4 +4572,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "e2be925b26c149d3fe1f43abb57cc7cdeefebe3fe3479e032e3e79f380dca2a0"
+content-hash = "2abcdb127e610dbfb4ef06d8e9f4664a9994920dc970ec4598964f1af20c0428"
