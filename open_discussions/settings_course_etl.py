@@ -19,7 +19,6 @@ OCW_CONTENT_BUCKET_NAME = get_string("OCW_CONTENT_BUCKET_NAME", None)
 
 # s3 Buckets for OCW Next imports
 OCW_NEXT_LIVE_BUCKET = get_string("OCW_NEXT_LIVE_BUCKET", None)
-OCW_NEXT_AWS_STORAGE_BUCKET_NAME = get_string("OCW_NEXT_AWS_STORAGE_BUCKET_NAME", None)
 
 # S3 Bucket info for exporting OCW Plone media files
 OCW_LEARNING_COURSE_BUCKET_NAME = get_string("OCW_LEARNING_COURSE_BUCKET_NAME", None)
