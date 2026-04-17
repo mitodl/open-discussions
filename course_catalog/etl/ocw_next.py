@@ -1,4 +1,5 @@
 """OCW Next Resource ETL"""
+
 import logging
 import mimetypes
 from os.path import splitext
@@ -49,9 +50,14 @@ def transform_ocw_next_content_files(s3_resource, course_prefix, force_overwrite
         if obj.key.endswith("data.json"):
             try:
                 resource_json = safe_load_json(get_s3_object_and_read(obj), obj.key)
-                transformed_resource = transform_resource(
-                    obj.key, resource_json, s3_resource, force_overwrite
-                )
+                if resource_json.get("resourcetype"):
+                    transformed_resource = transform_resource(
+                        obj.key, resource_json, s3_resource, force_overwrite
+                    )
+                else:
+                    transformed_resource = transform_resource_legacy(
+                        obj.key, resource_json, s3_resource, force_overwrite
+                    )
                 if transformed_resource:
                     yield transformed_resource
 
@@ -81,10 +87,11 @@ def transform_page(s3_key, page_data):
         "content": page_data.get("content"),
         "key": s3_path,
         "published": True,
+        "description": page_data.get("description"),
     }
 
 
-def transform_resource(
+def transform_resource_legacy(
     s3_key, resource_data, s3_resource, force_overwrite
 ):  # pylint:disable=too-many-locals,too-many-branches
     """Transforms the data from data.json for a resource into content_file data
@@ -128,18 +135,13 @@ def transform_resource(
         file_s3_path = "courses" + file_s3_path.split("courses")[1]
 
     ext_lower = splitext(file_s3_path)[-1].lower()
-    mime_type = mimetypes.types_map.get(file_s3_path)
+    mime_type = mimetypes.types_map.get(ext_lower)
     content_json = None
 
     if ext_lower in VALID_TEXT_FILE_TYPES:
-        try:
-            s3_obj = s3_resource.Object(
-                settings.OCW_NEXT_AWS_STORAGE_BUCKET_NAME, unquote(file_s3_path)
-            ).get()
-        except ClientError:
-            s3_obj = s3_resource.Object(
-                settings.OCW_NEXT_LIVE_BUCKET, unquote(file_s3_path)
-            ).get()
+        s3_obj = s3_resource.Object(
+            settings.OCW_NEXT_LIVE_BUCKET, unquote(file_s3_path)
+        ).get()
 
         course_file_obj = ContentFile.objects.filter(key=s3_path).first()
 
@@ -165,6 +167,99 @@ def transform_resource(
         "file_type": file_type,
         "content_type": content_type,
         "url": "../" + urlparse(s3_path).path.lstrip("/"),
+        "title": title,
+        "content_title": title,
+        "key": s3_path,
+        "learning_resource_types": resource_data.get("learning_resource_types"),
+        "published": True,
+    }
+
+    if content_json:
+        resource_data["content"] = content_json.get("content")
+
+    if image_src:
+        resource_data["image_src"] = image_src
+
+    return resource_data
+
+
+def transform_resource(
+    s3_key, resource_data, s3_resource, force_overwrite
+):  # pylint:disable=too-many-locals,too-many-branches
+    """Transforms the data from data.json for a resource into content_file data
+
+    Args:
+        s3_key (str):S3 path for the data.json file for the page
+        resource_data (dict): JSON data from the data.json file for the page
+        s3_resource (str): The S3 resource
+        force_overwrite (bool): Overwrite document text if true
+
+
+    Returns:
+        dict: transformed content file data
+
+    """
+    s3_path = s3_key.split("data.json")[0]
+    s3_path = urlparse(s3_path).path.lstrip("/")
+
+    file_type = resource_data.get("file_type")
+    video_files = resource_data.get("video_files", {})
+    if resource_data.get("resourcetype") == "Video":
+        content_type = CONTENT_TYPE_VIDEO
+    else:
+        content_type = get_content_type(file_type)
+
+    if content_type == "video":
+        file_s3_path = video_files.get("video_transcript_file")
+        image_src = video_files.get("video_thumbnail_file")
+    else:
+        file_s3_path = resource_data.get("file")
+        image_src = None
+
+    if not file_s3_path:
+        return None
+
+    title = resource_data.get("title")
+
+    if title in {"3play caption file", "3play pdf file"}:
+        return None
+
+    if not file_s3_path.startswith("courses"):
+        file_s3_path = "courses" + file_s3_path.split("courses")[1]
+
+    ext_lower = splitext(file_s3_path)[-1].lower()
+    mime_type = mimetypes.types_map.get(ext_lower)
+    content_json = None
+
+    if ext_lower in VALID_TEXT_FILE_TYPES:
+        s3_obj = s3_resource.Object(
+            settings.OCW_NEXT_LIVE_BUCKET, unquote(file_s3_path)
+        ).get()
+
+        course_file_obj = ContentFile.objects.filter(key=s3_path).first()
+
+        needs_text_update = (
+            force_overwrite
+            or course_file_obj is None
+            or (
+                s3_obj is not None
+                and s3_obj["LastModified"] >= course_file_obj.updated_on
+            )
+        )
+
+        if needs_text_update:
+            s3_body = s3_obj["Body"].read() if s3_obj else None
+            if s3_body:
+                content_json = extract_text_metadata(
+                    s3_body,
+                    other_headers={"Content-Type": mime_type} if mime_type else {},
+                )
+
+    resource_data = {
+        "description": resource_data.get("content"),
+        "file_type": file_type,
+        "content_type": content_type,
+        "url": "../" + s3_path,
         "title": title,
         "content_title": title,
         "key": s3_path,

@@ -1,12 +1,37 @@
 {
-  "description": "Video Description",
+  "audience": ["Learners"],
+  "body": "",
+  "content": "Video Description",
+  "content_type": "resource",
+  "draft": false,
   "file": "https://ol-ocw-studio-app-qa.s3.amazonaws.com/gdrive_uploads/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26/94force.mp4",
-  "learning_resource_types": ["Competition Videos"],
-  "resource_type": "Video",
   "file_type": "video/mp4",
-  "youtube_key":  "vKer2U5W5-s",
-  "captions_file": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26_transcript_webvtt",
-  "transcript_file": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26_transcript.pdf",
-  "thumbnail_file": "https://img.youtube.com/vi/vKer2U5W5-s/default.jpg",
-  "archive_url": null
+  "gdrive_url": "",
+  "image_metadata": {
+    "caption": "",
+    "credit": "",
+    "image-alt": ""
+  },
+  "iscjklanguage": false,
+  "learning_resource_types": ["Competition Videos"],
+  "level": ["Undergraduate"],
+  "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "resourcetype": "Video",
+  "title": null,
+  "uid": "42a52ff4-42ea-429c-936a-c75dfdc21d8f",
+  "video_files": {
+    "archive_url": "",
+    "video_captions_file": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26_transcript_webvtt",
+    "video_captions_resource": "",
+    "video_thumbnail_file": "https://img.youtube.com/vi/vKer2U5W5-s/default.jpg",
+    "video_transcript_file": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26_transcript.pdf",
+    "video_transcript_resource": ""
+  },
+  "video_metadata": {
+    "source": "",
+    "video_speakers": "",
+    "video_tags": "",
+    "youtube_description": "",
+    "youtube_id": "vKer2U5W5-s"
+  }
 }

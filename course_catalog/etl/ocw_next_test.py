@@ -1,4 +1,5 @@
 """Next OCW ETL tests"""
+
 from datetime import datetime
 
 import boto3
@@ -42,6 +43,7 @@ def test_transform_ocw_next_content_files(settings, mocker):
         "published": True,
         "title": "Pages",
         "content_title": "Pages",
+        "description": None,
         "url": "../courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/",
     }
 
@@ -52,6 +54,7 @@ def test_transform_ocw_next_content_files(settings, mocker):
         "published": True,
         "title": "Syllabus",
         "content_title": "Syllabus",
+        "description": "Description of Syllabus",
         "url": "../courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/syllabus/",
     }
 

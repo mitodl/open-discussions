@@ -1,8 +1,46 @@
-{  
-  "description": "This resource contains problem set 1",
+{
+  "audience": ["Learners"],
+  "body": "",
+  "content": "This resource contains problem set 1",
+  "content_type": "resource",
+  "draft": false,
   "file": "https://ol-ocw-studio-app-qa.s3.amazonaws.com/courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/0902956aa08f67a954b28efdcbaaa472_MIT6_262S11_assn%2001.pdf",
-  "learning_resource_types": ["Activity Assignments","Activity Assignments with Examples"],
-  "resource_type": "Document",
   "file_type": "application/pdf",
-  "title":  "Resource Title"
+  "gdrive_url": "",
+  "image_metadata": {
+    "caption": "",
+    "credit": "",
+    "image-alt": ""
+  },
+  "iscjklanguage": false,
+  "learning_resource_types": [
+    "Activity Assignments",
+    "Activity Assignments with Examples"
+  ],
+  "level": ["Undergraduate"],
+  "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "resourcetype": "Document",
+  "title": "Resource Title",
+  "uid": "42a52ff4-42ea-429c-936a-c75dfdc21d8f",
+  "video_files": {
+    "archive_url": "",
+    "video_captions_file": "",
+    "video_captions_resource": {
+      "content": "",
+      "website": "16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006"
+    },
+    "video_thumbnail_file": "",
+    "video_transcript_file": "",
+    "video_transcript_resource": {
+      "content": "",
+      "website": "16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006"
+    }
+  },
+  "video_metadata": {
+    "source": "",
+    "video_speakers": "",
+    "video_tags": "",
+    "youtube_description": "",
+    "youtube_id": ""
+  }
 }

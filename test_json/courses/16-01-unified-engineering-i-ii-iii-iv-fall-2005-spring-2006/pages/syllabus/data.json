@@ -1,6 +1,12 @@
-
 {
-  "title":"Syllabus",
-  "content":"Course Meeting Times Lecture"
+  "audience": [],
+  "content": "Course Meeting Times Lecture",
+  "content_type": "page",
+  "description": "Description of Syllabus",
+  "draft": false,
+  "iscjklanguage": false,
+  "learning_resource_types": [],
+  "level": [],
+  "title": "Syllabus",
+  "uid": "414408f8-e288-491a-8416-269f011da428"
 }
-
