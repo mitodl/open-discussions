@@ -256,7 +256,7 @@ def transform_resource(
                 )
 
     resource_data = {
-        "description": resource_data.get("content"),
+        "description": resource_data.get("description"),
         "file_type": file_type,
         "content_type": content_type,
         "url": "../" + s3_path,

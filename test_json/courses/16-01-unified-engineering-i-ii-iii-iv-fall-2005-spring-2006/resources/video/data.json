@@ -3,6 +3,7 @@
   "body": "",
   "content": "Video Description",
   "content_type": "resource",
+  "description": "Description of the video",
   "draft": false,
   "file": "https://ol-ocw-studio-app-qa.s3.amazonaws.com/gdrive_uploads/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26/94force.mp4",
   "file_type": "video/mp4",

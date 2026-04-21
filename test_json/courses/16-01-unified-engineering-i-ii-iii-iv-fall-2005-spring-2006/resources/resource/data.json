@@ -2,6 +2,7 @@
   "audience": ["Learners"],
   "body": "",
   "content": "This resource contains problem set 1",
+  "description": "Description of problem set 1",
   "content_type": "resource",
   "draft": false,
   "file": "https://ol-ocw-studio-app-qa.s3.amazonaws.com/courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/0902956aa08f67a954b28efdcbaaa472_MIT6_262S11_assn%2001.pdf",
