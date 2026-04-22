@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.237.0
+---------------
+
+- make ocw descriptions the way they were previously (#4448)
+- fix ocw etl (#4445)
+- chore(deps): update dependency cairosvg to v2.9.0 [security] (#4433)
+- chore(deps): update dependency requests to v2.33.0 [security] (#4435)
+- fix(deps): update dependency django to v4.2.30 [security] (#4431)
+- chore(deps): update nginx docker tag to v1.29.4 (#4425)
+- chore(deps): update opensearchproject/opensearch docker tag to v1.3.20 (#4424)
+- chore(deps): update postgres docker tag to v18 (#4427)
+
 Version 0.236.0 (Released February 02, 2026)
 ---------------
 
