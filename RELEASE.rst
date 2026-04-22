@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.237.0
+Version 0.237.0 (Released April 22, 2026)
 ---------------
 
 - make ocw descriptions the way they were previously (#4448)
