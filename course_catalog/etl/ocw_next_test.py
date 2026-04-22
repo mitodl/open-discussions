@@ -61,7 +61,7 @@ def test_transform_ocw_next_content_files(settings, mocker):
     assert content_data[2] == {
         "content": "TEXT",
         "content_type": "pdf",
-        "description": "This resource contains problem set 1",
+        "description": "Description of problem set 1",
         "file_type": "application/pdf",
         "key": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/resource/",
         "learning_resource_types": [
@@ -77,7 +77,7 @@ def test_transform_ocw_next_content_files(settings, mocker):
     assert content_data[3] == {
         "content": "TEXT",
         "content_type": "video",
-        "description": "Video Description",
+        "description": "Description of the video",
         "file_type": "video/mp4",
         "key": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/video/",
         "learning_resource_types": ["Competition Videos"],
