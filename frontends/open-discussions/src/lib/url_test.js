@@ -247,6 +247,11 @@ describe("url helper functions", () => {
       assert.ok(embedlyUrl.includes(`animate=false`))
       assert.ok(embedlyUrl.includes(`url=${encodeURIComponent(url)}`))
     })
+
+    it("should return the raw url when the key is unset", () => {
+      const url = "http://www.fake.url/fake.html"
+      assert.equal(embedlyThumbnail("", url, 100, 200), url)
+    })
   })
 
   describe("embedlyResizeImage", () => {
@@ -259,6 +264,11 @@ describe("url helper functions", () => {
       assert.ok(embedlyUrl.includes(`key=${key}`))
       assert.ok(embedlyUrl.includes(`animate=false`))
       assert.ok(embedlyUrl.includes(`url=${encodeURIComponent(url)}`))
+    })
+
+    it("should return the raw url when the key is unset", () => {
+      const url = "http://www.fake.url/fake.jpg"
+      assert.equal(embedlyResizeImage("", url, 512), url)
     })
   })
 
