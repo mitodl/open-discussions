@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.238.0
+---------------
+
+- Fix podcast images (#4453)
+
 Version 0.237.0 (Released April 22, 2026)
 ---------------
 
