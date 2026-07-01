@@ -63,25 +63,27 @@ export const defaultResourceImageURL = () =>
   ).toString()
 
 // When the embedly key is unset (the embedly subscription was cancelled) we
-// serve the raw, unoptimized image instead of routing through embedly.
+// serve the raw, unoptimized image instead of routing through embedly. Fall
+// back to the blank thumbnail when there is no url, matching embedly's old
+// errorurl behavior so we never render a broken image.
 export const embedlyThumbnail = (
   key: string,
   url: string,
   height: number,
   width: number
 ) =>
-  key
+  key && url
     ? `https://i.embed.ly/1/display/crop/?key=${key}&url=${encodeURIComponent(
-        url
-      )}&height=${height}&width=${width}&grow=true&animate=false&errorurl=${blankThumbnailUrl()}`
-    : url
+      url
+    )}&height=${height}&width=${width}&grow=true&animate=false&errorurl=${blankThumbnailUrl()}`
+    : url || blankThumbnailUrl()
 
 export const embedlyResizeImage = (key: string, url: string, height: number) =>
-  key
+  key && url
     ? `https://i.embed.ly/1/display/resize/?key=${key}&url=${encodeURIComponent(
-        url
-      )}&height=${height}&grow=false&animate=false&errorurl=${blankThumbnailUrl()}`
-    : url
+      url
+    )}&height=${height}&grow=false&animate=false&errorurl=${blankThumbnailUrl()}`
+    : url || blankThumbnailUrl()
 
 export const absolutizeURL = (url: string) =>
   new URL(url, window.location.origin).toString()

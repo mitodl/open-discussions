@@ -252,6 +252,11 @@ describe("url helper functions", () => {
       const url = "http://www.fake.url/fake.html"
       assert.equal(embedlyThumbnail("", url, 100, 200), url)
     })
+
+    it("should return the blank thumbnail when the url is falsy", () => {
+      assert.equal(embedlyThumbnail("", "", 100, 200), blankThumbnailUrl())
+      assert.equal(embedlyThumbnail("key", "", 100, 200), blankThumbnailUrl())
+    })
   })
 
   describe("embedlyResizeImage", () => {
