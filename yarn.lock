@@ -18577,7 +18577,7 @@ __metadata:
     styled-components: ^5.3.5
     url: 0.11.3
     url-assembler: ^2.1.1
-    uuid: ^8.3.2
+    uuid: ^11.0.0
     validator: 13.7.0
     webpack: 5.94.0
     webpack-bundle-analyzer: ^4.6.1
@@ -25293,6 +25293,15 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: c81095493225ecfc28add49c106ca4f09cdf56bc66731aa8dabc2edbbccb1e1bfe2de6a115e5c6a380d3ea166d1636410b62ef216bb07b3feb1cfde1d95d5080
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^11.0.0":
+  version: 11.1.1
+  resolution: "uuid@npm:11.1.1"
+  bin:
+    uuid: dist/esm/bin/uuid
+  checksum: 1c1ea6ffc9fd02a343d77151734af65644ebf5bac733b59bdab85859cf793cf03ac8d60909fa19dcd2272e154b20734c464b667afd8bdac02b4da5e206079469
   languageName: node
   linkType: hard
 
