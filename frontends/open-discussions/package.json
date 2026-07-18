@@ -10,7 +10,7 @@
     "url": "https://github.com/mitodl/mit-open.git"
   },
   "dependencies": {
-    "@babel/core": "7.18.5",
+    "@babel/core": "7.29.6",
     "@babel/eslint-parser": "7.11.0",
     "@babel/plugin-proposal-class-properties": "7.17.12",
     "@babel/plugin-transform-react-constant-elements": "7.17.12",
