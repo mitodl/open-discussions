@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.239.0
+---------------
+
+- Redirect open.mit.edu/podcasts to learn.mit.edu/podcasts (#4460)
+- Add department 21T (Theater Arts) (#4457)
+
 Version 0.238.0 (Released July 06, 2026)
 ---------------
 
