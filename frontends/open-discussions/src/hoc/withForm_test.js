@@ -62,7 +62,7 @@ describe("withForm", () => {
     onSubmitStub,
     onSubmitResultStub
 
-  const renderPage = ({ ...props }) =>
+  const renderPage = ({ ...props } = {}) =>
     mount(
       <WrappedPage
         form={formData}
