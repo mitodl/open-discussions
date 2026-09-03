@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.239.0
+Version 0.239.0 (Released September 03, 2026)
 ---------------
 
 - Redirect open.mit.edu/podcasts to learn.mit.edu/podcasts (#4460)
