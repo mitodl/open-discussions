@@ -37,10 +37,15 @@ from authentication.serializers import (
 )
 from authentication.utils import load_drf_strategy
 from mail.api import render_email_templates, send_messages
+from open_discussions import features
 from open_discussions.authentication import BearerAuthentication
 from open_discussions.permissions import IsStaffPermission
 
 User = get_user_model()
+
+LOGIN_DISABLED_MESSAGE = (
+    "Login is currently disabled. The site is now read-only."
+)
 
 
 class SocialAuthAPIView(APIView):
@@ -55,6 +60,12 @@ class SocialAuthAPIView(APIView):
 
     def post(self, request):
         """Processes a request"""
+        if features.is_enabled(features.DISABLE_USER_LOGIN):
+            return Response(
+                {"detail": LOGIN_DISABLED_MESSAGE},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         if request._cached_user.is_hijacked:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
