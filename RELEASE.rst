@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.240.0
+---------------
+
+- Rename department 21M from Music and Theater Arts to Music (#4458)
+
 Version 0.239.0 (Released September 03, 2026)
 ---------------
 
