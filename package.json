@@ -82,5 +82,8 @@
         "ts-node": "^10.9.1",
         "typescript": "^5.0.4",
         "url-assembler": "^2.1.1"
+    },
+    "devDependencies": {
+        "@j178/prek": "0.5.3"
     }
 }
