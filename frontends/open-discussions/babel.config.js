@@ -14,7 +14,7 @@ module.exports = api => {
     plugins: [
       "@babel/plugin-transform-flow-strip-types",
       ...(isProduction ? [] : ["react-hot-loader/babel"]),
-      "@babel/plugin-proposal-object-rest-spread",
+      "@babel/plugin-transform-object-rest-spread",
       "@babel/plugin-proposal-class-properties",
       "@babel/plugin-syntax-dynamic-import",
     ].concat(isProduction ? [
