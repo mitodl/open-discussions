@@ -262,14 +262,18 @@ OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.localhost:8063/
 
 ## Commits
 
-To ensure commits to github are safe, you should install the following first:
-```
-pip install pre_commit
-pre-commit install
+Code checks run with [prek](https://prek.j178.dev/), which reads `.pre-commit-config.yaml`.
+The `prek` check runs the same hooks on pull requests, and [autofix.ci](https://autofix.ci/)
+pushes a commit with any fixes they make.
+
+```bash
+yarn install --immutable
+npx prek install -f      # replaces an existing pre-commit git hook
+npx prek run --all-files
 ```
 
-To automatically install precommit hooks when cloning a repo, you can run this:
-```
+To automatically install prek hooks when cloning a repo, you can run this:
+```bash
 git config --global init.templateDir ~/.git-template
-pre-commit init-templatedir ~/.git-template
-```    
+npx prek init-templatedir ~/.git-template
+```
