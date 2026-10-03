@@ -2466,10 +2466,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:^7.3.0":
-  version: 7.3.0
-  resolution: "@faker-js/faker@npm:7.3.0"
-  checksum: ef5b64af30ce0ec76cb22798fbbe50184946fac389b4d81235f9d8d9eaaa77d67a80f46954fa993996b7c774bae23314529a95a42a6b68794f0795976c9be82b
+"@faker-js/faker@npm:^10.0.0":
+  version: 10.6.0
+  resolution: "@faker-js/faker@npm:10.6.0"
+  checksum: 36ddfdbb34dbd262c7aeb3cb918b8ed3456b0d7a9dc4b0a61050bf731c37f17a236b316d40af29cc281019cd1870004008609ecb8161c4346f5d61836ed7c07b
   languageName: node
   linkType: hard
 
@@ -13940,7 +13940,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
-    "@faker-js/faker": ^7.3.0
+    "@faker-js/faker": ^10.0.0
     "@mitodl/course-search-utils": ^2.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/lab": ^5.0.0-alpha.91
@@ -18353,7 +18353,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
-    "@faker-js/faker": ^7.3.0
+    "@faker-js/faker": ^10.0.0
     "@mitodl/course-search-utils": ^2.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
@@ -18383,7 +18383,7 @@ __metadata:
     "@dnd-kit/core": ^6.0.8
     "@dnd-kit/sortable": ^7.0.2
     "@dnd-kit/utilities": ^3.2.0
-    "@faker-js/faker": ^7.3.0
+    "@faker-js/faker": ^10.0.0
     classnames: ^2.3.1
     lodash: ^4.17.21
     nuka-carousel: ^5.2.0
@@ -18402,7 +18402,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
-    "@faker-js/faker": ^7.3.0
+    "@faker-js/faker": ^10.0.0
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
     "@types/js-beautify": ^1.13.3
