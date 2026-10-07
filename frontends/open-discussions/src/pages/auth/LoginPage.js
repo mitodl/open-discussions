@@ -35,6 +35,8 @@ export class LoginPage extends React.Component<LoginPageProps> {
   render() {
     const { renderForm, match, next } = this.props
 
+    const isLoginDisabled = SETTINGS.FEATURES && SETTINGS.FEATURES.DISABLE_USER_LOGIN
+
     return (
       <div className="auth-page login-page">
         <div className="main-content">
@@ -45,8 +47,18 @@ export class LoginPage extends React.Component<LoginPageProps> {
               <title>{formatTitle("Login")}</title>
             </MetaTags>
 
-            {renderForm()}
-            <ExternalLogins next={next} />
+            {isLoginDisabled ? (
+              <div className="login-disabled-message">
+                <p>
+                  Login is currently disabled. The site is now read-only.
+                </p>
+              </div>
+            ) : (
+              <>
+                {renderForm()}
+                <ExternalLogins next={next} />
+              </>
+            )}
           </Card>
         </div>
       </div>
