@@ -128,4 +128,44 @@ describe("RegisterPage", () => {
     const dispatchedActions = store.getActions()
     assert.equal(R.last(dispatchedActions).type, SET_BANNER_MESSAGE)
   })
+
+  describe("when login is disabled", () => {
+    beforeEach(() => {
+      SETTINGS.FEATURES = { DISABLE_USER_LOGIN: true }
+    })
+
+    afterEach(() => {
+      SETTINGS.FEATURES = {}
+    })
+
+    it("should show login disabled message instead of form", async () => {
+      const { inner } = await renderPage()
+
+      const form = inner.find("AuthEmailForm")
+      assert.ok(!form.exists())
+
+      const disabledMessage = inner.find(".login-disabled-message")
+      assert.ok(disabledMessage.exists())
+      assert.include(
+        disabledMessage.text(),
+        "Login is currently disabled. The site is now read-only."
+      )
+    })
+
+    it("should not render ExternalLogins", async () => {
+      const { inner } = await renderPage()
+
+      const externalLogins = inner.find("ExternalLogins")
+      assert.ok(!externalLogins.exists())
+    })
+
+    it("should not render link to login page", async () => {
+      const { inner } = await renderPage()
+
+      const link = inner
+        .find("Link")
+        .findWhere(c => c.prop("to") === `${LOGIN_URL}?next=%2F`)
+      assert.ok(!link.exists())
+    })
+  })
 })
