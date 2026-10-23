@@ -119,11 +119,20 @@ describe("UserMenu", () => {
       assert.equal(firstLinkProps.children, "Log In")
     })
 
-    it("should include a logout link, if feature is enabled", () => {
+    it("should log out via a CSRF-protected POST form", () => {
       const wrapper = shallow(<LoggedInMenu {...menuProps} />)
-      const { href, children } = wrapper.find("a").props()
-      assert.equal(href, "/logout")
-      assert.equal(children, "Sign Out")
+      const form = wrapper.find("form.logout-form")
+      assert.equal(form.props().method, "post")
+      // trailing slash required: APPEND_SLASH would drop the POST body
+      assert.equal(form.props().action, "/logout/")
+      assert.equal(
+        form.find("input[name='csrfmiddlewaretoken']").length,
+        1,
+        "logout form must carry a CSRF token"
+      )
+      const button = form.find("button")
+      assert.equal(button.props().type, "submit")
+      assert.equal(button.props().children, "Sign Out")
     })
 
     //

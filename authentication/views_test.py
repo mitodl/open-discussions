@@ -4,6 +4,9 @@
 import factory
 import pytest
 from django.contrib.auth import get_user, get_user_model
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.http import Http404
 from django.test import Client
 from django.urls import reverse
 from rest_framework import status
@@ -12,8 +15,10 @@ from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
+from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from authentication.serializers import PARTIAL_PIPELINE_TOKEN_KEY
 from authentication.utils import SocialAuthState
+from authentication.views import CustomLogoutView
 from open_discussions import features
 from open_discussions.factories import UserFactory, UserSocialAuthFactory
 from open_discussions.test_utils import MockResponse, any_instance_of
@@ -872,3 +877,66 @@ def test_post_user_details_for_keycloak(mocker, client, user, admin_user):
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
     response = client.post(url, data={"password": "correct_password"})
     assert response.status_code == status.HTTP_200_OK
+
+
+def test_logout_view_logs_out_on_post(client, user):
+    """POST ends the session. This is the only verb Django 5 allows."""
+    client.force_login(user)
+    assert get_user(client).is_authenticated is True
+
+    resp = client.post(reverse("logout"))
+
+    assert resp.status_code == status.HTTP_302_FOUND
+    assert get_user(client).is_authenticated is False
+
+
+def test_logout_view_rejects_get(client, user):
+    """
+    GET must not log anyone out. Django 5.0 made LogoutView POST-only so that a
+    third party cannot force a logout with an <img src> or a link prefetch.
+    """
+    client.force_login(user)
+
+    resp = client.get(reverse("logout"))
+
+    assert resp.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert get_user(client).is_authenticated is True
+
+
+def _logout_request(rf, method, user):
+    """Build a logout request with a real session.
+
+    LogoutView.dispatch is csrf_protect-decorated and RequestFactory, unlike the
+    test Client, does not exempt itself from that. The session is needed so the
+    real auth_logout() runs rather than being mocked out -- without it the test
+    would pass even if the view never logged anyone out.
+    """
+    request = getattr(rf, method)("/logout/")
+    request._dont_enforce_csrf_checks = True
+    SessionMiddleware(lambda _: None).process_request(request)
+    request.session.save()
+    request.user = user
+    return request
+
+
+def test_custom_logout_view_redirects_to_keycloak(rf, user):
+    """CustomLogoutView logs the user out and redirects to Keycloak"""
+    UserSocialAuthFactory.create(
+        user=user, provider=OlOpenIdConnectAuth.name, extra_data={"id_token": "a-token"}
+    )
+    request = _logout_request(rf, "post", user)
+
+    resp = CustomLogoutView.as_view()(request)
+
+    assert resp.status_code == status.HTTP_302_FOUND
+    assert "id_token_hint=a-token" in resp.url
+    # the Django session must actually be torn down, not just redirected away from
+    assert request.user.is_anonymous
+
+
+def test_custom_logout_view_404s_when_anonymous(rf):
+    """CustomLogoutView 404s for an anonymous user"""
+    request = _logout_request(rf, "post", AnonymousUser())
+
+    with pytest.raises(Http404):
+        CustomLogoutView.as_view()(request)
