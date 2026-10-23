@@ -39,6 +39,7 @@ beautifulsoup4 = "^4.8.2"
 boto3 = "^1.26.155"
 cairosvg = "^2.7.0"
 celery = "^5.3.1"
+certifi = ">=2026.10.19"  # eMudhra CA compromise: never resolve a certifi that trusts the compromised CAs
 cffi = "^1.15.1"
 cryptography = "^39.0.1"
 dj-database-url = "^0.5.0"
