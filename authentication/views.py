@@ -313,13 +313,3 @@ class CustomLogoutView(views.LogoutView):
             super().post(request)
             return redirect(self._keycloak_logout_url(user))
         raise Http404("Not currently logged in.")
-
-    def get(self, request, *args, **kwargs):
-        """GET endpoint for loggin a user out.
-        Raises 404 if the user is not included in the request.
-        """
-        user = getattr(request, "user", None)
-        if user and user.is_authenticated:
-            super().get(request)
-            return redirect(self._keycloak_logout_url(user))
-        raise Http404("Not currently logged in.")

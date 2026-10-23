@@ -194,8 +194,6 @@ class AbstractCourse(LearningResource):
     class Meta:
         abstract = True
 
-        index_together = (("id", "published"),)
-
 
 class LearningResourceRun(AbstractCourse):
     """Model for course runs"""
@@ -243,13 +241,17 @@ class LearningResourceRun(AbstractCourse):
 
     class Meta:
         unique_together = (("platform", "run_id"),)
-        index_together = (
-            (
-                "content_type",
-                "start_date",
-            ),  # index for sorting course runs by start date
-            ("content_type", "object_id"),
-        )
+        indexes = [
+            # index for sorting course runs by start date
+            models.Index(
+                fields=["content_type", "start_date"],
+                name="lrrun_ct_start_date_idx",
+            ),
+            models.Index(
+                fields=["content_type", "object_id"],
+                name="lrrun_ct_object_id_idx",
+            ),
+        ]
 
 
 class ContentFile(TimestampedModel):
