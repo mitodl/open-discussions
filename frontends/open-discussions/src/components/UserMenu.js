@@ -8,6 +8,7 @@ import ProfileImage, { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 import { DropUpArrow, DropDownArrow } from "./Arrow"
 import ResponsiveWrapper from "./ResponsiveWrapper"
 
+import { getCookie } from "../lib/api/util"
 import { isProfileComplete } from "../lib/util"
 import { profileURL, userListIndexURL, LOGIN_URL } from "../lib/url"
 import { PHONE } from "../lib/constants"
@@ -43,7 +44,19 @@ export const LoggedInMenu = (props: DropdownMenuProps) => (
       />
     </ResponsiveWrapper>
     <li>
-      <a href="/logout">Sign Out</a>
+      {/* Django 5 made LogoutView POST-only, so this has to be a form rather
+          than a link. The trailing slash matters: APPEND_SLASH cannot redirect
+          a POST without dropping its body. */}
+      <form className="logout-form" method="post" action="/logout/">
+        <input
+          type="hidden"
+          name="csrfmiddlewaretoken"
+          value={getCookie("csrftoken") || ""}
+        />
+        <button type="submit" className="dropdown-menu-button">
+          Sign Out
+        </button>
+      </form>
     </li>
   </DropdownMenu>
 )
