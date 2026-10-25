@@ -1297,14 +1297,14 @@ sftp = ["paramiko (>=1.10.0)"]
 
 [[package]]
 name = "django-webpack-loader"
-version = "1.8.1"
+version = "3.2.4"
 description = "Transparently use webpack with django"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "django-webpack-loader-1.8.1.tar.gz", hash = "sha256:073beda18e2929fa5cd83bafbcaaf975e5945e84a17bfa81927cb6c9f5a17b94"},
-    {file = "django_webpack_loader-1.8.1-py2.py3-none-any.whl", hash = "sha256:2d50a902256cf94bdd87eac3e7687989c9aa757a63af21db68773115216cedee"},
+    {file = "django_webpack_loader-3.2.4-py2.py3-none-any.whl", hash = "sha256:a9d345746ae4d0700b9a86a7f0683ab8282c56a3a32736070f27ad658a9bfcb2"},
+    {file = "django_webpack_loader-3.2.4.tar.gz", hash = "sha256:0a253113ea6b150403cd2de802e732872c1d5e3185f0ad4a7fac673c00ae5af2"},
 ]
 
 [[package]]
@@ -4572,4 +4572,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "46cd7ca0afca17c5862b13920025ac4e4d0ae8ed30c2da5bc861ec30b1293bcd"
+content-hash = "7ea6ceae78c54dbd2d18b47254af8a565f3959963d5a75bd51fb55a97d746d7c"
