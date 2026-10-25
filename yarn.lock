@@ -11592,7 +11592,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esm@npm:^3.2.25":
+"esm@npm:3.2.25":
   version: 3.2.25
   resolution: "esm@npm:3.2.25"
   checksum: 978aabe2de83541c105605a6d60a26ed8e627ef6bb0a7605fe15a95bbdea6b8348bd045255cb22219c054dd09a81a94823df00843d9e97f42419c92015ce3a64
@@ -18590,7 +18590,7 @@ __metadata:
     eslint-plugin-mocha: 6.3.0
     eslint-plugin-react: 7.34.1
     eslint-plugin-react-hooks: 4.6.2
-    esm: ^3.2.25
+    esm: 3.2.25
     express: 4.20.0
     fetch-mock: 6.5.2
     flow-bin: 0.94.0
