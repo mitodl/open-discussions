@@ -155,6 +155,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login"
 LOGIN_ERROR_URL = "/login"
+LOGOUT_URL = "/logout"
 LOGOUT_REDIRECT_URL = "/"
 
 ROOT_URLCONF = "open_discussions.urls"

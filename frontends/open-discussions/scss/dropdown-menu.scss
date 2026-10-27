@@ -9,28 +9,12 @@ ul.dropdown-menu {
   list-style: none;
   z-index: 10;
 
-  a,
-  .dropdown-menu-button {
+  a {
     text-decoration: none;
     color: $navy;
     white-space: nowrap;
     display: inline-block;
     width: 100%;
-  }
-
-  // A POST form is the only way to reach Django 5's logout view; strip the
-  // form and button chrome so it still reads as a menu item.
-  .logout-form {
-    display: contents;
-  }
-
-  .dropdown-menu-button {
-    background: none;
-    border: 0;
-    padding: 0;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
   }
 
   li {

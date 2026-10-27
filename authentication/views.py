@@ -285,6 +285,13 @@ def get_user_details_for_keycloak(request, email):
 class CustomLogoutView(views.LogoutView):
     """Ends the user's Keycloak session in additional to the built in Django logout."""
 
+    # Django 5.0 made LogoutView POST-only and dropped its `get = post` alias.
+    # The Sign Out link is a plain GET and this app is being retired, so keep
+    # the 4.x behaviour rather than convert the frontend to a POST form. The
+    # tradeoff is the CSRF hole 5.0 closed: a third party can force a logout
+    # with an <img src> or a link prefetch.
+    http_method_names = ["get", "post", "options"]
+
     def _keycloak_logout_url(self, user):
         """Returns the OpenID Connect logout URL for a user based on their SocialAuth record's id_token
         and the currently configured Keycloak environment variables.
@@ -313,3 +320,8 @@ class CustomLogoutView(views.LogoutView):
             super().post(request)
             return redirect(self._keycloak_logout_url(user))
         raise Http404("Not currently logged in.")
+
+    # GET must route to post(), not to TemplateView.get(): auth_logout() lives
+    # in LogoutView.post(), so anything else redirects to Keycloak while
+    # leaving the Django session alive.
+    get = post
