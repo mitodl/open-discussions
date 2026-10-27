@@ -99,7 +99,6 @@ INSTALLED_APPS = (
     "django.contrib.humanize",
     "django.contrib.sites",
     "social_django",
-    "server_status",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -108,7 +107,6 @@ INSTALLED_APPS = (
     "hijack",
     "hijack.contrib.admin",
     "guardian",
-    "imagekit",
     "django_json_widget",
     "django_filters",
     "drf_spectacular",
@@ -212,8 +210,6 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -556,8 +552,6 @@ LOGGING = {
     "root": {"handlers": ["console", "syslog"], "level": LOG_LEVEL},
 }
 
-STATUS_TOKEN = get_string("STATUS_TOKEN", "")
-HEALTH_CHECK = ["CELERY", "REDIS", "POSTGRES", "OPEN_SEARCH"]
 
 GA_TRACKING_ID = get_string("GA_TRACKING_ID", "")
 GA_G_TRACKING_ID = get_string("GA_G_TRACKING_ID", "")
@@ -583,15 +577,17 @@ if OPEN_DISCUSSIONS_USE_S3 and (
         "AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, or "
         "AWS_STORAGE_BUCKET_NAME"
     )
+# Django 5.1 removed DEFAULT_FILE_STORAGE/STATICFILES_STORAGE in favor of STORAGES
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
 if OPEN_DISCUSSIONS_USE_S3:
     # Configure Django Storages to use Cloudfront distribution for S3 assets
     if CLOUDFRONT_DIST:
         AWS_S3_CUSTOM_DOMAIN = f"{CLOUDFRONT_DIST}.cloudfront.net"
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STORAGES["default"] = {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}
     AWS_DEFAULT_ACL = "public-read"
-
-IMAGEKIT_SPEC_CACHEFILE_NAMER = "imagekit.cachefiles.namers.source_name_dot_hash"
-IMAGEKIT_CACHEFILE_DIR = get_string("IMAGEKIT_CACHEFILE_DIR", "")
 
 
 # django cache back-ends

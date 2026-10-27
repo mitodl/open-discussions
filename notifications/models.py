@@ -88,7 +88,12 @@ class NotificationSettings(TimestampedModel):
             ),
         ]
 
-        index_together = (("notification_type", "trigger_frequency"),)
+        indexes = [
+            models.Index(
+                fields=["notification_type", "trigger_frequency"],
+                name="notifsettings_type_freq_idx",
+            )
+        ]
 
 
 class NotificationBase(TimestampedModel):
@@ -107,7 +112,15 @@ class NotificationBase(TimestampedModel):
     class Meta:
         abstract = True
 
-        index_together = (("user", "notification_type", "created_on"),)
+        # Concrete subclasses must concatenate this onto their own indexes.
+        # %(class)s keeps the name unique per subclass and under Django's
+        # 30-character limit for index names.
+        indexes = [
+            models.Index(
+                fields=["user", "notification_type", "created_on"],
+                name="%(class)s_lookup_idx",
+            )
+        ]
 
 
 class EmailNotification(NotificationBase):
@@ -130,6 +143,9 @@ class EmailNotification(NotificationBase):
     sent_at = models.DateTimeField(null=True)
 
     class Meta:
-        index_together = (
-            ("state", "updated_on"),
-        ) + NotificationBase.Meta.index_together
+        indexes = [
+            models.Index(
+                fields=["state", "updated_on"],
+                name="emailnotif_state_updated_idx",
+            )
+        ] + NotificationBase.Meta.indexes

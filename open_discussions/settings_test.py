@@ -48,9 +48,9 @@ class TestSettings(TestCase):
             clear=True,
         ):
             settings_vars = self.reload_settings()
-            self.assertNotEqual(
-                settings_vars.get("DEFAULT_FILE_STORAGE"),
-                "storages.backends.s3boto3.S3Boto3Storage",
+            self.assertEqual(
+                settings_vars["STORAGES"]["default"]["BACKEND"],
+                "django.core.files.storage.FileSystemStorage",
             )
 
         with self.assertRaises(ImproperlyConfigured), mock.patch.dict(
@@ -72,7 +72,7 @@ class TestSettings(TestCase):
         ):
             settings_vars = self.reload_settings()
             self.assertEqual(
-                settings_vars.get("DEFAULT_FILE_STORAGE"),
+                settings_vars["STORAGES"]["default"]["BACKEND"],
                 "storages.backends.s3boto3.S3Boto3Storage",
             )
 
