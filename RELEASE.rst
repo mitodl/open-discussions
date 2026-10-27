@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.241.0
+---------------
+
+- Upgrade Django 4.2.30 to 5.2.17 (#4471)
+- Bump certifi to 2026.10.19 and add certifi floor (eMudhra CA compromise) (#4470)
+- ci: run hooks with prek and autofix.ci (#4464)
+
 Version 0.240.0
 ---------------
 
