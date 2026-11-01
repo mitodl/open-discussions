@@ -8,7 +8,7 @@ jobs:
       # Label used to access the service container
       db:
         # Docker Hub image
-        image: postgres:18.1
+        image: postgres:18.1@sha256:1090bc3a8ccfb0b55f78a494d76f8d603434f7e4553543d6e807bc7bd6bbd17f
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -23,7 +23,7 @@ jobs:
           - 5432:5432
 
       redis:
-        image: redis:5.0.14
+        image: redis:5.0.14@sha256:fc5ecd863862f89f04334b7cbb57e93c9790478ea8188a49f6e57b0967d38c75
         ports:
           - 6379:6379
 
