@@ -202,6 +202,6 @@
     "repl": "node --require ./scripts/repl.js"
   },
   "devDependencies": {
-    "esm": "^3.2.25"
+    "esm": "3.2.25"
   }
 }
