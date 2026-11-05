@@ -11,6 +11,7 @@ from sentry_sdk.transport import Transport
 
 from open_discussions.sentry import (
     before_send,
+    init_sentry,
     scrub_pg_detail,
     scrub_pg_details,
 )
@@ -56,6 +57,20 @@ def sentry_transport():
     )
     yield transport
     sentry_sdk.get_global_scope().set_client(None)
+
+
+def test_init_sentry_wires_privacy_controls(mocker):
+    """init_sentry caps request bodies and installs the DETAIL scrub."""
+    mock_init = mocker.patch("open_discussions.sentry.sentry_sdk.init")
+    init_sentry(
+        dsn="https://k@o0.ingest.sentry.io/0",
+        environment="test",
+        version="0.0.0",
+        log_level=logging.ERROR,
+    )
+    mock_init.assert_called_once()
+    assert mock_init.call_args.kwargs["max_request_body_size"] == "small"
+    assert mock_init.call_args.kwargs["before_send"] is before_send
 
 
 def test_detail_line_is_truncated():
